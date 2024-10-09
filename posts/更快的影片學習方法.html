@@ -1,0 +1,443 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>更快的影片學習方法 - alanhc-til</title>
+                
+
+        <!-- Custom HTML head -->
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+                <link rel="icon" href="../favicon.svg">
+                        <link rel="shortcut icon" href="../favicon.png">
+                <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+                <link rel="stylesheet" href="../css/print.css" media="print">
+        
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+                <link rel="stylesheet" href="../fonts/fonts.css">
+        
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+            </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../posts/20231210-convert-post-markdown.html"><strong aria-hidden="true">1.</strong> 20231210-convert-post-markdown</a></li><li class="chapter-item expanded "><a href="../posts/20231213-pyspark.html"><strong aria-hidden="true">2.</strong> 20231213-pyspark</a></li><li class="chapter-item expanded "><a href="../posts/20231217-google-gemini.html"><strong aria-hidden="true">3.</strong> 20231217-google-gemini</a></li><li class="chapter-item expanded "><a href="../posts/20231217-ntu-matches.html"><strong aria-hidden="true">4.</strong> 20231217-ntu-matches</a></li><li class="chapter-item expanded "><a href="../posts/20231222-chat.html"><strong aria-hidden="true">5.</strong> 20231222-chat</a></li><li class="chapter-item expanded "><a href="../posts/20240107-notion-website.html"><strong aria-hidden="true">6.</strong> 20240107-notion-website</a></li><li class="chapter-item expanded "><a href="../posts/20240108-attention.html"><strong aria-hidden="true">7.</strong> 20240108-attention</a></li><li class="chapter-item expanded "><a href="../posts/20240113-data-engineer-salary.html"><strong aria-hidden="true">8.</strong> 20240113-data-engineer-salary</a></li><li class="chapter-item expanded "><a href="../posts/20240119-OSINT.html"><strong aria-hidden="true">9.</strong> 20240119-OSINT</a></li><li class="chapter-item expanded "><a href="../posts/20240122-english-speaking.html"><strong aria-hidden="true">10.</strong> 20240122-english-speaking</a></li><li class="chapter-item expanded "><a href="../posts/20240122-ntu-cool-video-download.html"><strong aria-hidden="true">11.</strong> 20240122-ntu-cool-video-download</a></li><li class="chapter-item expanded "><a href="../posts/20240122-stock-data-design.html"><strong aria-hidden="true">12.</strong> 20240122-stock-data-design</a></li><li class="chapter-item expanded "><a href="../posts/20240123-scalper.html"><strong aria-hidden="true">13.</strong> 20240123-scalper</a></li><li class="chapter-item expanded "><a href="../posts/20240124-break-cloudflare-bot-prevention.html"><strong aria-hidden="true">14.</strong> 20240124-break-cloudflare-bot-prevention</a></li><li class="chapter-item expanded "><a href="../posts/20240125-cache-design.html"><strong aria-hidden="true">15.</strong> 20240125-cache-design</a></li><li class="chapter-item expanded "><a href="../posts/20240125-duplicate-url-design.html"><strong aria-hidden="true">16.</strong> 20240125-duplicate-url-design</a></li><li class="chapter-item expanded "><a href="../posts/20240125-web-crawler-design.html"><strong aria-hidden="true">17.</strong> 20240125-web-crawler-design</a></li><li class="chapter-item expanded "><a href="../posts/20240203-trading-bot.html"><strong aria-hidden="true">18.</strong> 20240203-trading-bot</a></li><li class="chapter-item expanded "><a href="../posts/20240205-salesrank-design.html"><strong aria-hidden="true">19.</strong> 20240205-salesrank-design</a></li><li class="chapter-item expanded "><a href="../posts/20240209-job-insights.html"><strong aria-hidden="true">20.</strong> 20240209-job-insights</a></li><li class="chapter-item expanded "><a href="../posts/20240211-pastebin-design.html"><strong aria-hidden="true">21.</strong> 20240211-pastebin-design</a></li><li class="chapter-item expanded "><a href="../posts/20240211-taiwan-job-insights.html"><strong aria-hidden="true">22.</strong> 20240211-taiwan-job-insights</a></li><li class="chapter-item expanded "><a href="../posts/20240212-linkedin-private-api.html"><strong aria-hidden="true">23.</strong> 20240212-linkedin-private-api</a></li><li class="chapter-item expanded "><a href="../posts/20240215-Deck-of-cards-ood.html"><strong aria-hidden="true">24.</strong> 20240215-Deck-of-cards-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240216-levelsfyi-crawler.html"><strong aria-hidden="true">25.</strong> 20240216-levelsfyi-crawler</a></li><li class="chapter-item expanded "><a href="../posts/20240217-call-center-ood.html"><strong aria-hidden="true">26.</strong> 20240217-call-center-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240217-jigsaw-ood.html"><strong aria-hidden="true">27.</strong> 20240217-jigsaw-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240217-jukebox-ood.html"><strong aria-hidden="true">28.</strong> 20240217-jukebox-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240217-online-book-reader-ood.html"><strong aria-hidden="true">29.</strong> 20240217-online-book-reader-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240217-parking-lot-ood.html"><strong aria-hidden="true">30.</strong> 20240217-parking-lot-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240219-chat-server-ood.html"><strong aria-hidden="true">31.</strong> 20240219-chat-server-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240221-othello-ood.html"><strong aria-hidden="true">32.</strong> 20240221-othello-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240222-text-network-analysis.html"><strong aria-hidden="true">33.</strong> 20240222-text-network-analysis</a></li><li class="chapter-item expanded "><a href="../posts/20240226-Circular-array-ood.html"><strong aria-hidden="true">34.</strong> 20240226-Circular-array-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240226-minesweeper-ood.html"><strong aria-hidden="true">35.</strong> 20240226-minesweeper-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240227-File-Systems-ood.html"><strong aria-hidden="true">36.</strong> 20240227-File-Systems-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240227-Hash-Table-ood.html"><strong aria-hidden="true">37.</strong> 20240227-Hash-Table-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240227-huggingface-nlp.html"><strong aria-hidden="true">38.</strong> 20240227-huggingface-nlp</a></li><li class="chapter-item expanded "><a href="../posts/20240227-warp-terminal.html"><strong aria-hidden="true">39.</strong> 20240227-warp-terminal</a></li><li class="chapter-item expanded "><a href="../posts/20240303-save-password-python.html"><strong aria-hidden="true">40.</strong> 20240303-save-password-python</a></li><li class="chapter-item expanded "><a href="../posts/20240321-interview-warmup.html"><strong aria-hidden="true">41.</strong> 20240321-interview-warmup</a></li><li class="chapter-item expanded "><a href="../posts/20240324-learn-go.html"><strong aria-hidden="true">42.</strong> 20240324-learn-go</a></li><li class="chapter-item expanded "><a href="../posts/20240409-你要如何衡量你的人生.html"><strong aria-hidden="true">43.</strong> 20240409-你要如何衡量你的人生</a></li><li class="chapter-item expanded "><a href="../posts/20240621-公雲學習筆記.html"><strong aria-hidden="true">44.</strong> 20240621-公雲學習筆記</a></li><li class="chapter-item expanded "><a href="../posts/20240716-BuildingYourOwnDatabaseAgent.html"><strong aria-hidden="true">45.</strong> 20240716-BuildingYourOwnDatabaseAgent</a></li><li class="chapter-item expanded "><a href="../posts/HuggingFaceLLM.html"><strong aria-hidden="true">46.</strong> HuggingFaceLLM</a></li><li class="chapter-item expanded affix "><li class="part-title">ai</li><li class="chapter-item expanded "><a href="../posts/ai/20231028-mozilla-ai.html"><strong aria-hidden="true">47.</strong> 20231028-mozilla-ai</a></li><li class="chapter-item expanded "><a href="../posts/ai/20231209-AI-music-example.html"><strong aria-hidden="true">48.</strong> 20231209-AI-music-example</a></li><li class="chapter-item expanded affix "><li class="part-title">backend</li><li class="chapter-item expanded "><a href="../posts/backend/20231006-fastapi-streaming.html"><strong aria-hidden="true">49.</strong> 20231006-fastapi-streaming</a></li><li class="chapter-item expanded affix "><li class="part-title">blockchain</li><li class="chapter-item expanded "><a href="../posts/blockchain/20221228-solana-nft-tutorial.html"><strong aria-hidden="true">50.</strong> 20221228-solana-nft-tutorial</a></li><li class="chapter-item expanded "><a href="../posts/blockchain/20230824-bigchain.html"><strong aria-hidden="true">51.</strong> 20230824-bigchain</a></li><li class="chapter-item expanded "><a href="../posts/blockchain/20231104-learn-cosmos.html"><strong aria-hidden="true">52.</strong> 20231104-learn-cosmos</a></li><li class="chapter-item expanded affix "><li class="part-title">bot</li><li class="chapter-item expanded "><a href="../posts/bot/20231202-twitter-bot.html"><strong aria-hidden="true">53.</strong> 20231202-twitter-bot</a></li><li class="chapter-item expanded affix "><li class="part-title">c_c++</li><li class="chapter-item expanded "><a href="../posts/c_c++/20171210-vector.html"><strong aria-hidden="true">54.</strong> 20171210-vector</a></li><li class="chapter-item expanded "><a href="../posts/c_c++/20180124-gets-puts.html"><strong aria-hidden="true">55.</strong> 20180124-gets-puts</a></li><li class="chapter-item expanded affix "><li class="part-title">class_notes</li><li class="chapter-item expanded "><a href="../posts/class_notes/*.html"><strong aria-hidden="true">56.</strong> </a></li><li class="chapter-item expanded affix "><li class="part-title">cloudflare</li><li class="chapter-item expanded "><a href="../posts/cloudflare/20231125-cloudflare-tunnel.html"><strong aria-hidden="true">57.</strong> 20231125-cloudflare-tunnel</a></li><li class="chapter-item expanded affix "><li class="part-title">competative_programing</li><li class="chapter-item expanded "><a href="../posts/competative_programing/20171221-uva10190.html"><strong aria-hidden="true">58.</strong> 20171221-uva10190</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180128-uva10931.html"><strong aria-hidden="true">59.</strong> 20180128-uva10931</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180131-uva11917.html"><strong aria-hidden="true">60.</strong> 20180131-uva11917</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180205-uva10405.html"><strong aria-hidden="true">61.</strong> 20180205-uva10405</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180206-uva10162.html"><strong aria-hidden="true">62.</strong> 20180206-uva10162</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180209-uva406.html"><strong aria-hidden="true">63.</strong> 20180209-uva406</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180210-NCTU-PCCA-winter-notes.html"><strong aria-hidden="true">64.</strong> 20180210-NCTU-PCCA-winter-notes</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180212-uva10611.html"><strong aria-hidden="true">65.</strong> 20180212-uva10611</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180222-uva401.html"><strong aria-hidden="true">66.</strong> 20180222-uva401</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180309-uva141.html"><strong aria-hidden="true">67.</strong> 20180309-uva141</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180312-uva10190.html"><strong aria-hidden="true">68.</strong> 20180312-uva10190</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180314-uva105.html"><strong aria-hidden="true">69.</strong> 20180314-uva105</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180317-uva10409.html"><strong aria-hidden="true">70.</strong> 20180317-uva10409</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180405-uva630.html"><strong aria-hidden="true">71.</strong> 20180405-uva630</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20190409-uva409.html"><strong aria-hidden="true">72.</strong> 20190409-uva409</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/閱讀筆記-競技程式路線圖.html"><strong aria-hidden="true">73.</strong> 閱讀筆記-競技程式路線圖</a></li><li class="chapter-item expanded affix "><li class="part-title">computer_graphics</li><li class="chapter-item expanded "><a href="../posts/computer_graphics/20190614-CGfinal.html"><strong aria-hidden="true">74.</strong> 20190614-CGfinal</a></li><li class="chapter-item expanded affix "><li class="part-title">crawler</li><li class="chapter-item expanded "><a href="../posts/crawler/20230813-back-up-crawler.html"><strong aria-hidden="true">75.</strong> 20230813-back-up-crawler</a></li><li class="chapter-item expanded "><a href="../posts/crawler/20240121-Web-Scraping-Instagram-with-Selenium.html"><strong aria-hidden="true">76.</strong> 20240121-Web-Scraping-Instagram-with-Selenium</a></li><li class="chapter-item expanded affix "><li class="part-title">db</li><li class="chapter-item expanded "><a href="../posts/db/20230831-mongodb-aggregate-multiple-group.html"><strong aria-hidden="true">77.</strong> 20230831-mongodb-aggregate-multiple-group</a></li><li class="chapter-item expanded affix "><li class="part-title">devops</li><li class="chapter-item expanded "><a href="../posts/devops/20231124-terraform-vercel.html"><strong aria-hidden="true">78.</strong> 20231124-terraform-vercel</a></li><li class="chapter-item expanded affix "><li class="part-title">docker</li><li class="chapter-item expanded "><a href="../posts/docker/20231209-docker-machine-learning.html"><strong aria-hidden="true">79.</strong> 20231209-docker-machine-learning</a></li><li class="chapter-item expanded affix "><li class="part-title">dsa</li><li class="chapter-item expanded "><a href="../posts/dsa/20171217-DP.html"><strong aria-hidden="true">80.</strong> 20171217-DP</a></li><li class="chapter-item expanded "><a href="../posts/dsa/20171219-recursion.html"><strong aria-hidden="true">81.</strong> 20171219-recursion</a></li><li class="chapter-item expanded "><a href="../posts/dsa/20171230-recursion.html"><strong aria-hidden="true">82.</strong> 20171230-recursion</a></li><li class="chapter-item expanded "><a href="../posts/dsa/20180209-linked-list.html"><strong aria-hidden="true">83.</strong> 20180209-linked-list</a></li><li class="chapter-item expanded "><a href="../posts/dsa/20180228-hash-table.html"><strong aria-hidden="true">84.</strong> 20180228-hash-table</a></li><li class="chapter-item expanded "><a href="../posts/dsa/20231103-linklist.html"><strong aria-hidden="true">85.</strong> 20231103-linklist</a></li><li class="chapter-item expanded "><a href="../posts/fastapi-k8s.html"><strong aria-hidden="true">86.</strong> fastapi-k8s</a></li><li class="chapter-item expanded "><a href="../posts/first-day.html"><strong aria-hidden="true">87.</strong> first-day</a></li><li class="chapter-item expanded affix "><li class="part-title">frontend</li><li class="chapter-item expanded "><a href="../posts/frontend/20230812-react-syntax-clipboard.html"><strong aria-hidden="true">88.</strong> 20230812-react-syntax-clipboard</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230816-nprogress.html"><strong aria-hidden="true">89.</strong> 20230816-nprogress</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230817-next-sitemap.html"><strong aria-hidden="true">90.</strong> 20230817-next-sitemap</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230818-markdown-section-link.html"><strong aria-hidden="true">91.</strong> 20230818-markdown-section-link</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230819-mermaid-js.html"><strong aria-hidden="true">92.</strong> 20230819-mermaid-js</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230820-nexjs13.html"><strong aria-hidden="true">93.</strong> 20230820-nexjs13</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230824-chakra-darkmode.html"><strong aria-hidden="true">94.</strong> 20230824-chakra-darkmode</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230825-rss.html"><strong aria-hidden="true">95.</strong> 20230825-rss</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230826-import-alias.html"><strong aria-hidden="true">96.</strong> 20230826-import-alias</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230826-next-seo.html"><strong aria-hidden="true">97.</strong> 20230826-next-seo</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230827-chat-app.html"><strong aria-hidden="true">98.</strong> 20230827-chat-app</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230827-next-pwa.html"><strong aria-hidden="true">99.</strong> 20230827-next-pwa</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230829-chakra-ui.html"><strong aria-hidden="true">100.</strong> 20230829-chakra-ui</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230830-nextjs-google-analytics.html"><strong aria-hidden="true">101.</strong> 20230830-nextjs-google-analytics</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230831-kbar.html"><strong aria-hidden="true">102.</strong> 20230831-kbar</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230831-mdx.html"><strong aria-hidden="true">103.</strong> 20230831-mdx</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230907-react-native.html"><strong aria-hidden="true">104.</strong> 20230907-react-native</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230924-QR-Code.html"><strong aria-hidden="true">105.</strong> 20230924-QR-Code</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230924-wagami.html"><strong aria-hidden="true">106.</strong> 20230924-wagami</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230929-rn-qrcode.html"><strong aria-hidden="true">107.</strong> 20230929-rn-qrcode</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20231010-webauthn.html"><strong aria-hidden="true">108.</strong> 20231010-webauthn</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20231107-MUI-toolpad.html"><strong aria-hidden="true">109.</strong> 20231107-MUI-toolpad</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20231107-imgbb.html"><strong aria-hidden="true">110.</strong> 20231107-imgbb</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20231112-nextjs-upload-large-file.html"><strong aria-hidden="true">111.</strong> 20231112-nextjs-upload-large-file</a></li><li class="chapter-item expanded affix "><li class="part-title">genai</li><li class="chapter-item expanded "><a href="../posts/genai/20231108-How-Diffusion-Models-Work.html"><strong aria-hidden="true">112.</strong> 20231108-How-Diffusion-Models-Work</a></li><li class="chapter-item expanded "><a href="../posts/genai/20231110-生成式AI淺談圖像生成模型-Diffusion-Model-原理.html"><strong aria-hidden="true">113.</strong> 20231110-生成式AI淺談圖像生成模型-Diffusion-Model-原理</a></li><li class="chapter-item expanded affix "><li class="part-title">jobs</li><li class="chapter-item expanded "><a href="../posts/jobs/20220811-LINE-Blockchain-Developer-Intern.html"><strong aria-hidden="true">114.</strong> 20220811-LINE-Blockchain-Developer-Intern</a></li><li class="chapter-item expanded affix "><li class="part-title">kubenetes</li><li class="chapter-item expanded "><a href="../posts/kubenetes/20221231-k8s-notes.html"><strong aria-hidden="true">115.</strong> 20221231-k8s-notes</a></li><li class="chapter-item expanded affix "><li class="part-title">learning</li><li class="chapter-item expanded "><a href="../posts/learning/20231023-learning-from-lin.html"><strong aria-hidden="true">116.</strong> 20231023-learning-from-lin</a></li><li class="chapter-item expanded affix "><li class="part-title">llm</li><li class="chapter-item expanded "><a href="../posts/llm/20231023-Pair-Programming-with-a-Large-Language-Model.html"><strong aria-hidden="true">117.</strong> 20231023-Pair-Programming-with-a-Large-Language-Model</a></li><li class="chapter-item expanded "><a href="../posts/llm/20231026-ChatGPT-Prompt-Engineering-for-Developers.html"><strong aria-hidden="true">118.</strong> 20231026-ChatGPT-Prompt-Engineering-for-Developers</a></li><li class="chapter-item expanded "><a href="../posts/llm/20231029-Building-Systems-with-the-ChatGPT-API.html"><strong aria-hidden="true">119.</strong> 20231029-Building-Systems-with-the-ChatGPT-API</a></li><li class="chapter-item expanded "><a href="../posts/llm/20231031-Andrew-Ng-Opportunities-in-AI-2023.html"><strong aria-hidden="true">120.</strong> 20231031-Andrew-Ng-Opportunities-in-AI-2023</a></li><li class="chapter-item expanded "><a href="../posts/llm/20231101-generative-ai-for-everyone.html"><strong aria-hidden="true">121.</strong> 20231101-generative-ai-for-everyone</a></li><li class="chapter-item expanded "><a href="../posts/llm/20231103-Finetuning-Large-Language-Models.html"><strong aria-hidden="true">122.</strong> 20231103-Finetuning-Large-Language-Models</a></li><li class="chapter-item expanded "><a href="../posts/llm/20231110-80分鐘快速了解大型語言模型-5-30有咒術迴戰雷.html"><strong aria-hidden="true">123.</strong> 20231110-80分鐘快速了解大型語言模型-5-30有咒術迴戰雷</a></li><li class="chapter-item expanded "><a href="../posts/llm/20231129-ShouldYouUseOpenSourceLargeLanguageModels?.html"><strong aria-hidden="true">124.</strong> 20231129-ShouldYouUseOpenSourceLargeLanguageModels?</a></li><li class="chapter-item expanded "><a href="../posts/llm/20231130-Building-and-Evaluating-Advanced-RAG.html"><strong aria-hidden="true">125.</strong> 20231130-Building-and-Evaluating-Advanced-RAG</a></li><li class="chapter-item expanded "><a href="../posts/llm-k8s.html"><strong aria-hidden="true">126.</strong> llm-k8s</a></li><li class="chapter-item expanded affix "><li class="part-title">maker</li><li class="chapter-item expanded "><a href="../posts/maker/20171105-makerfair.html"><strong aria-hidden="true">127.</strong> 20171105-makerfair</a></li><li class="chapter-item expanded affix "><li class="part-title">monorepo</li><li class="chapter-item expanded "><a href="../posts/monorepo/20220721-upgrade-nx-repo-to-react-18.html"><strong aria-hidden="true">128.</strong> 20220721-upgrade-nx-repo-to-react-18</a></li><li class="chapter-item expanded "><a href="../posts/monorepo/20220811-monorepo-development.html"><strong aria-hidden="true">129.</strong> 20220811-monorepo-development</a></li><li class="chapter-item expanded "><a href="../posts/monorepo/20230920-nx.html"><strong aria-hidden="true">130.</strong> 20230920-nx</a></li><li class="chapter-item expanded "><a href="../posts/nextjs-markdown.html"><strong aria-hidden="true">131.</strong> nextjs-markdown</a></li><li class="chapter-item expanded "><a href="../posts/nextjs.html"><strong aria-hidden="true">132.</strong> nextjs</a></li><li class="chapter-item expanded affix "><li class="part-title">nft</li><li class="chapter-item expanded "><a href="../posts/nft/20221230-tezos-nft-tutorial.html"><strong aria-hidden="true">133.</strong> 20221230-tezos-nft-tutorial</a></li><li class="chapter-item expanded "><a href="../posts/nft/20230108-solidity-nft.html"><strong aria-hidden="true">134.</strong> 20230108-solidity-nft</a></li><li class="chapter-item expanded "><a href="../posts/nft/20230109-ipfs-upload.html"><strong aria-hidden="true">135.</strong> 20230109-ipfs-upload</a></li><li class="chapter-item expanded affix "><li class="part-title">programing</li><li class="chapter-item expanded "><a href="../posts/programing/20171027-bnf.html"><strong aria-hidden="true">136.</strong> 20171027-bnf</a></li><li class="chapter-item expanded "><a href="../posts/programing/20171106-gcd.html"><strong aria-hidden="true">137.</strong> 20171106-gcd</a></li><li class="chapter-item expanded "><a href="../posts/programing/20180123-int2str.html"><strong aria-hidden="true">138.</strong> 20180123-int2str</a></li><li class="chapter-item expanded affix "><li class="part-title">projects</li><li class="chapter-item expanded "><a href="../posts/projects/20210820-開發mcu-up-銘傳金手指3-0-的那些事兒.html"><strong aria-hidden="true">139.</strong> 20210820-開發mcu-up-銘傳金手指3-0-的那些事兒</a></li><li class="chapter-item expanded "><a href="../posts/projects/20220531-Decentral-Showroom-NTU-DApp-Term-project.html"><strong aria-hidden="true">140.</strong> 20220531-Decentral-Showroom-NTU-DApp-Term-project</a></li><li class="chapter-item expanded "><a href="../posts/python使用pyinstaller製作桌面應用程式.html"><strong aria-hidden="true">141.</strong> python使用pyinstaller製作桌面應用程式</a></li><li class="chapter-item expanded "><a href="../posts/quotes.html"><strong aria-hidden="true">142.</strong> quotes</a></li><li class="chapter-item expanded affix "><li class="part-title">security</li><li class="chapter-item expanded "><a href="../posts/security/20171102-computer-virus.html"><strong aria-hidden="true">143.</strong> 20171102-computer-virus</a></li><li class="chapter-item expanded affix "><li class="part-title">shell</li><li class="chapter-item expanded "><a href="../posts/shell/20230924-cmd-copy.html"><strong aria-hidden="true">144.</strong> 20230924-cmd-copy</a></li><li class="chapter-item expanded affix "><li class="part-title">software_engineering</li><li class="chapter-item expanded "><a href="../posts/software_engineering/20171027-refactor.html"><strong aria-hidden="true">145.</strong> 20171027-refactor</a></li><li class="chapter-item expanded "><a href="../posts/software_engineering/20171202-styleguide.html"><strong aria-hidden="true">146.</strong> 20171202-styleguide</a></li><li class="chapter-item expanded affix "><li class="part-title">startup</li><li class="chapter-item expanded "><a href="../posts/startup/20230926-21-things-before-21.html"><strong aria-hidden="true">147.</strong> 20230926-21-things-before-21</a></li><li class="chapter-item expanded "><a href="../posts/startup/20231115-How-to-Build-An-MVP-Startup-School.html"><strong aria-hidden="true">148.</strong> 20231115-How-to-Build-An-MVP-Startup-School</a></li><li class="chapter-item expanded affix "><li class="part-title">tools</li><li class="chapter-item expanded "><a href="../posts/tools/20180119-hackmd.html"><strong aria-hidden="true">149.</strong> 20180119-hackmd</a></li><li class="chapter-item expanded "><a href="../posts/tools/20230826-imgur.html"><strong aria-hidden="true">150.</strong> 20230826-imgur</a></li><li class="chapter-item expanded "><a href="../posts/tools/20230827-notion-alternative.html"><strong aria-hidden="true">151.</strong> 20230827-notion-alternative</a></li><li class="chapter-item expanded affix "><li class="part-title">vector_database</li><li class="chapter-item expanded "><a href="../posts/vector_database/20231115-Building-Multi-Modal-Search-with-Vector-Databases.html"><strong aria-hidden="true">152.</strong> 20231115-Building-Multi-Modal-Search-with-Vector-Databases</a></li><li class="chapter-item expanded "><a href="../posts/vector_database/20231116-Vector-Databases-from-Embeddings-to-Applications.html"><strong aria-hidden="true">153.</strong> 20231116-Vector-Databases-from-Embeddings-to-Applications</a></li><li class="chapter-item expanded affix "><li class="part-title">vscode</li><li class="chapter-item expanded "><a href="../posts/vscode/20230827-vscode-animate-extension.html"><strong aria-hidden="true">154.</strong> 20230827-vscode-animate-extension</a></li><li class="chapter-item expanded affix "><li class="part-title">web3</li><li class="chapter-item expanded "><a href="../posts/web3/20211011-虛擬人課堂筆記-spark-ar.html"><strong aria-hidden="true">155.</strong> 20211011-虛擬人課堂筆記-spark-ar</a></li><li class="chapter-item expanded "><a href="../posts/web3/20211018-虛擬人課堂筆記2.html"><strong aria-hidden="true">156.</strong> 20211018-虛擬人課堂筆記2</a></li><li class="chapter-item expanded "><a href="../posts/web3/20211027-虛擬人課堂筆記3-unity-facecapture.html"><strong aria-hidden="true">157.</strong> 20211027-虛擬人課堂筆記3-unity-facecapture</a></li><li class="chapter-item expanded "><a href="../posts/web3/20211028-虛擬人課堂筆記4-vroid.html"><strong aria-hidden="true">158.</strong> 20211028-虛擬人課堂筆記4-vroid</a></li><li class="chapter-item expanded "><a href="../posts/web3/20220518-web3-世界裡的驗證機制-以Tezos為例.html"><strong aria-hidden="true">159.</strong> 20220518-web3-世界裡的驗證機制-以Tezos為例</a></li><li class="chapter-item expanded "><a href="../posts/web3/20230827-orbitdb.html"><strong aria-hidden="true">160.</strong> 20230827-orbitdb</a></li><li class="chapter-item expanded "><a href="../posts/web3/20230828-ipfs.html"><strong aria-hidden="true">161.</strong> 20230828-ipfs</a></li><li class="chapter-item expanded "><a href="../posts/web3/20230828-libp2p.html"><strong aria-hidden="true">162.</strong> 20230828-libp2p</a></li><li class="chapter-item expanded "><a href="../posts/web3/20230829-orbit-chat.html"><strong aria-hidden="true">163.</strong> 20230829-orbit-chat</a></li><li class="chapter-item expanded "><a href="../posts/web3/20230919-hardhat.html"><strong aria-hidden="true">164.</strong> 20230919-hardhat</a></li><li class="chapter-item expanded affix "><li class="part-title">webrtc</li><li class="chapter-item expanded "><a href="../posts/webrtc/20230829-peerjs.html"><strong aria-hidden="true">165.</strong> 20230829-peerjs</a></li><li class="chapter-item expanded "><a href="../posts/windows下的套件管理-Chocolatey.html"><strong aria-hidden="true">166.</strong> windows下的套件管理-Chocolatey</a></li><li class="chapter-item expanded "><a href="../posts/超簡單!一文理解如何使用私有大型語言模型LLM-Ollama＋OpenWebUI篇.html"><strong aria-hidden="true">167.</strong> 超簡單!一文理解如何使用私有大型語言模型LLM-Ollama＋OpenWebUI篇</a></li><li class="chapter-item expanded "><a href="../posts/閱讀筆記-建中2021校內培訓簡報.html"><strong aria-hidden="true">168.</strong> 閱讀筆記-建中2021校內培訓簡報</a></li><li class="chapter-item expanded "><a href="../posts/閱讀筆記-建中2021暑假資讀投影片-謝一.html"><strong aria-hidden="true">169.</strong> 閱讀筆記-建中2021暑假資讀投影片-謝一</a></li><li class="chapter-item expanded "><a href="../posts/國外工作.html"><strong aria-hidden="true">170.</strong> 國外工作</a></li><li class="chapter-item expanded "><a href="../posts/更快的影片學習方法.html" class="active"><strong aria-hidden="true">171.</strong> 更快的影片學習方法</a></li></ol>            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                                                <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                                            </div>
+
+                    <h1 class="menu-title">alanhc-til</h1>
+
+                    <div class="right-buttons">
+                                                <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                                                                        
+                    </div>
+                </div>
+
+                                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <hr />
+<p>title: 更快的影片學習方法
+date: 2024-08-14
+tags:</p>
+<ul>
+<li>學習
+updated: 2024-08-14
+up:</li>
+<li>&quot;[[學習]]&quot;</li>
+</ul>
+<hr />
+<ol>
+<li>ytd get youtube video</li>
+<li>whisper video -&gt; text</li>
+<li>video -&gt; 關鍵影格 （變動threshold&gt;0.2）</li>
+</ol>
+<ul>
+<li><code>learn-fast/</code></li>
+</ul>
+<pre><code class="language-python">import sys
+
+import os
+
+import subprocess
+
+from yt_dlp import YoutubeDL
+
+from mlx_whisper import transcribe
+
+import cv2
+
+import numpy as np
+
+import json
+
+from slugify import slugify
+
+# create mp.json if not exist
+
+if not os.path.exists(&quot;mp.json&quot;):
+
+with open(&quot;mp.json&quot;, &quot;w&quot;) as f:
+
+json.dump({}, f)
+
+def download_youtube_video(url, output_path='./videos'):
+
+mp={}
+
+ydl_opts = {
+
+'verbose': True,
+
+'format': 'bestvideo+bestaudio/best',
+
+'outtmpl': os.path.join(output_path, '%(id)s.%(ext)s'),
+
+'merge_output_format': 'mp4',
+
+'quiet': False,
+
+'writesubtitles': True,
+
+'writeautomaticsub': True,
+
+}
+
+info_save = None
+
+with YoutubeDL(ydl_opts) as ydl:
+
+info = ydl.extract_info(url, download=True)
+
+video_title = info['title']
+
+info_save = info
+
+video_file = os.path.join(output_path, f&quot;{id}.mp4&quot;)
+
+try:
+
+with open(&quot;mp.json&quot;, &quot;r&quot;) as f:
+
+mp = json.load(f)
+
+except json.JSONDecodeError as e:
+
+print(f&quot;Error reading mp.json: {e}&quot;)
+
+print(f&quot;Error position: {e.pos}&quot;)
+
+with open(&quot;mp.json&quot;, &quot;r&quot;) as f:
+
+json_data = f.read()
+
+print(f&quot;JSON content up to error position: {json_data[:e.pos]}&quot;)
+
+# mp = {}
+
+  
+
+mp[url] = info_save
+
+with open(&quot;mp.json&quot;, &quot;w&quot;) as f:
+
+json.dump(mp, f)
+
+return f'{output_path}/{mp[url]['id']}.mp4'
+
+  
+
+def video_to_text(output_folder, audio_file):
+
+print(&quot;==&quot;, audio_file)
+
+output = transcribe(audio_file, word_timestamps=True)
+
+with open(f&quot;{audio_file}.transcription.json&quot;, &quot;w&quot;) as f:
+
+json.dump(output, f, default=lambda x: x.item() if isinstance(x, np.float16) else print(x))
+
+return output
+
+  
+
+def extract_key_frames(video_path, output_folder, threshold=0.2):
+
+cap = cv2.VideoCapture(video_path)
+
+path = os.path.join(output_folder, os.path.splitext(os.path.basename(video_path))[0])
+
+basename = os.path.basename(path)
+
+  
+
+os.makedirs(output_folder, exist_ok=True)
+
+os.makedirs(f&quot;{output_folder}/{basename}&quot;, exist_ok=True)
+
+  
+
+success, prev_frame = cap.read()
+
+if success:
+
+cv2.imwrite(f&quot;{output_folder}/{basename}/frame_0.jpg&quot;, prev_frame)
+
+  
+
+count = 0
+
+ans = []
+
+while success:
+
+success, curr_frame = cap.read()
+
+if not success:
+
+break
+
+  
+
+diff = cv2.absdiff(cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY),
+
+cv2.cvtColor(curr_frame, cv2.COLOR_BGR2GRAY))
+
+non_zero_count = np.count_nonzero(diff)
+
+non_zero_ratio = non_zero_count / diff.size
+
+if non_zero_ratio &gt; threshold:
+
+frame_time = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000.0
+
+frame_name = f&quot;{output_folder}/{basename}/frame_{int(frame_time)}.jpg&quot;
+
+cv2.imwrite(frame_name, curr_frame)
+
+print(f&quot;Saved frame at {frame_time:.2f} seconds as {frame_name}&quot;)
+
+ans.append(
+
+{
+
+&quot;frame&quot;: frame_name,
+
+&quot;time&quot;: frame_time
+
+}
+
+)
+
+prev_frame = curr_frame
+
+count += 1
+
+  
+
+cap.release()
+
+with open(f&quot;{output_folder}/{basename}/keyframes.json&quot;, &quot;w&quot;) as f:
+
+json.dump(ans, f)
+
+print(f&quot;Extracted frames saved in {output_folder}&quot;)
+
+  
+
+def video_to_audio(video_file=&quot;&quot;):
+
+audio_file = f&quot;{video_file}.wav&quot;
+
+subprocess.run([&quot;ffmpeg&quot;, &quot;-i&quot;, video_file, audio_file], check=True)
+
+return audio_file
+
+  
+
+def main():
+
+if len(sys.argv) != 2:
+
+print(&quot;Usage: python pt.py &lt;YouTube URL&gt;&quot;)
+
+return
+
+  
+
+youtube_url = sys.argv[1]
+
+video_output_path = './videos'
+
+frames_output_folder = './frames'
+
+threshold = 0.2 # 畫面變動的閾值
+
+  
+
+video_file = download_youtube_video(youtube_url, video_output_path)
+
+audio_file = video_to_audio(video_file)
+
+transcription = video_to_text(&quot;videos&quot;, audio_file)
+
+# extract_key_frames(video_file, frames_output_folder, threshold)
+
+  
+
+if __name__ == &quot;__main__&quot;:
+
+main()
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                                                    <a rel="prev" href="../posts/國外工作.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+                        
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                                    <a rel="prev" href="../posts/國外工作.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+                            </nav>
+
+        </div>
+
+        
+        
+        
+                <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+        
+                <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+        
+    </body>
+</html>
