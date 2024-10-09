@@ -1,0 +1,1332 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>20240324-learn-go - alanhc-til</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../posts/20231210-convert-post-markdown.html"><strong aria-hidden="true">1.</strong> 20231210-convert-post-markdown</a></li><li class="chapter-item expanded "><a href="../posts/20231213-pyspark.html"><strong aria-hidden="true">2.</strong> 20231213-pyspark</a></li><li class="chapter-item expanded "><a href="../posts/20231217-google-gemini.html"><strong aria-hidden="true">3.</strong> 20231217-google-gemini</a></li><li class="chapter-item expanded "><a href="../posts/20231217-ntu-matches.html"><strong aria-hidden="true">4.</strong> 20231217-ntu-matches</a></li><li class="chapter-item expanded "><a href="../posts/20231222-chat.html"><strong aria-hidden="true">5.</strong> 20231222-chat</a></li><li class="chapter-item expanded "><a href="../posts/20240107-notion-website.html"><strong aria-hidden="true">6.</strong> 20240107-notion-website</a></li><li class="chapter-item expanded "><a href="../posts/20240108-attention.html"><strong aria-hidden="true">7.</strong> 20240108-attention</a></li><li class="chapter-item expanded "><a href="../posts/20240113-data-engineer-salary.html"><strong aria-hidden="true">8.</strong> 20240113-data-engineer-salary</a></li><li class="chapter-item expanded "><a href="../posts/20240119-OSINT.html"><strong aria-hidden="true">9.</strong> 20240119-OSINT</a></li><li class="chapter-item expanded "><a href="../posts/20240122-english-speaking.html"><strong aria-hidden="true">10.</strong> 20240122-english-speaking</a></li><li class="chapter-item expanded "><a href="../posts/20240122-ntu-cool-video-download.html"><strong aria-hidden="true">11.</strong> 20240122-ntu-cool-video-download</a></li><li class="chapter-item expanded "><a href="../posts/20240122-stock-data-design.html"><strong aria-hidden="true">12.</strong> 20240122-stock-data-design</a></li><li class="chapter-item expanded "><a href="../posts/20240123-scalper.html"><strong aria-hidden="true">13.</strong> 20240123-scalper</a></li><li class="chapter-item expanded "><a href="../posts/20240124-break-cloudflare-bot-prevention.html"><strong aria-hidden="true">14.</strong> 20240124-break-cloudflare-bot-prevention</a></li><li class="chapter-item expanded "><a href="../posts/20240125-cache-design.html"><strong aria-hidden="true">15.</strong> 20240125-cache-design</a></li><li class="chapter-item expanded "><a href="../posts/20240125-duplicate-url-design.html"><strong aria-hidden="true">16.</strong> 20240125-duplicate-url-design</a></li><li class="chapter-item expanded "><a href="../posts/20240125-web-crawler-design.html"><strong aria-hidden="true">17.</strong> 20240125-web-crawler-design</a></li><li class="chapter-item expanded "><a href="../posts/20240203-trading-bot.html"><strong aria-hidden="true">18.</strong> 20240203-trading-bot</a></li><li class="chapter-item expanded "><a href="../posts/20240205-salesrank-design.html"><strong aria-hidden="true">19.</strong> 20240205-salesrank-design</a></li><li class="chapter-item expanded "><a href="../posts/20240209-job-insights.html"><strong aria-hidden="true">20.</strong> 20240209-job-insights</a></li><li class="chapter-item expanded "><a href="../posts/20240211-pastebin-design.html"><strong aria-hidden="true">21.</strong> 20240211-pastebin-design</a></li><li class="chapter-item expanded "><a href="../posts/20240211-taiwan-job-insights.html"><strong aria-hidden="true">22.</strong> 20240211-taiwan-job-insights</a></li><li class="chapter-item expanded "><a href="../posts/20240212-linkedin-private-api.html"><strong aria-hidden="true">23.</strong> 20240212-linkedin-private-api</a></li><li class="chapter-item expanded "><a href="../posts/20240215-Deck-of-cards-ood.html"><strong aria-hidden="true">24.</strong> 20240215-Deck-of-cards-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240216-levelsfyi-crawler.html"><strong aria-hidden="true">25.</strong> 20240216-levelsfyi-crawler</a></li><li class="chapter-item expanded "><a href="../posts/20240217-call-center-ood.html"><strong aria-hidden="true">26.</strong> 20240217-call-center-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240217-jigsaw-ood.html"><strong aria-hidden="true">27.</strong> 20240217-jigsaw-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240217-jukebox-ood.html"><strong aria-hidden="true">28.</strong> 20240217-jukebox-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240217-online-book-reader-ood.html"><strong aria-hidden="true">29.</strong> 20240217-online-book-reader-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240217-parking-lot-ood.html"><strong aria-hidden="true">30.</strong> 20240217-parking-lot-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240219-chat-server-ood.html"><strong aria-hidden="true">31.</strong> 20240219-chat-server-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240221-othello-ood.html"><strong aria-hidden="true">32.</strong> 20240221-othello-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240222-text-network-analysis.html"><strong aria-hidden="true">33.</strong> 20240222-text-network-analysis</a></li><li class="chapter-item expanded "><a href="../posts/20240226-Circular-array-ood.html"><strong aria-hidden="true">34.</strong> 20240226-Circular-array-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240226-minesweeper-ood.html"><strong aria-hidden="true">35.</strong> 20240226-minesweeper-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240227-File-Systems-ood.html"><strong aria-hidden="true">36.</strong> 20240227-File-Systems-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240227-Hash-Table-ood.html"><strong aria-hidden="true">37.</strong> 20240227-Hash-Table-ood</a></li><li class="chapter-item expanded "><a href="../posts/20240227-huggingface-nlp.html"><strong aria-hidden="true">38.</strong> 20240227-huggingface-nlp</a></li><li class="chapter-item expanded "><a href="../posts/20240227-warp-terminal.html"><strong aria-hidden="true">39.</strong> 20240227-warp-terminal</a></li><li class="chapter-item expanded "><a href="../posts/20240303-save-password-python.html"><strong aria-hidden="true">40.</strong> 20240303-save-password-python</a></li><li class="chapter-item expanded "><a href="../posts/20240321-interview-warmup.html"><strong aria-hidden="true">41.</strong> 20240321-interview-warmup</a></li><li class="chapter-item expanded "><a href="../posts/20240324-learn-go.html" class="active"><strong aria-hidden="true">42.</strong> 20240324-learn-go</a></li><li class="chapter-item expanded "><a href="../posts/20240409-你要如何衡量你的人生.html"><strong aria-hidden="true">43.</strong> 20240409-你要如何衡量你的人生</a></li><li class="chapter-item expanded "><a href="../posts/20240621-公雲學習筆記.html"><strong aria-hidden="true">44.</strong> 20240621-公雲學習筆記</a></li><li class="chapter-item expanded "><a href="../posts/20240716-BuildingYourOwnDatabaseAgent.html"><strong aria-hidden="true">45.</strong> 20240716-BuildingYourOwnDatabaseAgent</a></li><li class="chapter-item expanded "><a href="../posts/HuggingFaceLLM.html"><strong aria-hidden="true">46.</strong> HuggingFaceLLM</a></li><li class="chapter-item expanded affix "><li class="part-title">ai</li><li class="chapter-item expanded "><a href="../posts/ai/20231028-mozilla-ai.html"><strong aria-hidden="true">47.</strong> 20231028-mozilla-ai</a></li><li class="chapter-item expanded "><a href="../posts/ai/20231209-AI-music-example.html"><strong aria-hidden="true">48.</strong> 20231209-AI-music-example</a></li><li class="chapter-item expanded affix "><li class="part-title">backend</li><li class="chapter-item expanded "><a href="../posts/backend/20231006-fastapi-streaming.html"><strong aria-hidden="true">49.</strong> 20231006-fastapi-streaming</a></li><li class="chapter-item expanded affix "><li class="part-title">blockchain</li><li class="chapter-item expanded "><a href="../posts/blockchain/20221228-solana-nft-tutorial.html"><strong aria-hidden="true">50.</strong> 20221228-solana-nft-tutorial</a></li><li class="chapter-item expanded "><a href="../posts/blockchain/20230824-bigchain.html"><strong aria-hidden="true">51.</strong> 20230824-bigchain</a></li><li class="chapter-item expanded "><a href="../posts/blockchain/20231104-learn-cosmos.html"><strong aria-hidden="true">52.</strong> 20231104-learn-cosmos</a></li><li class="chapter-item expanded affix "><li class="part-title">bot</li><li class="chapter-item expanded "><a href="../posts/bot/20231202-twitter-bot.html"><strong aria-hidden="true">53.</strong> 20231202-twitter-bot</a></li><li class="chapter-item expanded affix "><li class="part-title">c_c++</li><li class="chapter-item expanded "><a href="../posts/c_c++/20171210-vector.html"><strong aria-hidden="true">54.</strong> 20171210-vector</a></li><li class="chapter-item expanded "><a href="../posts/c_c++/20180124-gets-puts.html"><strong aria-hidden="true">55.</strong> 20180124-gets-puts</a></li><li class="chapter-item expanded affix "><li class="part-title">class_notes</li><li class="chapter-item expanded "><a href="../posts/class_notes/*.html"><strong aria-hidden="true">56.</strong> *</a></li><li class="chapter-item expanded affix "><li class="part-title">cloudflare</li><li class="chapter-item expanded "><a href="../posts/cloudflare/20231125-cloudflare-tunnel.html"><strong aria-hidden="true">57.</strong> 20231125-cloudflare-tunnel</a></li><li class="chapter-item expanded affix "><li class="part-title">competative_programing</li><li class="chapter-item expanded "><a href="../posts/competative_programing/20171221-uva10190.html"><strong aria-hidden="true">58.</strong> 20171221-uva10190</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180128-uva10931.html"><strong aria-hidden="true">59.</strong> 20180128-uva10931</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180131-uva11917.html"><strong aria-hidden="true">60.</strong> 20180131-uva11917</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180205-uva10405.html"><strong aria-hidden="true">61.</strong> 20180205-uva10405</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180206-uva10162.html"><strong aria-hidden="true">62.</strong> 20180206-uva10162</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180209-uva406.html"><strong aria-hidden="true">63.</strong> 20180209-uva406</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180210-NCTU-PCCA-winter-notes.html"><strong aria-hidden="true">64.</strong> 20180210-NCTU-PCCA-winter-notes</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180212-uva10611.html"><strong aria-hidden="true">65.</strong> 20180212-uva10611</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180222-uva401.html"><strong aria-hidden="true">66.</strong> 20180222-uva401</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180309-uva141.html"><strong aria-hidden="true">67.</strong> 20180309-uva141</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180312-uva10190.html"><strong aria-hidden="true">68.</strong> 20180312-uva10190</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180314-uva105.html"><strong aria-hidden="true">69.</strong> 20180314-uva105</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180317-uva10409.html"><strong aria-hidden="true">70.</strong> 20180317-uva10409</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20180405-uva630.html"><strong aria-hidden="true">71.</strong> 20180405-uva630</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/20190409-uva409.html"><strong aria-hidden="true">72.</strong> 20190409-uva409</a></li><li class="chapter-item expanded "><a href="../posts/competative_programing/閱讀筆記-競技程式路線圖.html"><strong aria-hidden="true">73.</strong> 閱讀筆記-競技程式路線圖</a></li><li class="chapter-item expanded affix "><li class="part-title">computer_graphics</li><li class="chapter-item expanded "><a href="../posts/computer_graphics/20190614-CGfinal.html"><strong aria-hidden="true">74.</strong> 20190614-CGfinal</a></li><li class="chapter-item expanded affix "><li class="part-title">crawler</li><li class="chapter-item expanded "><a href="../posts/crawler/20230813-back-up-crawler.html"><strong aria-hidden="true">75.</strong> 20230813-back-up-crawler</a></li><li class="chapter-item expanded "><a href="../posts/crawler/20240121-Web-Scraping-Instagram-with-Selenium.html"><strong aria-hidden="true">76.</strong> 20240121-Web-Scraping-Instagram-with-Selenium</a></li><li class="chapter-item expanded affix "><li class="part-title">db</li><li class="chapter-item expanded "><a href="../posts/db/20230831-mongodb-aggregate-multiple-group.html"><strong aria-hidden="true">77.</strong> 20230831-mongodb-aggregate-multiple-group</a></li><li class="chapter-item expanded affix "><li class="part-title">devops</li><li class="chapter-item expanded "><a href="../posts/devops/20231124-terraform-vercel.html"><strong aria-hidden="true">78.</strong> 20231124-terraform-vercel</a></li><li class="chapter-item expanded affix "><li class="part-title">docker</li><li class="chapter-item expanded "><a href="../posts/docker/20231209-docker-machine-learning.html"><strong aria-hidden="true">79.</strong> 20231209-docker-machine-learning</a></li><li class="chapter-item expanded affix "><li class="part-title">dsa</li><li class="chapter-item expanded "><a href="../posts/dsa/20171217-DP.html"><strong aria-hidden="true">80.</strong> 20171217-DP</a></li><li class="chapter-item expanded "><a href="../posts/dsa/20171219-recursion.html"><strong aria-hidden="true">81.</strong> 20171219-recursion</a></li><li class="chapter-item expanded "><a href="../posts/dsa/20171230-recursion.html"><strong aria-hidden="true">82.</strong> 20171230-recursion</a></li><li class="chapter-item expanded "><a href="../posts/dsa/20180209-linked-list.html"><strong aria-hidden="true">83.</strong> 20180209-linked-list</a></li><li class="chapter-item expanded "><a href="../posts/dsa/20180228-hash-table.html"><strong aria-hidden="true">84.</strong> 20180228-hash-table</a></li><li class="chapter-item expanded "><a href="../posts/dsa/20231103-linklist.html"><strong aria-hidden="true">85.</strong> 20231103-linklist</a></li><li class="chapter-item expanded "><a href="../posts/fastapi-k8s.html"><strong aria-hidden="true">86.</strong> fastapi-k8s</a></li><li class="chapter-item expanded "><a href="../posts/first-day.html"><strong aria-hidden="true">87.</strong> first-day</a></li><li class="chapter-item expanded affix "><li class="part-title">frontend</li><li class="chapter-item expanded "><a href="../posts/frontend/20230812-react-syntax-clipboard.html"><strong aria-hidden="true">88.</strong> 20230812-react-syntax-clipboard</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230816-nprogress.html"><strong aria-hidden="true">89.</strong> 20230816-nprogress</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230817-next-sitemap.html"><strong aria-hidden="true">90.</strong> 20230817-next-sitemap</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230818-markdown-section-link.html"><strong aria-hidden="true">91.</strong> 20230818-markdown-section-link</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230819-mermaid-js.html"><strong aria-hidden="true">92.</strong> 20230819-mermaid-js</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230820-nexjs13.html"><strong aria-hidden="true">93.</strong> 20230820-nexjs13</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230824-chakra-darkmode.html"><strong aria-hidden="true">94.</strong> 20230824-chakra-darkmode</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230825-rss.html"><strong aria-hidden="true">95.</strong> 20230825-rss</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230826-import-alias.html"><strong aria-hidden="true">96.</strong> 20230826-import-alias</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230826-next-seo.html"><strong aria-hidden="true">97.</strong> 20230826-next-seo</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230827-chat-app.html"><strong aria-hidden="true">98.</strong> 20230827-chat-app</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230827-next-pwa.html"><strong aria-hidden="true">99.</strong> 20230827-next-pwa</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230829-chakra-ui.html"><strong aria-hidden="true">100.</strong> 20230829-chakra-ui</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230830-nextjs-google-analytics.html"><strong aria-hidden="true">101.</strong> 20230830-nextjs-google-analytics</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230831-kbar.html"><strong aria-hidden="true">102.</strong> 20230831-kbar</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230831-mdx.html"><strong aria-hidden="true">103.</strong> 20230831-mdx</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230907-react-native.html"><strong aria-hidden="true">104.</strong> 20230907-react-native</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230924-QR-Code.html"><strong aria-hidden="true">105.</strong> 20230924-QR-Code</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230924-wagami.html"><strong aria-hidden="true">106.</strong> 20230924-wagami</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20230929-rn-qrcode.html"><strong aria-hidden="true">107.</strong> 20230929-rn-qrcode</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20231010-webauthn.html"><strong aria-hidden="true">108.</strong> 20231010-webauthn</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20231107-MUI-toolpad.html"><strong aria-hidden="true">109.</strong> 20231107-MUI-toolpad</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20231107-imgbb.html"><strong aria-hidden="true">110.</strong> 20231107-imgbb</a></li><li class="chapter-item expanded "><a href="../posts/frontend/20231112-nextjs-upload-large-file.html"><strong aria-hidden="true">111.</strong> 20231112-nextjs-upload-large-file</a></li><li class="chapter-item expanded affix "><li class="part-title">genai</li><li class="chapter-item expanded "><a href="../posts/genai/20231108-How-Diffusion-Models-Work.html"><strong aria-hidden="true">112.</strong> 20231108-How-Diffusion-Models-Work</a></li><li class="chapter-item expanded "><a href="../posts/genai/20231110-生成式AI淺談圖像生成模型-Diffusion-Model-原理.html"><strong aria-hidden="true">113.</strong> 20231110-生成式AI淺談圖像生成模型-Diffusion-Model-原理</a></li><li class="chapter-item expanded affix "><li class="part-title">jobs</li><li class="chapter-item expanded "><a href="../posts/jobs/20220811-LINE-Blockchain-Developer-Intern.html"><strong aria-hidden="true">114.</strong> 20220811-LINE-Blockchain-Developer-Intern</a></li><li class="chapter-item expanded affix "><li class="part-title">kubenetes</li><li class="chapter-item expanded "><a href="../posts/kubenetes/20221231-k8s-notes.html"><strong aria-hidden="true">115.</strong> 20221231-k8s-notes</a></li><li class="chapter-item expanded affix "><li class="part-title">learning</li><li class="chapter-item expanded "><a href="../posts/learning/20231023-learning-from-lin.html"><strong aria-hidden="true">116.</strong> 20231023-learning-from-lin</a></li><li class="chapter-item expanded affix "><li class="part-title">llm</li><li class="chapter-item expanded "><a href="../posts/llm/20231023-Pair-Programming-with-a-Large-Language-Model.html"><strong aria-hidden="true">117.</strong> 20231023-Pair-Programming-with-a-Large-Language-Model</a></li><li class="chapter-item expanded "><a href="../posts/llm/20231026-ChatGPT-Prompt-Engineering-for-Developers.html"><strong aria-hidden="true">118.</strong> 20231026-ChatGPT-Prompt-Engineering-for-Developers</a></li><li class="chapter-item expanded "><a href="../posts/llm/20231029-Building-Systems-with-the-ChatGPT-API.html"><strong aria-hidden="true">119.</strong> 20231029-Building-Systems-with-the-ChatGPT-API</a></li><li class="chapter-item expanded "><a href="../posts/llm/20231031-Andrew-Ng-Opportunities-in-AI-2023.html"><strong aria-hidden="true">120.</strong> 20231031-Andrew-Ng-Opportunities-in-AI-2023</a></li><li class="chapter-item expanded "><a href="../posts/llm/20231101-generative-ai-for-everyone.html"><strong aria-hidden="true">121.</strong> 20231101-generative-ai-for-everyone</a></li><li class="chapter-item expanded "><a href="../posts/llm/20231103-Finetuning-Large-Language-Models.html"><strong aria-hidden="true">122.</strong> 20231103-Finetuning-Large-Language-Models</a></li><li class="chapter-item expanded "><a href="../posts/llm/20231110-80分鐘快速了解大型語言模型-5-30有咒術迴戰雷.html"><strong aria-hidden="true">123.</strong> 20231110-80分鐘快速了解大型語言模型-5-30有咒術迴戰雷</a></li><li class="chapter-item expanded "><a href="../posts/llm/20231129-ShouldYouUseOpenSourceLargeLanguageModels?.html"><strong aria-hidden="true">124.</strong> 20231129-ShouldYouUseOpenSourceLargeLanguageModels?</a></li><li class="chapter-item expanded "><a href="../posts/llm/20231130-Building-and-Evaluating-Advanced-RAG.html"><strong aria-hidden="true">125.</strong> 20231130-Building-and-Evaluating-Advanced-RAG</a></li><li class="chapter-item expanded "><a href="../posts/llm-k8s.html"><strong aria-hidden="true">126.</strong> llm-k8s</a></li><li class="chapter-item expanded affix "><li class="part-title">maker</li><li class="chapter-item expanded "><a href="../posts/maker/20171105-makerfair.html"><strong aria-hidden="true">127.</strong> 20171105-makerfair</a></li><li class="chapter-item expanded affix "><li class="part-title">monorepo</li><li class="chapter-item expanded "><a href="../posts/monorepo/20220721-upgrade-nx-repo-to-react-18.html"><strong aria-hidden="true">128.</strong> 20220721-upgrade-nx-repo-to-react-18</a></li><li class="chapter-item expanded "><a href="../posts/monorepo/20220811-monorepo-development.html"><strong aria-hidden="true">129.</strong> 20220811-monorepo-development</a></li><li class="chapter-item expanded "><a href="../posts/monorepo/20230920-nx.html"><strong aria-hidden="true">130.</strong> 20230920-nx</a></li><li class="chapter-item expanded "><a href="../posts/nextjs-markdown.html"><strong aria-hidden="true">131.</strong> nextjs-markdown</a></li><li class="chapter-item expanded "><a href="../posts/nextjs.html"><strong aria-hidden="true">132.</strong> nextjs</a></li><li class="chapter-item expanded affix "><li class="part-title">nft</li><li class="chapter-item expanded "><a href="../posts/nft/20221230-tezos-nft-tutorial.html"><strong aria-hidden="true">133.</strong> 20221230-tezos-nft-tutorial</a></li><li class="chapter-item expanded "><a href="../posts/nft/20230108-solidity-nft.html"><strong aria-hidden="true">134.</strong> 20230108-solidity-nft</a></li><li class="chapter-item expanded "><a href="../posts/nft/20230109-ipfs-upload.html"><strong aria-hidden="true">135.</strong> 20230109-ipfs-upload</a></li><li class="chapter-item expanded affix "><li class="part-title">programing</li><li class="chapter-item expanded "><a href="../posts/programing/20171027-bnf.html"><strong aria-hidden="true">136.</strong> 20171027-bnf</a></li><li class="chapter-item expanded "><a href="../posts/programing/20171106-gcd.html"><strong aria-hidden="true">137.</strong> 20171106-gcd</a></li><li class="chapter-item expanded "><a href="../posts/programing/20180123-int2str.html"><strong aria-hidden="true">138.</strong> 20180123-int2str</a></li><li class="chapter-item expanded affix "><li class="part-title">projects</li><li class="chapter-item expanded "><a href="../posts/projects/20210820-開發mcu-up-銘傳金手指3-0-的那些事兒.html"><strong aria-hidden="true">139.</strong> 20210820-開發mcu-up-銘傳金手指3-0-的那些事兒</a></li><li class="chapter-item expanded "><a href="../posts/projects/20220531-Decentral-Showroom-NTU-DApp-Term-project.html"><strong aria-hidden="true">140.</strong> 20220531-Decentral-Showroom-NTU-DApp-Term-project</a></li><li class="chapter-item expanded "><a href="../posts/python使用pyinstaller製作桌面應用程式.html"><strong aria-hidden="true">141.</strong> python使用pyinstaller製作桌面應用程式</a></li><li class="chapter-item expanded "><a href="../posts/quotes.html"><strong aria-hidden="true">142.</strong> quotes</a></li><li class="chapter-item expanded affix "><li class="part-title">security</li><li class="chapter-item expanded "><a href="../posts/security/20171102-computer-virus.html"><strong aria-hidden="true">143.</strong> 20171102-computer-virus</a></li><li class="chapter-item expanded affix "><li class="part-title">shell</li><li class="chapter-item expanded "><a href="../posts/shell/20230924-cmd-copy.html"><strong aria-hidden="true">144.</strong> 20230924-cmd-copy</a></li><li class="chapter-item expanded affix "><li class="part-title">software_engineering</li><li class="chapter-item expanded "><a href="../posts/software_engineering/20171027-refactor.html"><strong aria-hidden="true">145.</strong> 20171027-refactor</a></li><li class="chapter-item expanded "><a href="../posts/software_engineering/20171202-styleguide.html"><strong aria-hidden="true">146.</strong> 20171202-styleguide</a></li><li class="chapter-item expanded affix "><li class="part-title">startup</li><li class="chapter-item expanded "><a href="../posts/startup/20230926-21-things-before-21.html"><strong aria-hidden="true">147.</strong> 20230926-21-things-before-21</a></li><li class="chapter-item expanded "><a href="../posts/startup/20231115-How-to-Build-An-MVP-Startup-School.html"><strong aria-hidden="true">148.</strong> 20231115-How-to-Build-An-MVP-Startup-School</a></li><li class="chapter-item expanded affix "><li class="part-title">tools</li><li class="chapter-item expanded "><a href="../posts/tools/20180119-hackmd.html"><strong aria-hidden="true">149.</strong> 20180119-hackmd</a></li><li class="chapter-item expanded "><a href="../posts/tools/20230826-imgur.html"><strong aria-hidden="true">150.</strong> 20230826-imgur</a></li><li class="chapter-item expanded "><a href="../posts/tools/20230827-notion-alternative.html"><strong aria-hidden="true">151.</strong> 20230827-notion-alternative</a></li><li class="chapter-item expanded affix "><li class="part-title">vector_database</li><li class="chapter-item expanded "><a href="../posts/vector_database/20231115-Building-Multi-Modal-Search-with-Vector-Databases.html"><strong aria-hidden="true">152.</strong> 20231115-Building-Multi-Modal-Search-with-Vector-Databases</a></li><li class="chapter-item expanded "><a href="../posts/vector_database/20231116-Vector-Databases-from-Embeddings-to-Applications.html"><strong aria-hidden="true">153.</strong> 20231116-Vector-Databases-from-Embeddings-to-Applications</a></li><li class="chapter-item expanded affix "><li class="part-title">vscode</li><li class="chapter-item expanded "><a href="../posts/vscode/20230827-vscode-animate-extension.html"><strong aria-hidden="true">154.</strong> 20230827-vscode-animate-extension</a></li><li class="chapter-item expanded affix "><li class="part-title">web3</li><li class="chapter-item expanded "><a href="../posts/web3/20211011-虛擬人課堂筆記-spark-ar.html"><strong aria-hidden="true">155.</strong> 20211011-虛擬人課堂筆記-spark-ar</a></li><li class="chapter-item expanded "><a href="../posts/web3/20211018-虛擬人課堂筆記2.html"><strong aria-hidden="true">156.</strong> 20211018-虛擬人課堂筆記2</a></li><li class="chapter-item expanded "><a href="../posts/web3/20211027-虛擬人課堂筆記3-unity-facecapture.html"><strong aria-hidden="true">157.</strong> 20211027-虛擬人課堂筆記3-unity-facecapture</a></li><li class="chapter-item expanded "><a href="../posts/web3/20211028-虛擬人課堂筆記4-vroid.html"><strong aria-hidden="true">158.</strong> 20211028-虛擬人課堂筆記4-vroid</a></li><li class="chapter-item expanded "><a href="../posts/web3/20220518-web3-世界裡的驗證機制-以Tezos為例.html"><strong aria-hidden="true">159.</strong> 20220518-web3-世界裡的驗證機制-以Tezos為例</a></li><li class="chapter-item expanded "><a href="../posts/web3/20230827-orbitdb.html"><strong aria-hidden="true">160.</strong> 20230827-orbitdb</a></li><li class="chapter-item expanded "><a href="../posts/web3/20230828-ipfs.html"><strong aria-hidden="true">161.</strong> 20230828-ipfs</a></li><li class="chapter-item expanded "><a href="../posts/web3/20230828-libp2p.html"><strong aria-hidden="true">162.</strong> 20230828-libp2p</a></li><li class="chapter-item expanded "><a href="../posts/web3/20230829-orbit-chat.html"><strong aria-hidden="true">163.</strong> 20230829-orbit-chat</a></li><li class="chapter-item expanded "><a href="../posts/web3/20230919-hardhat.html"><strong aria-hidden="true">164.</strong> 20230919-hardhat</a></li><li class="chapter-item expanded affix "><li class="part-title">webrtc</li><li class="chapter-item expanded "><a href="../posts/webrtc/20230829-peerjs.html"><strong aria-hidden="true">165.</strong> 20230829-peerjs</a></li><li class="chapter-item expanded "><a href="../posts/windows下的套件管理-Chocolatey.html"><strong aria-hidden="true">166.</strong> windows下的套件管理-Chocolatey</a></li><li class="chapter-item expanded "><a href="../posts/超簡單!一文理解如何使用私有大型語言模型LLM-Ollama＋OpenWebUI篇.html"><strong aria-hidden="true">167.</strong> 超簡單!一文理解如何使用私有大型語言模型LLM-Ollama＋OpenWebUI篇</a></li><li class="chapter-item expanded "><a href="../posts/閱讀筆記-建中2021校內培訓簡報.html"><strong aria-hidden="true">168.</strong> 閱讀筆記-建中2021校內培訓簡報</a></li><li class="chapter-item expanded "><a href="../posts/閱讀筆記-建中2021暑假資讀投影片-謝一.html"><strong aria-hidden="true">169.</strong> 閱讀筆記-建中2021暑假資讀投影片-謝一</a></li><li class="chapter-item expanded "><a href="../posts/國外工作.html"><strong aria-hidden="true">170.</strong> 國外工作</a></li><li class="chapter-item expanded "><a href="../posts/更快的影片學習方法.html"><strong aria-hidden="true">171.</strong> 更快的影片學習方法</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">alanhc-til</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <hr />
+<p>title: 20240324-learn-go
+date: 2024-03-24
+tags:</p>
+<ul>
+<li>backend</li>
+<li>go</li>
+<li>grpc
+updated: 2024-03-24
+up:</li>
+<li>"[[backend]]"</li>
+</ul>
+<hr />
+<h2 id="quickstart"><a class="header" href="#quickstart">quickstart</a></h2>
+<p><a href="https://youtu.be/446E-r0rXHI?si=waOpCnHux4UM8rFo">golang in 100 secoonds</a></p>
+<pre><code class="language-go">package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	fmt.Println("Hello, world!")
+}
+</code></pre>
+<p>編譯可執行檔案：<code>go build hello.go</code>
+執行：<code>go run hello.go</code>
+初始化 dependancy: <code>go mod init alanhc/school</code>
+下載：<code>go install OOO</code>，會出現在<code>go.mod</code></p>
+<h2 id="tutorial-get-started-with-go"><a class="header" href="#tutorial-get-started-with-go">Tutorial: Get started with Go</a></h2>
+<ul>
+<li>dependency</li>
+<li>how? <code>go mod init example/hello</code></li>
+<li>Hello world</li>
+</ul>
+<pre><code class="language-go">package main
+import "fmt"
+func main() {
+	fmt.Println("Hello, World!")
+}
+</code></pre>
+<ul>
+<li><code>go run .</code></li>
+<li>external package
+<ul>
+<li>e.g. https://pkg.go.dev/search?q=quote</li>
+<li><code>go mod tidy</code>：新增或移除未使用的pkg ，會產生go.sum(用於驗證)</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-go">import "rsc.io/quote"
+func main() {
+    fmt.Println(quote.Go())
+
+</code></pre>
+<h2 id="tutorial-create-a-go-module"><a class="header" href="#tutorial-create-a-go-module">Tutorial: Create a Go module</a></h2>
+<p><img src="https://i.imgur.com/smHOkA3.png" alt="" /></p>
+<h3 id="call-your-code-from-another-module"><a class="header" href="#call-your-code-from-another-module">Call your code from another module</a></h3>
+<ul>
+<li>production
+<ul>
+<li>會公開 example.com/greetings</li>
+</ul>
+</li>
+<li>替換規則到指定路徑
+<ul>
+<li><code>go mod edit -replace example.com/greetings=../greetings</code></li>
+</ul>
+</li>
+<li>在hello/hello.go <code>go run .</code></li>
+</ul>
+<h3 id="return-and-handle-an-error"><a class="header" href="#return-and-handle-an-error">Return and handle an error</a></h3>
+<pre><code class="language-go">import (
+	"errors"
+func Hello(name string) (string, error) {
+	// If no name was given, return an error with a message.
+	if name == "" {
+		return "", errors.New("empty name")
+	}
+	
+	return message, nil  // nil 代表沒有錯誤
+</code></pre>
+<pre><code class="language-go">package main
+
+  
+
+import (
+
+"fmt"
+
+"log"
+
+  
+
+"example.com/greetings"
+
+)
+
+  
+
+func main() {
+
+// Set properties of the predefined Logger, including
+
+// the log entry prefix and a flag to disable printing
+
+// the time, source file, and line number.
+
+log.SetPrefix("greetings: ") // log 開頭會是greetings
+
+log.SetFlags(0) //禁用列印時間
+
+  
+
+// Request a greeting message.
+
+message, err := greetings.Hello("")
+
+// If an error was returned, print it to the console and
+
+// exit the program.
+
+if err != nil {
+
+log.Fatal(err)
+
+}
+
+  
+
+// If no error was returned, print the returned message
+
+// to the console.
+
+fmt.Println(message)
+
+}
+</code></pre>
+<h3 id="return-a-random-greeting"><a class="header" href="#return-a-random-greeting">Return a random greeting</a></h3>
+<ul>
+<li><code>greetings.go</code></li>
+</ul>
+<pre><code class="language-go">import (
+    "errors"
+    "fmt"
+    "math/rand"
+...
+func Hello(name string) (string, error) {
+...
+	message := fmt.Sprintf(randomFormat(), name)
+// randomFormat returns one of a set of greeting messages. The returned
+// message is selected at random.
+func randomFormat() string {
+    // A slice of message formats.
+    formats := []string{
+        "Hi, %v. Welcome!",
+        "Great to see you, %v!",
+        "Hail, %v! Well met!",
+    }
+
+    // Return a randomly selected message format by specifying
+    // a random index for the slice of formats.
+    return formats[rand.Intn(len(formats))]
+}
+</code></pre>
+<ul>
+<li><code>hello.go</code></li>
+</ul>
+<pre><code class="language-go">message, err := greetings.Hello("Gladys")
+</code></pre>
+<h3 id="return-greetings-for-multiple-people"><a class="header" href="#return-greetings-for-multiple-people">Return greetings for multiple people</a></h3>
+<ul>
+<li><code>greeting.go</code></li>
+</ul>
+<pre><code class="language-go">// Hellos returns a map that associates each of the named people
+// with a greeting message.
+func Hellos(names []string) (map[string]string, error) {
+    // A map to associate names with messages.
+    messages := make(map[string]string)
+    // Loop through the received slice of names, calling
+    // the Hello function to get a message for each name.
+    for _, name := range names {
+        message, err := Hello(name)
+        if err != nil {
+            return nil, err
+        }
+        // In the map, associate the retrieved message with
+        // the name.
+        messages[name] = message
+    }
+    return messages, nil
+}
+</code></pre>
+<ul>
+<li><code>hello.go</code></li>
+</ul>
+<pre><code class="language-go">// A slice of names.
+    names := []string{"Gladys", "Samantha", "Darrin"}
+
+    // Request greeting messages for the names.
+    messages, err := greetings.Hellos(names)
+    if err != nil {
+        log.Fatal(err)
+    }
+    // If no error was returned, print the returned map of
+    // messages to the console.
+    fmt.Println(messages)
+</code></pre>
+<h3 id="add-a-test"><a class="header" href="#add-a-test">Add a test</a></h3>
+<ul>
+<li>test: 直接在原本資料夾新增 <code>_test.go</code> e.g. <code>greetings_test.go</code></li>
+<li>testing.T: 指到testing pkg的指標</li>
+</ul>
+<h3 id="compile-and-install-the-application"><a class="header" href="#compile-and-install-the-application">Compile and install the application</a></h3>
+<ul>
+<li><code>go build</code> 會產生 .hello / hello.exe</li>
+<li>查詢安裝路徑：<code>go list -f '{{.Target}}'</code></li>
+<li>確認GOPATH要加到 ~/.zshrc</li>
+</ul>
+<h2 id="tutorial-getting-started-with-multi-module-workspaces"><a class="header" href="#tutorial-getting-started-with-multi-module-workspaces">Tutorial: Getting started with multi-module workspaces</a></h2>
+<ul>
+<li>新增workspace: <code>go work init ./hello</code></li>
+<li>執行: <code>go run ./hello</code></li>
+<li>使用外部
+<ul>
+<li><code>git clone https://go.googlesource.com/example</code></li>
+<li>加到workspace <code>go work use ./example/hello</code></li>
+<li>新增到workspace:  <code>workspace/example/hello/reverse</code> 新增int.go</li>
+<li>執行 <code>go run ./hello</code></li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-go">package main
+
+import (
+    "fmt"
+
+    "golang.org/x/example/hello/reverse"
+)
+
+func main() {
+    fmt.Println(reverse.String("Hello"), reverse.Int(24601))
+}
+</code></pre>
+<h2 id="tutorial-accessing-a-relational-database"><a class="header" href="#tutorial-accessing-a-relational-database">Tutorial: Accessing a relational database</a></h2>
+<p><code>mkdir data-access</code>
+<code>go mod init example/data-access</code></p>
+<pre><code>mysql -u root -p
+</code></pre>
+<pre><code>mysql&gt; create database recordings;
+</code></pre>
+<pre><code>mysql&gt; use recordings;
+Database changed
+</code></pre>
+<p> create-tables.sql</p>
+<pre><code class="language-sql">DROP TABLE IF EXISTS album;
+CREATE TABLE album (
+  id         INT AUTO_INCREMENT NOT NULL,
+  title      VARCHAR(128) NOT NULL,
+  artist     VARCHAR(255) NOT NULL,
+  price      DECIMAL(5,2) NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
+INSERT INTO album
+  (title, artist, price)
+VALUES
+  ('Blue Train', 'John Coltrane', 56.99),
+  ('Giant Steps', 'John Coltrane', 63.99),
+  ('Jeru', 'Gerry Mulligan', 17.99),
+  ('Sarah Vaughan', 'Sarah Vaughan', 34.98);
+</code></pre>
+<pre><code>mysql&gt; source /path/to/create-tables.sql
+</code></pre>
+<ul>
+<li>main.go</li>
+</ul>
+<pre><code class="language-go">package main
+
+import (
+    "database/sql"
+    "fmt"
+    "log"
+    "os"
+
+    "github.com/go-sql-driver/mysql"
+)
+
+var db *sql.DB
+
+type Album struct {
+    ID     int64
+    Title  string
+    Artist string
+    Price  float32
+}
+
+func main() {
+    // Capture connection properties.
+    cfg := mysql.Config{
+        User:   os.Getenv("DBUSER"),
+        Passwd: os.Getenv("DBPASS"),
+        Net:    "tcp",
+        Addr:   "127.0.0.1:3306",
+        DBName: "recordings",
+    }
+    // Get a database handle.
+    var err error
+    db, err = sql.Open("mysql", cfg.FormatDSN())
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    pingErr := db.Ping()
+    if pingErr != nil {
+        log.Fatal(pingErr)
+    }
+    fmt.Println("Connected!")
+
+    albums, err := albumsByArtist("John Coltrane")
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("Albums found: %v\n", albums)
+
+    // Hard-code ID 2 here to test the query.
+    alb, err := albumByID(2)
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("Album found: %v\n", alb)
+
+    albID, err := addAlbum(Album{
+        Title:  "The Modern Sound of Betty Carter",
+        Artist: "Betty Carter",
+        Price:  49.99,
+    })
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("ID of added album: %v\n", albID)
+}
+
+// albumsByArtist queries for albums that have the specified artist name.
+func albumsByArtist(name string) ([]Album, error) {
+    // An albums slice to hold data from returned rows.
+    var albums []Album
+
+    rows, err := db.Query("SELECT * FROM album WHERE artist = ?", name)
+    if err != nil {
+        return nil, fmt.Errorf("albumsByArtist %q: %v", name, err)
+    }
+    defer rows.Close()
+    // Loop through rows, using Scan to assign column data to struct fields.
+    for rows.Next() {
+        var alb Album
+        if err := rows.Scan(&amp;alb.ID, &amp;alb.Title, &amp;alb.Artist, &amp;alb.Price); err != nil {
+            return nil, fmt.Errorf("albumsByArtist %q: %v", name, err)
+        }
+        albums = append(albums, alb)
+    }
+    if err := rows.Err(); err != nil {
+        return nil, fmt.Errorf("albumsByArtist %q: %v", name, err)
+    }
+    return albums, nil
+}
+
+// albumByID queries for the album with the specified ID.
+func albumByID(id int64) (Album, error) {
+    // An album to hold data from the returned row.
+    var alb Album
+
+    row := db.QueryRow("SELECT * FROM album WHERE id = ?", id)
+    if err := row.Scan(&amp;alb.ID, &amp;alb.Title, &amp;alb.Artist, &amp;alb.Price); err != nil {
+        if err == sql.ErrNoRows {
+            return alb, fmt.Errorf("albumsById %d: no such album", id)
+        }
+        return alb, fmt.Errorf("albumsById %d: %v", id, err)
+    }
+    return alb, nil
+}
+
+// addAlbum adds the specified album to the database,
+// returning the album ID of the new entry
+func addAlbum(alb Album) (int64, error) {
+    result, err := db.Exec("INSERT INTO album (title, artist, price) VALUES (?, ?, ?)", alb.Title, alb.Artist, alb.Price)
+    if err != nil {
+        return 0, fmt.Errorf("addAlbum: %v", err)
+    }
+    id, err := result.LastInsertId()
+    if err != nil {
+        return 0, fmt.Errorf("addAlbum: %v", err)
+    }
+    return id, nil
+}
+</code></pre>
+<h2 id="tutorial-developing-a-restful-api-with-go-and-gin"><a class="header" href="#tutorial-developing-a-restful-api-with-go-and-gin">Tutorial: Developing a RESTful API with Go and Gin</a></h2>
+<ul>
+<li>Design API endpoints
+<ul>
+<li><code>/albums</code></li>
+<li><code>/albums/:id</code></li>
+<li><code>c *gin.Context</code> c 是一個指向 gin.Context 結構體的指標，優點：
+<ul>
+<li>傳址效率更高，可降低內存使用，因為傳遞一個大型結構體時，傳值會複製該結構體的每一個欄位，這樣會消耗更多的記憶體和 CPU 資源</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="tutorial-getting-started-with-generics"><a class="header" href="#tutorial-getting-started-with-generics">Tutorial: Getting started with generics</a></h2>
+<ul>
+<li>寫法：放在 <code>[]</code> 裡</li>
+<li>限制型別（Constraints）</li>
+</ul>
+<pre><code class="language-go">func SumNumbers[T int | float64](a, b T) T {
+    return a + b
+}
+</code></pre>
+<pre><code class="language-go">package main
+
+import "fmt"
+
+type Number interface {
+    int64 | float64
+}
+
+func main() {
+    // Initialize a map for the integer values
+    ints := map[string]int64{
+        "first": 34,
+        "second": 12,
+    }
+
+    // Initialize a map for the float values
+    floats := map[string]float64{
+        "first": 35.98,
+        "second": 26.99,
+    }
+
+    fmt.Printf("Non-Generic Sums: %v and %v\n",
+        SumInts(ints),
+        SumFloats(floats))
+
+    fmt.Printf("Generic Sums: %v and %v\n",
+        SumIntsOrFloats[string, int64](ints),
+        SumIntsOrFloats[string, float64](floats))
+
+    fmt.Printf("Generic Sums, type parameters inferred: %v and %v\n",
+        SumIntsOrFloats(ints),
+        SumIntsOrFloats(floats))
+
+    fmt.Printf("Generic Sums with Constraint: %v and %v\n",
+        SumNumbers(ints),
+        SumNumbers(floats))
+}
+
+// SumInts adds together the values of m.
+func SumInts(m map[string]int64) int64 {
+    var s int64
+    for _, v := range m {
+        s += v
+    }
+    return s
+}
+
+// SumFloats adds together the values of m.
+func SumFloats(m map[string]float64) float64 {
+    var s float64
+    for _, v := range m {
+        s += v
+    }
+    return s
+}
+
+// SumIntsOrFloats sums the values of map m. It supports both floats and integers
+// as map values.
+func SumIntsOrFloats[K comparable, V int64 | float64](m map[K]V) V {
+    var s V
+    for _, v := range m {
+        s += v
+    }
+    return s
+}
+
+// SumNumbers sums the values of map m. Its supports both integers
+// and floats as map values.
+func SumNumbers[K comparable, V Number](m map[K]V) V {
+    var s V
+    for _, v := range m {
+        s += v
+    }
+    return s
+}
+</code></pre>
+<h2 id="qa"><a class="header" href="#qa">Q&amp;A</a></h2>
+<ul>
+<li>Gin 框架中，使用 Context 這個名稱是為了表示這個物件與當前的 HTTP 請求的「上下文」有關。Context 一詞表示這個物件包含了有關請求處理的所有相關信息和操作，讓開發者可以在處理請求的過程中方便地存取和操作請求及回應。
+<ul>
+<li>why?
+<strong>1. 什麼是 context？</strong>
+Go 的 context 是一個用來在<strong>同一請求的不同協程間</strong>傳遞訊息的機制，它能夠：</li>
+</ul>
+</li>
+<li><strong>取消操作</strong>：當一個操作不再需要進行時，透過 context 可以通知相關的協程停止運行。</li>
+<li><strong>設置超時</strong>：允許設置一個超時時間，超過時間後自動取消操作。</li>
+<li><strong>傳遞元數據</strong>：可以在請求處理過程中，跨不同的協程傳遞一些與請求相關的數據（如用戶 ID、認證資訊等）。
+<strong>2. context 的用途</strong>
+在需要並發處理的場景，特別是當有長時間運行的任務時，context 非常有用。例如：
+• 處理 HTTP 請求時，每個請求可能會啟動多個協程來執行子任務，而如果請求被取消了，這些子任務也需要立刻停止執行。
+• 操作數據庫查詢或外部 API 時，為了避免請求卡死，通常會設置一個超時，context 可以幫助實現這種超時控制。
+<strong>3. 常見的 context 用法</strong>
+Go 中的 context 有幾個常見的使用模式：
+• <strong>背景上下文 (<strong><strong>context.Background()</strong></strong>)</strong>：
+• 這是用來初始化 context 的根節點，它表示一個空的上下文，通常作為 context 的起點。</li>
+</ul>
+<pre><code class="language-go">ctx := context.Background()
+</code></pre>
+<ul>
+<li><strong>帶取消功能的上下文 (<strong><strong>context.WithCancel()</strong></strong>)</strong>：
+<ul>
+<li>這會創建一個新的 context，並且可以使用 cancel 函數來手動取消這個上下文。</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-go">ctx, cancel := context.WithCancel(context.Background())
+// 需要時調用 cancel() 來取消此上下文
+cancel()
+</code></pre>
+<ul>
+<li><strong>帶超時功能的上下文 (<strong><strong>context.WithTimeout()</strong></strong>)</strong>：
+<ul>
+<li>用來設置一個操作的超時時間，超過時間自動取消操作。</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-go">ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+defer cancel() // 超過 5 秒自動取消
+</code></pre>
+<ul>
+<li><strong>帶截止時間的上下文 (<strong><strong>context.WithDeadline()</strong></strong>)</strong>：
+<ul>
+<li>類似於 WithTimeout()，但直接指定一個具體的時間點。</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-go">deadline := time.Now().Add(1 * time.Hour)
+ctx, cancel := context.WithDeadline(context.Background(), deadline)
+defer cancel()
+</code></pre>
+<ul>
+<li><strong>傳遞資料 (<strong><strong>context.WithValue()</strong></strong>)</strong>：
+<ul>
+<li>可以將一些關聯數據傳遞到 context 中，例如用戶 ID 等，在請求處理過程中不同協程可以共享這些數據。</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-go">ctx := context.WithValue(context.Background(), "userID", 123)
+userID := ctx.Value("userID")
+</code></pre>
+<ul>
+<li><strong>4. context 的應用場景</strong></li>
+<li><strong>HTTP 請求處理：</strong>
+當處理一個 HTTP 請求時，如果該請求被取消或超時，我們可以通過 context 來通知所有處理該請求的協程停止操作。</li>
+<li><strong>長時間運行的任務：</strong>
+在進行一些需要長時間運行的任務時，context 可以幫助控制任務的生命週期，確保在適當的時候可以中止任務，節省資源。
+• <strong>並發操作：</strong>
+當我們在多個協程中進行併發操作時，context 可以用來協調這些協程的執行狀態，比如某個協程完成或取消時，通知其他協程一起停止。</li>
+</ul>
+<pre><code class="language-go">package main
+
+import (
+    "net/http"
+
+    "github.com/gin-gonic/gin"
+)
+
+// album represents data about a record album.
+type album struct {
+    ID     string  `json:"id"`
+    Title  string  `json:"title"`
+    Artist string  `json:"artist"`
+    Price  float64 `json:"price"`
+}
+
+// albums slice to seed record album data.
+var albums = []album{
+    {ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
+    {ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
+    {ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
+}
+
+func main() {
+    router := gin.Default()
+    router.GET("/albums", getAlbums)
+    router.GET("/albums/:id", getAlbumByID)
+    router.POST("/albums", postAlbums)
+
+    router.Run("localhost:8080")
+}
+
+// getAlbums responds with the list of all albums as JSON.
+func getAlbums(c *gin.Context) {
+    c.IndentedJSON(http.StatusOK, albums)
+}
+
+// postAlbums adds an album from JSON received in the request body.
+func postAlbums(c *gin.Context) {
+    var newAlbum album
+
+    // Call BindJSON to bind the received JSON to
+    // newAlbum.
+    if err := c.BindJSON(&amp;newAlbum); err != nil {
+        return
+    }
+
+    // Add the new album to the slice.
+    albums = append(albums, newAlbum)
+    c.IndentedJSON(http.StatusCreated, newAlbum)
+}
+
+// getAlbumByID locates the album whose ID value matches the id
+// parameter sent by the client, then returns that album as a response.
+func getAlbumByID(c *gin.Context) {
+    id := c.Param("id")
+
+    // Loop through the list of albums, looking for
+    // an album whose ID value matches the parameter.
+    for _, a := range albums {
+        if a.ID == id {
+            c.IndentedJSON(http.StatusOK, a)
+            return
+        }
+    }
+    c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
+}
+</code></pre>
+<h2 id="web"><a class="header" href="#web">web</a></h2>
+<ul>
+<li>https://gowebexamples.com</li>
+</ul>
+<h3 id="routing-mux"><a class="header" href="#routing-mux">Routing (mux)</a></h3>
+<ul>
+<li>https://gowebexamples.com/routes-using-gorilla-mux/</li>
+</ul>
+<h3 id="middleware"><a class="header" href="#middleware">Middleware</a></h3>
+<ul>
+<li>https://gowebexamples.com/basic-middleware/</li>
+<li></li>
+</ul>
+<h3 id="json"><a class="header" href="#json">JSON</a></h3>
+<ul>
+<li>https://gowebexamples.com/json/</li>
+</ul>
+<h3 id="websocket"><a class="header" href="#websocket">Websocket</a></h3>
+<ul>
+<li>https://gowebexamples.com/websockets/</li>
+</ul>
+<h3 id="crypto--password-hashing"><a class="header" href="#crypto--password-hashing">crypto / password hashing</a></h3>
+<ul>
+<li>https://gowebexamples.com/password-hashing/</li>
+</ul>
+<h3 id="grpc"><a class="header" href="#grpc">gRPC</a></h3>
+<h4 id="install"><a class="header" href="#install">install</a></h4>
+<ul>
+<li>https://grpc.io/docs/protoc-installation/</li>
+</ul>
+<h4 id="quickstart-1"><a class="header" href="#quickstart-1">Quickstart</a></h4>
+<ul>
+<li>https://grpc.io/docs/languages/go/quickstart/</li>
+</ul>
+<h4 id="basic"><a class="header" href="#basic">Basic</a></h4>
+<ul>
+<li>https://grpc.io/docs/languages/go/basics/</li>
+<li>Define a service in a <code>.proto</code> file.</li>
+<li>Generate server and client code using the protocol buffer compiler.</li>
+<li>Use the Go gRPC API to write a simple client and server for your service.</li>
+<li>why gRPC?</li>
+</ul>
+<ol>
+<li>寫proto file</li>
+<li>產生
+protoc --go_out=. --go_opt=paths=source_relative <br />
+--go-grpc_out=. --go-grpc_opt=paths=source_relative proto/rating.proto</li>
+</ol>
+<h5 id="proto-file-import-問題"><a class="header" href="#proto-file-import-問題">proto file import 問題</a></h5>
+<p>solution: <code>protoc -I=. --go_out=$GOROOT/src --go-grpc_out=require_unimplemented_servers=false:$GOROOT/src proto/**.proto</code></p>
+<p><code>protoc -I=. --go_out=$GOROOT/src --go-grpc_out=$GOROOT/src proto/rating.proto</code></p>
+<h4 id="mongodb"><a class="header" href="#mongodb">Mongodb</a></h4>
+<p><code>go get go.mongodb.org/mongo-driver/mongo</code></p>
+<h4 id="mongodb-grpc-go"><a class="header" href="#mongodb-grpc-go">Mongodb grpc go</a></h4>
+<pre><code class="language-go">syntax = "proto3";
+
+option go_package = "alanhc/ratingpb";
+message Rating {
+  // 教師姓名
+  string teacher = 1;
+
+  // 科目名稱
+  string subject = 2;
+
+  // 顯示名稱
+  string name = 3;
+
+  // 評分內容
+  string content = 4;
+
+  // 建立時間
+  string created_at = 5;
+
+  // 修改時間
+  string modified_at = 6;
+
+
+  // 作業評分
+  float rate_homework = 9;
+  // 學習評分
+  float rate_learning = 10;
+
+  // 推薦評分
+  float rate_recommendation = 11;
+
+}
+
+message ListRatingReq {
+  string teacher = 1;
+  string subject = 2;
+}
+
+message ListRatingRes {
+  Rating rating = 1;
+}
+
+service ratingService {
+  rpc ListRating(ListRatingReq) returns (stream ListRatingRes);
+}
+</code></pre>
+<pre><code class="language-go">package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"net"
+	"os"
+	"os/signal"
+
+	pb "alanhc/ratingpb"
+
+	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"google.golang.org/grpc"
+)
+
+var db *mongo.Database
+
+type RatingItem struct {
+	Teacher            string  `bson:"teacher"`
+	Subject            string  `bson:"subject"`
+	Name               string  `bson:"name"`
+	Content            string  `bson:"content"`
+	CreatedAt          string  `bson:"createdAt"`
+	ModifiedAt         string  `bson:"modifiedAt"`
+	RateHomework       float32 `bson:"rateHomework"`
+	RateLearning       float32 `bson:"rateLearning"`
+	RateRecommendation float32 `bson:"rateRecommendation"`
+}
+
+func (s *RatingServiceServer) ListRating(req *pb.ListRatingReq, stream pb.RatingService_ListRatingServer) error {
+	fmt.Println("ReadRating function was invoked with ", req.Teacher, req.Subject)
+
+	cursor, err := db.Collection("rating").Find(context.Background(), bson.M{"teacher": req.Teacher, "subject": req.Subject})
+	if err != nil {
+		log.Fatalf("Error finding rating: %v", err)
+	}
+	defer cursor.Close(context.Background())
+	data := &amp;RatingItem{}
+	for cursor.Next(context.Background()) {
+		// var data pb.Rating
+		err := cursor.Decode(data)
+		if err != nil {
+			log.Fatalf("Error decoding data: %v", err)
+		}
+		// fmt.Println(data)
+		// ratingPb := data.toRatingPB()
+		if err := stream.Send(&amp;pb.ListRatingRes{
+			Rating: &amp;pb.Rating{
+				Teacher:            data.Teacher,
+				Subject:            data.Subject,
+				Name:               data.Name,
+				Content:            data.Content,
+				CreatedAt:          data.CreatedAt,
+				ModifiedAt:         data.ModifiedAt,
+				RateHomework:       data.RateHomework,
+				RateLearning:       data.RateLearning,
+				RateRecommendation: data.RateRecommendation,
+			},
+		}); err != nil {
+			log.Fatalf("Error sending data to client: %v", err)
+		}
+
+	}
+	err = cursor.Close(context.Background())
+	if err := cursor.Err(); err != nil {
+		log.Fatalf("Error cursor.Err(): %v", err)
+	}
+	return nil
+}
+
+type RatingServiceServer struct {
+}
+
+// ListRating implements ratingpb.RatingServiceServer.
+// func (s *RatingServiceServer) ListRating(req *pb.ListRatingReq, stream pb.RatingService_ListRatingServer) error {
+// 	fmt.Println("ReadRating function was invoked with ", req.Teacher, req.Subject)
+
+// 	cursor, err := db.Collection("rating").Find(context.Background(), bson.M{"teacher": req.Teacher, "subject": req.Subject})
+// 	if err != nil {
+// 		log.Fatalf("Error finding rating: %v", err)
+// 	}
+// 	defer cursor.Close(context.Background())
+// 	data := &amp;RatingItem{}
+// 	for cursor.Next(context.Background()) {
+// 		// var data pb.Rating
+// 		err := cursor.Decode(data)
+// 		if err != nil {
+// 			log.Fatalf("Error decoding data: %v", err)
+// 		}
+// 		// fmt.Println(data)
+// 		// ratingPb := data.toRatingPB()
+// 		if err := (*stream).Send(&amp;pb.ListRatingRes{ // Fix: Dereference the pointer to the interface before calling Send method
+// 			Rating: &amp;pb.Rating{
+// 				Teacher:            data.Teacher,
+// 				Subject:            data.Subject,
+// 				Name:               data.Name,
+// 				Content:            data.Content,
+// 				CreatedAt:          data.CreatedAt,
+// 				ModifiedAt:         data.ModifiedAt,
+// 				RateHomework:       data.RateHomework,
+// 				RateLearning:       data.RateLearning,
+// 				RateRecommendation: data.RateRecommendation,
+// 			},
+// 		}); err != nil {
+// 			log.Fatalf("Error sending data to client: %v", err)
+// 		}
+// 		//stream.Send(data)
+// 	}
+// 	err = cursor.Close(context.Background())
+// 	if err := cursor.Err(); err != nil {
+// 		log.Fatalf("Error cursor.Err(): %v", err)
+// 	}
+// 	return nil
+
+// }
+
+// ListRating implements ratingpb.RatingServiceServer.
+// func (s *RatingServiceServer) ListRating(ctx context.Context, req *pb.ListRatingReq, stream *pb.RatingService_ListRatingServer) error {
+// 	fmt.Println("ReadRating function was invoked with ", req.Teacher, req.Subject)
+
+// 	cursor, err := db.Collection("rating").Find(context.Background(), bson.M{"teacher": req.Teacher, "subject": req.Subject})
+// 	if err != nil {
+// 		log.Fatalf("Error finding rating: %v", err)
+// 	}
+// 	defer cursor.Close(context.Background())
+// 	data := &amp;RatingItem{}
+// 	for cursor.Next(context.Background()) {
+// 		// var data pb.Rating
+// 		err := cursor.Decode(data)
+// 		if err != nil {
+// 			log.Fatalf("Error decoding data: %v", err)
+// 		}
+// 		// fmt.Println(data)
+// 		// ratingPb := data.toRatingPB()
+// 		if err := (*stream).Send(&amp;pb.ListRatingRes{ // Fix: Dereference the pointer to the interface before calling Send method
+// 			Rating: &amp;pb.Rating{
+// 				Teacher:            data.Teacher,
+// 				Subject:            data.Subject,
+// 				Name:               data.Name,
+// 				Content:            data.Content,
+// 				CreatedAt:          data.CreatedAt,
+// 				ModifiedAt:         data.ModifiedAt,
+// 				RateHomework:       data.RateHomework,
+// 				RateLearning:       data.RateLearning,
+// 				RateRecommendation: data.RateRecommendation,
+// 			},
+// 		}); err != nil {
+// 			log.Fatalf("Error sending data to client: %v", err)
+// 		}
+// 		//stream.Send(data)
+// 	}
+// 	err = cursor.Close(context.Background())
+// 	if err := cursor.Err(); err != nil {
+// 		log.Fatalf("Error cursor.Err(): %v", err)
+// 	}
+// 	return nil
+// }
+
+var mongoCtx context.Context
+
+func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file:", err)
+	}
+	CONNECTION_STRING := os.Getenv("CONNECTION_STRING")
+	// fmt.Println(CONNECTION_STRING)
+	fmt.Println("Starting server on port :50051...")
+	lis, err := net.Listen("tcp", "localhost:50051")
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	var grpc_opts []grpc.ServerOption
+	srv := &amp;RatingServiceServer{}
+	// var srv *RatingServiceServer
+	grpcServer := grpc.NewServer(grpc_opts...)
+	pb.RegisterRatingServiceServer(grpcServer, srv)
+	// Initialize MongoDb client
+	fmt.Println("Connecting to MongoDB...")
+	mongoCtx = context.Background()
+	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	opts := options.Client().ApplyURI(CONNECTION_STRING).SetServerAPIOptions(serverAPI)
+	// Create a new client and connect to the server
+	client, err := mongo.Connect(context.TODO(), opts)
+	// 連線到 MongoDB
+	if err != nil {
+		panic(err)
+	}
+	err = client.Ping(mongoCtx, nil)
+	if err != nil {
+		log.Fatalf("Could not connect to MongoDB: %v\n", err)
+	} else {
+		fmt.Println("Connected to Mongodb")
+	}
+	db = client.Database("school")
+
+	defer func() {
+		if err = client.Disconnect(context.TODO()); err != nil {
+			panic(err)
+		}
+	}()
+	// Send a ping to confirm a successful connection
+	var result bson.M
+	if err := client.Database("admin").RunCommand(context.TODO(), bson.D{{"ping", 1}}).Decode(&amp;result); err != nil {
+		panic(err)
+	}
+	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
+
+	fmt.Println("Server is running on port 50051")
+	defer lis.Close()
+	// Start the server in a child routine
+	go func() {
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+	fmt.Println("Server succesfully started on port :50051")
+	// Create a channel to receive OS signals
+	c := make(chan os.Signal)
+	// Relay os.Interrupt to our channel (os.Interrupt = CTRL+C)
+	// Ignore other incoming signals
+	signal.Notify(c, os.Interrupt)
+	// Block main routine until a signal is received
+	// As long as user doesn't press CTRL+C a message is not passed
+	// And our main routine keeps running
+	// If the main routine were to shutdown so would the child routine that is Serving the server
+	&lt;-c
+	fmt.Println("\nStopping the server...")
+	grpcServer.Stop()
+	lis.Close()
+	fmt.Println("Closing MongoDB connection")
+	// db.Disconnect(mongoCtx)
+	fmt.Println("Done.")
+
+}
+
+</code></pre>
+<h2 id="cli"><a class="header" href="#cli">CLI</a></h2>
+<ul>
+<li>Cobra CLI</li>
+<li>https://github.com/spf13/cobra</li>
+</ul>
+<h3 id="待看-deploy-go-apps-on-google-cloud-serverless-platforms"><a class="header" href="#待看-deploy-go-apps-on-google-cloud-serverless-platforms">(待看) Deploy Go Apps on Google Cloud Serverless Platforms</a></h3>
+<ul>
+<li>https://www.cloudskillsboost.google/focuses/10532?parent=catalog</li>
+</ul>
+<h2 id="教學網站"><a class="header" href="#教學網站">教學網站</a></h2>
+<ul>
+<li>https://go.dev/learn/</li>
+</ul>
+<h2 id="ref"><a class="header" href="#ref">Ref</a></h2>
+<h2 id="sample-code"><a class="header" href="#sample-code">sample code</a></h2>
+<h3 id="crud-example---http---pg"><a class="header" href="#crud-example---http---pg">CRUD example - http  + pg</a></h3>
+<pre><code class="language-go">package main
+
+import (
+	"database/sql"
+	"fmt"
+	"log"
+	"net/http"
+
+	_ "github.com/lib/pq"
+)
+
+type Student struct {
+	ID   int
+	Name string
+	Age  int
+}
+
+func main() {
+	db, err := sql.Open("postgres", "user=postgres dbname=school sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close() // 確保程式結束前關閉資料庫連線
+
+	// 建立路由
+	http.HandleFunc("/hello", hello)
+	http.HandleFunc("/students", listStudents(db))
+	http.HandleFunc("/students/create", createStudent(db))
+	http.HandleFunc("/students/update", updateStudent(db))
+	http.HandleFunc("/students/delete", deleteStudent(db))
+	log.Fatal(http.ListenAndServe(":8080", nil)) // 如果錯誤就記錄錯誤
+
+}
+func hello(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Hello, World!")
+}
+func listStudents(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		rows, err := db.Query("SELECT * FROM students")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+		for rows.Next() {
+			var s Student
+			if err := rows.Scan(&amp;s.ID, &amp;s.Name, &amp;s.Age); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			fmt.Fprintf(w, "%d %s %d\n", s.ID, s.Name, s.Age)
+		}
+	}
+}
+func createStudent(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		name := r.FormValue("name")
+		age := r.FormValue("age")
+		_, err := db.Exec("INSERT INTO students (name, age) VALUES ($1, $2)", name, age)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprint(w, "created")
+	}
+}
+func updateStudent(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		id := r.FormValue("id")
+		name := r.FormValue("name")
+		age := r.FormValue("age")
+		_, err := db.Exec("UPDATE students SET name=$1, age=$2 WHERE id=$3", name, age, id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprint(w, "updated")
+	}
+}
+func deleteStudent(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		id := r.FormValue("id")
+		_, err := db.Exec("DELETE FROM students WHERE id=$1", id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprint(w, "deleted")
+	}
+}
+
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../posts/20240321-interview-warmup.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../posts/20240409-你要如何衡量你的人生.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../posts/20240321-interview-warmup.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../posts/20240409-你要如何衡量你的人生.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

@@ -1,0 +1,1313 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>20231026-ChatGPT-Prompt-Engineering-for-Developers - alanhc-til</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../../posts/20231210-convert-post-markdown.html"><strong aria-hidden="true">1.</strong> 20231210-convert-post-markdown</a></li><li class="chapter-item expanded "><a href="../../posts/20231213-pyspark.html"><strong aria-hidden="true">2.</strong> 20231213-pyspark</a></li><li class="chapter-item expanded "><a href="../../posts/20231217-google-gemini.html"><strong aria-hidden="true">3.</strong> 20231217-google-gemini</a></li><li class="chapter-item expanded "><a href="../../posts/20231217-ntu-matches.html"><strong aria-hidden="true">4.</strong> 20231217-ntu-matches</a></li><li class="chapter-item expanded "><a href="../../posts/20231222-chat.html"><strong aria-hidden="true">5.</strong> 20231222-chat</a></li><li class="chapter-item expanded "><a href="../../posts/20240107-notion-website.html"><strong aria-hidden="true">6.</strong> 20240107-notion-website</a></li><li class="chapter-item expanded "><a href="../../posts/20240108-attention.html"><strong aria-hidden="true">7.</strong> 20240108-attention</a></li><li class="chapter-item expanded "><a href="../../posts/20240113-data-engineer-salary.html"><strong aria-hidden="true">8.</strong> 20240113-data-engineer-salary</a></li><li class="chapter-item expanded "><a href="../../posts/20240119-OSINT.html"><strong aria-hidden="true">9.</strong> 20240119-OSINT</a></li><li class="chapter-item expanded "><a href="../../posts/20240122-english-speaking.html"><strong aria-hidden="true">10.</strong> 20240122-english-speaking</a></li><li class="chapter-item expanded "><a href="../../posts/20240122-ntu-cool-video-download.html"><strong aria-hidden="true">11.</strong> 20240122-ntu-cool-video-download</a></li><li class="chapter-item expanded "><a href="../../posts/20240122-stock-data-design.html"><strong aria-hidden="true">12.</strong> 20240122-stock-data-design</a></li><li class="chapter-item expanded "><a href="../../posts/20240123-scalper.html"><strong aria-hidden="true">13.</strong> 20240123-scalper</a></li><li class="chapter-item expanded "><a href="../../posts/20240124-break-cloudflare-bot-prevention.html"><strong aria-hidden="true">14.</strong> 20240124-break-cloudflare-bot-prevention</a></li><li class="chapter-item expanded "><a href="../../posts/20240125-cache-design.html"><strong aria-hidden="true">15.</strong> 20240125-cache-design</a></li><li class="chapter-item expanded "><a href="../../posts/20240125-duplicate-url-design.html"><strong aria-hidden="true">16.</strong> 20240125-duplicate-url-design</a></li><li class="chapter-item expanded "><a href="../../posts/20240125-web-crawler-design.html"><strong aria-hidden="true">17.</strong> 20240125-web-crawler-design</a></li><li class="chapter-item expanded "><a href="../../posts/20240203-trading-bot.html"><strong aria-hidden="true">18.</strong> 20240203-trading-bot</a></li><li class="chapter-item expanded "><a href="../../posts/20240205-salesrank-design.html"><strong aria-hidden="true">19.</strong> 20240205-salesrank-design</a></li><li class="chapter-item expanded "><a href="../../posts/20240209-job-insights.html"><strong aria-hidden="true">20.</strong> 20240209-job-insights</a></li><li class="chapter-item expanded "><a href="../../posts/20240211-pastebin-design.html"><strong aria-hidden="true">21.</strong> 20240211-pastebin-design</a></li><li class="chapter-item expanded "><a href="../../posts/20240211-taiwan-job-insights.html"><strong aria-hidden="true">22.</strong> 20240211-taiwan-job-insights</a></li><li class="chapter-item expanded "><a href="../../posts/20240212-linkedin-private-api.html"><strong aria-hidden="true">23.</strong> 20240212-linkedin-private-api</a></li><li class="chapter-item expanded "><a href="../../posts/20240215-Deck-of-cards-ood.html"><strong aria-hidden="true">24.</strong> 20240215-Deck-of-cards-ood</a></li><li class="chapter-item expanded "><a href="../../posts/20240216-levelsfyi-crawler.html"><strong aria-hidden="true">25.</strong> 20240216-levelsfyi-crawler</a></li><li class="chapter-item expanded "><a href="../../posts/20240217-call-center-ood.html"><strong aria-hidden="true">26.</strong> 20240217-call-center-ood</a></li><li class="chapter-item expanded "><a href="../../posts/20240217-jigsaw-ood.html"><strong aria-hidden="true">27.</strong> 20240217-jigsaw-ood</a></li><li class="chapter-item expanded "><a href="../../posts/20240217-jukebox-ood.html"><strong aria-hidden="true">28.</strong> 20240217-jukebox-ood</a></li><li class="chapter-item expanded "><a href="../../posts/20240217-online-book-reader-ood.html"><strong aria-hidden="true">29.</strong> 20240217-online-book-reader-ood</a></li><li class="chapter-item expanded "><a href="../../posts/20240217-parking-lot-ood.html"><strong aria-hidden="true">30.</strong> 20240217-parking-lot-ood</a></li><li class="chapter-item expanded "><a href="../../posts/20240219-chat-server-ood.html"><strong aria-hidden="true">31.</strong> 20240219-chat-server-ood</a></li><li class="chapter-item expanded "><a href="../../posts/20240221-othello-ood.html"><strong aria-hidden="true">32.</strong> 20240221-othello-ood</a></li><li class="chapter-item expanded "><a href="../../posts/20240222-text-network-analysis.html"><strong aria-hidden="true">33.</strong> 20240222-text-network-analysis</a></li><li class="chapter-item expanded "><a href="../../posts/20240226-Circular-array-ood.html"><strong aria-hidden="true">34.</strong> 20240226-Circular-array-ood</a></li><li class="chapter-item expanded "><a href="../../posts/20240226-minesweeper-ood.html"><strong aria-hidden="true">35.</strong> 20240226-minesweeper-ood</a></li><li class="chapter-item expanded "><a href="../../posts/20240227-File-Systems-ood.html"><strong aria-hidden="true">36.</strong> 20240227-File-Systems-ood</a></li><li class="chapter-item expanded "><a href="../../posts/20240227-Hash-Table-ood.html"><strong aria-hidden="true">37.</strong> 20240227-Hash-Table-ood</a></li><li class="chapter-item expanded "><a href="../../posts/20240227-huggingface-nlp.html"><strong aria-hidden="true">38.</strong> 20240227-huggingface-nlp</a></li><li class="chapter-item expanded "><a href="../../posts/20240227-warp-terminal.html"><strong aria-hidden="true">39.</strong> 20240227-warp-terminal</a></li><li class="chapter-item expanded "><a href="../../posts/20240303-save-password-python.html"><strong aria-hidden="true">40.</strong> 20240303-save-password-python</a></li><li class="chapter-item expanded "><a href="../../posts/20240321-interview-warmup.html"><strong aria-hidden="true">41.</strong> 20240321-interview-warmup</a></li><li class="chapter-item expanded "><a href="../../posts/20240324-learn-go.html"><strong aria-hidden="true">42.</strong> 20240324-learn-go</a></li><li class="chapter-item expanded "><a href="../../posts/20240409-你要如何衡量你的人生.html"><strong aria-hidden="true">43.</strong> 20240409-你要如何衡量你的人生</a></li><li class="chapter-item expanded "><a href="../../posts/20240621-公雲學習筆記.html"><strong aria-hidden="true">44.</strong> 20240621-公雲學習筆記</a></li><li class="chapter-item expanded "><a href="../../posts/20240716-BuildingYourOwnDatabaseAgent.html"><strong aria-hidden="true">45.</strong> 20240716-BuildingYourOwnDatabaseAgent</a></li><li class="chapter-item expanded "><a href="../../posts/HuggingFaceLLM.html"><strong aria-hidden="true">46.</strong> HuggingFaceLLM</a></li><li class="chapter-item expanded affix "><li class="part-title">ai</li><li class="chapter-item expanded "><a href="../../posts/ai/20231028-mozilla-ai.html"><strong aria-hidden="true">47.</strong> 20231028-mozilla-ai</a></li><li class="chapter-item expanded "><a href="../../posts/ai/20231209-AI-music-example.html"><strong aria-hidden="true">48.</strong> 20231209-AI-music-example</a></li><li class="chapter-item expanded affix "><li class="part-title">backend</li><li class="chapter-item expanded "><a href="../../posts/backend/20231006-fastapi-streaming.html"><strong aria-hidden="true">49.</strong> 20231006-fastapi-streaming</a></li><li class="chapter-item expanded affix "><li class="part-title">blockchain</li><li class="chapter-item expanded "><a href="../../posts/blockchain/20221228-solana-nft-tutorial.html"><strong aria-hidden="true">50.</strong> 20221228-solana-nft-tutorial</a></li><li class="chapter-item expanded "><a href="../../posts/blockchain/20230824-bigchain.html"><strong aria-hidden="true">51.</strong> 20230824-bigchain</a></li><li class="chapter-item expanded "><a href="../../posts/blockchain/20231104-learn-cosmos.html"><strong aria-hidden="true">52.</strong> 20231104-learn-cosmos</a></li><li class="chapter-item expanded affix "><li class="part-title">bot</li><li class="chapter-item expanded "><a href="../../posts/bot/20231202-twitter-bot.html"><strong aria-hidden="true">53.</strong> 20231202-twitter-bot</a></li><li class="chapter-item expanded affix "><li class="part-title">c_c++</li><li class="chapter-item expanded "><a href="../../posts/c_c++/20171210-vector.html"><strong aria-hidden="true">54.</strong> 20171210-vector</a></li><li class="chapter-item expanded "><a href="../../posts/c_c++/20180124-gets-puts.html"><strong aria-hidden="true">55.</strong> 20180124-gets-puts</a></li><li class="chapter-item expanded affix "><li class="part-title">class_notes</li><li class="chapter-item expanded "><a href="../../posts/class_notes/*.html"><strong aria-hidden="true">56.</strong> *</a></li><li class="chapter-item expanded affix "><li class="part-title">cloudflare</li><li class="chapter-item expanded "><a href="../../posts/cloudflare/20231125-cloudflare-tunnel.html"><strong aria-hidden="true">57.</strong> 20231125-cloudflare-tunnel</a></li><li class="chapter-item expanded affix "><li class="part-title">competative_programing</li><li class="chapter-item expanded "><a href="../../posts/competative_programing/20171221-uva10190.html"><strong aria-hidden="true">58.</strong> 20171221-uva10190</a></li><li class="chapter-item expanded "><a href="../../posts/competative_programing/20180128-uva10931.html"><strong aria-hidden="true">59.</strong> 20180128-uva10931</a></li><li class="chapter-item expanded "><a href="../../posts/competative_programing/20180131-uva11917.html"><strong aria-hidden="true">60.</strong> 20180131-uva11917</a></li><li class="chapter-item expanded "><a href="../../posts/competative_programing/20180205-uva10405.html"><strong aria-hidden="true">61.</strong> 20180205-uva10405</a></li><li class="chapter-item expanded "><a href="../../posts/competative_programing/20180206-uva10162.html"><strong aria-hidden="true">62.</strong> 20180206-uva10162</a></li><li class="chapter-item expanded "><a href="../../posts/competative_programing/20180209-uva406.html"><strong aria-hidden="true">63.</strong> 20180209-uva406</a></li><li class="chapter-item expanded "><a href="../../posts/competative_programing/20180210-NCTU-PCCA-winter-notes.html"><strong aria-hidden="true">64.</strong> 20180210-NCTU-PCCA-winter-notes</a></li><li class="chapter-item expanded "><a href="../../posts/competative_programing/20180212-uva10611.html"><strong aria-hidden="true">65.</strong> 20180212-uva10611</a></li><li class="chapter-item expanded "><a href="../../posts/competative_programing/20180222-uva401.html"><strong aria-hidden="true">66.</strong> 20180222-uva401</a></li><li class="chapter-item expanded "><a href="../../posts/competative_programing/20180309-uva141.html"><strong aria-hidden="true">67.</strong> 20180309-uva141</a></li><li class="chapter-item expanded "><a href="../../posts/competative_programing/20180312-uva10190.html"><strong aria-hidden="true">68.</strong> 20180312-uva10190</a></li><li class="chapter-item expanded "><a href="../../posts/competative_programing/20180314-uva105.html"><strong aria-hidden="true">69.</strong> 20180314-uva105</a></li><li class="chapter-item expanded "><a href="../../posts/competative_programing/20180317-uva10409.html"><strong aria-hidden="true">70.</strong> 20180317-uva10409</a></li><li class="chapter-item expanded "><a href="../../posts/competative_programing/20180405-uva630.html"><strong aria-hidden="true">71.</strong> 20180405-uva630</a></li><li class="chapter-item expanded "><a href="../../posts/competative_programing/20190409-uva409.html"><strong aria-hidden="true">72.</strong> 20190409-uva409</a></li><li class="chapter-item expanded "><a href="../../posts/competative_programing/閱讀筆記-競技程式路線圖.html"><strong aria-hidden="true">73.</strong> 閱讀筆記-競技程式路線圖</a></li><li class="chapter-item expanded affix "><li class="part-title">computer_graphics</li><li class="chapter-item expanded "><a href="../../posts/computer_graphics/20190614-CGfinal.html"><strong aria-hidden="true">74.</strong> 20190614-CGfinal</a></li><li class="chapter-item expanded affix "><li class="part-title">crawler</li><li class="chapter-item expanded "><a href="../../posts/crawler/20230813-back-up-crawler.html"><strong aria-hidden="true">75.</strong> 20230813-back-up-crawler</a></li><li class="chapter-item expanded "><a href="../../posts/crawler/20240121-Web-Scraping-Instagram-with-Selenium.html"><strong aria-hidden="true">76.</strong> 20240121-Web-Scraping-Instagram-with-Selenium</a></li><li class="chapter-item expanded affix "><li class="part-title">db</li><li class="chapter-item expanded "><a href="../../posts/db/20230831-mongodb-aggregate-multiple-group.html"><strong aria-hidden="true">77.</strong> 20230831-mongodb-aggregate-multiple-group</a></li><li class="chapter-item expanded affix "><li class="part-title">devops</li><li class="chapter-item expanded "><a href="../../posts/devops/20231124-terraform-vercel.html"><strong aria-hidden="true">78.</strong> 20231124-terraform-vercel</a></li><li class="chapter-item expanded affix "><li class="part-title">docker</li><li class="chapter-item expanded "><a href="../../posts/docker/20231209-docker-machine-learning.html"><strong aria-hidden="true">79.</strong> 20231209-docker-machine-learning</a></li><li class="chapter-item expanded affix "><li class="part-title">dsa</li><li class="chapter-item expanded "><a href="../../posts/dsa/20171217-DP.html"><strong aria-hidden="true">80.</strong> 20171217-DP</a></li><li class="chapter-item expanded "><a href="../../posts/dsa/20171219-recursion.html"><strong aria-hidden="true">81.</strong> 20171219-recursion</a></li><li class="chapter-item expanded "><a href="../../posts/dsa/20171230-recursion.html"><strong aria-hidden="true">82.</strong> 20171230-recursion</a></li><li class="chapter-item expanded "><a href="../../posts/dsa/20180209-linked-list.html"><strong aria-hidden="true">83.</strong> 20180209-linked-list</a></li><li class="chapter-item expanded "><a href="../../posts/dsa/20180228-hash-table.html"><strong aria-hidden="true">84.</strong> 20180228-hash-table</a></li><li class="chapter-item expanded "><a href="../../posts/dsa/20231103-linklist.html"><strong aria-hidden="true">85.</strong> 20231103-linklist</a></li><li class="chapter-item expanded "><a href="../../posts/fastapi-k8s.html"><strong aria-hidden="true">86.</strong> fastapi-k8s</a></li><li class="chapter-item expanded "><a href="../../posts/first-day.html"><strong aria-hidden="true">87.</strong> first-day</a></li><li class="chapter-item expanded affix "><li class="part-title">frontend</li><li class="chapter-item expanded "><a href="../../posts/frontend/20230812-react-syntax-clipboard.html"><strong aria-hidden="true">88.</strong> 20230812-react-syntax-clipboard</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230816-nprogress.html"><strong aria-hidden="true">89.</strong> 20230816-nprogress</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230817-next-sitemap.html"><strong aria-hidden="true">90.</strong> 20230817-next-sitemap</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230818-markdown-section-link.html"><strong aria-hidden="true">91.</strong> 20230818-markdown-section-link</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230819-mermaid-js.html"><strong aria-hidden="true">92.</strong> 20230819-mermaid-js</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230820-nexjs13.html"><strong aria-hidden="true">93.</strong> 20230820-nexjs13</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230824-chakra-darkmode.html"><strong aria-hidden="true">94.</strong> 20230824-chakra-darkmode</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230825-rss.html"><strong aria-hidden="true">95.</strong> 20230825-rss</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230826-import-alias.html"><strong aria-hidden="true">96.</strong> 20230826-import-alias</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230826-next-seo.html"><strong aria-hidden="true">97.</strong> 20230826-next-seo</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230827-chat-app.html"><strong aria-hidden="true">98.</strong> 20230827-chat-app</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230827-next-pwa.html"><strong aria-hidden="true">99.</strong> 20230827-next-pwa</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230829-chakra-ui.html"><strong aria-hidden="true">100.</strong> 20230829-chakra-ui</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230830-nextjs-google-analytics.html"><strong aria-hidden="true">101.</strong> 20230830-nextjs-google-analytics</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230831-kbar.html"><strong aria-hidden="true">102.</strong> 20230831-kbar</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230831-mdx.html"><strong aria-hidden="true">103.</strong> 20230831-mdx</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230907-react-native.html"><strong aria-hidden="true">104.</strong> 20230907-react-native</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230924-QR-Code.html"><strong aria-hidden="true">105.</strong> 20230924-QR-Code</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230924-wagami.html"><strong aria-hidden="true">106.</strong> 20230924-wagami</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20230929-rn-qrcode.html"><strong aria-hidden="true">107.</strong> 20230929-rn-qrcode</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20231010-webauthn.html"><strong aria-hidden="true">108.</strong> 20231010-webauthn</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20231107-MUI-toolpad.html"><strong aria-hidden="true">109.</strong> 20231107-MUI-toolpad</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20231107-imgbb.html"><strong aria-hidden="true">110.</strong> 20231107-imgbb</a></li><li class="chapter-item expanded "><a href="../../posts/frontend/20231112-nextjs-upload-large-file.html"><strong aria-hidden="true">111.</strong> 20231112-nextjs-upload-large-file</a></li><li class="chapter-item expanded affix "><li class="part-title">genai</li><li class="chapter-item expanded "><a href="../../posts/genai/20231108-How-Diffusion-Models-Work.html"><strong aria-hidden="true">112.</strong> 20231108-How-Diffusion-Models-Work</a></li><li class="chapter-item expanded "><a href="../../posts/genai/20231110-生成式AI淺談圖像生成模型-Diffusion-Model-原理.html"><strong aria-hidden="true">113.</strong> 20231110-生成式AI淺談圖像生成模型-Diffusion-Model-原理</a></li><li class="chapter-item expanded affix "><li class="part-title">jobs</li><li class="chapter-item expanded "><a href="../../posts/jobs/20220811-LINE-Blockchain-Developer-Intern.html"><strong aria-hidden="true">114.</strong> 20220811-LINE-Blockchain-Developer-Intern</a></li><li class="chapter-item expanded affix "><li class="part-title">kubenetes</li><li class="chapter-item expanded "><a href="../../posts/kubenetes/20221231-k8s-notes.html"><strong aria-hidden="true">115.</strong> 20221231-k8s-notes</a></li><li class="chapter-item expanded affix "><li class="part-title">learning</li><li class="chapter-item expanded "><a href="../../posts/learning/20231023-learning-from-lin.html"><strong aria-hidden="true">116.</strong> 20231023-learning-from-lin</a></li><li class="chapter-item expanded affix "><li class="part-title">llm</li><li class="chapter-item expanded "><a href="../../posts/llm/20231023-Pair-Programming-with-a-Large-Language-Model.html"><strong aria-hidden="true">117.</strong> 20231023-Pair-Programming-with-a-Large-Language-Model</a></li><li class="chapter-item expanded "><a href="../../posts/llm/20231026-ChatGPT-Prompt-Engineering-for-Developers.html" class="active"><strong aria-hidden="true">118.</strong> 20231026-ChatGPT-Prompt-Engineering-for-Developers</a></li><li class="chapter-item expanded "><a href="../../posts/llm/20231029-Building-Systems-with-the-ChatGPT-API.html"><strong aria-hidden="true">119.</strong> 20231029-Building-Systems-with-the-ChatGPT-API</a></li><li class="chapter-item expanded "><a href="../../posts/llm/20231031-Andrew-Ng-Opportunities-in-AI-2023.html"><strong aria-hidden="true">120.</strong> 20231031-Andrew-Ng-Opportunities-in-AI-2023</a></li><li class="chapter-item expanded "><a href="../../posts/llm/20231101-generative-ai-for-everyone.html"><strong aria-hidden="true">121.</strong> 20231101-generative-ai-for-everyone</a></li><li class="chapter-item expanded "><a href="../../posts/llm/20231103-Finetuning-Large-Language-Models.html"><strong aria-hidden="true">122.</strong> 20231103-Finetuning-Large-Language-Models</a></li><li class="chapter-item expanded "><a href="../../posts/llm/20231110-80分鐘快速了解大型語言模型-5-30有咒術迴戰雷.html"><strong aria-hidden="true">123.</strong> 20231110-80分鐘快速了解大型語言模型-5-30有咒術迴戰雷</a></li><li class="chapter-item expanded "><a href="../../posts/llm/20231129-ShouldYouUseOpenSourceLargeLanguageModels?.html"><strong aria-hidden="true">124.</strong> 20231129-ShouldYouUseOpenSourceLargeLanguageModels?</a></li><li class="chapter-item expanded "><a href="../../posts/llm/20231130-Building-and-Evaluating-Advanced-RAG.html"><strong aria-hidden="true">125.</strong> 20231130-Building-and-Evaluating-Advanced-RAG</a></li><li class="chapter-item expanded "><a href="../../posts/llm-k8s.html"><strong aria-hidden="true">126.</strong> llm-k8s</a></li><li class="chapter-item expanded affix "><li class="part-title">maker</li><li class="chapter-item expanded "><a href="../../posts/maker/20171105-makerfair.html"><strong aria-hidden="true">127.</strong> 20171105-makerfair</a></li><li class="chapter-item expanded affix "><li class="part-title">monorepo</li><li class="chapter-item expanded "><a href="../../posts/monorepo/20220721-upgrade-nx-repo-to-react-18.html"><strong aria-hidden="true">128.</strong> 20220721-upgrade-nx-repo-to-react-18</a></li><li class="chapter-item expanded "><a href="../../posts/monorepo/20220811-monorepo-development.html"><strong aria-hidden="true">129.</strong> 20220811-monorepo-development</a></li><li class="chapter-item expanded "><a href="../../posts/monorepo/20230920-nx.html"><strong aria-hidden="true">130.</strong> 20230920-nx</a></li><li class="chapter-item expanded "><a href="../../posts/nextjs-markdown.html"><strong aria-hidden="true">131.</strong> nextjs-markdown</a></li><li class="chapter-item expanded "><a href="../../posts/nextjs.html"><strong aria-hidden="true">132.</strong> nextjs</a></li><li class="chapter-item expanded affix "><li class="part-title">nft</li><li class="chapter-item expanded "><a href="../../posts/nft/20221230-tezos-nft-tutorial.html"><strong aria-hidden="true">133.</strong> 20221230-tezos-nft-tutorial</a></li><li class="chapter-item expanded "><a href="../../posts/nft/20230108-solidity-nft.html"><strong aria-hidden="true">134.</strong> 20230108-solidity-nft</a></li><li class="chapter-item expanded "><a href="../../posts/nft/20230109-ipfs-upload.html"><strong aria-hidden="true">135.</strong> 20230109-ipfs-upload</a></li><li class="chapter-item expanded affix "><li class="part-title">programing</li><li class="chapter-item expanded "><a href="../../posts/programing/20171027-bnf.html"><strong aria-hidden="true">136.</strong> 20171027-bnf</a></li><li class="chapter-item expanded "><a href="../../posts/programing/20171106-gcd.html"><strong aria-hidden="true">137.</strong> 20171106-gcd</a></li><li class="chapter-item expanded "><a href="../../posts/programing/20180123-int2str.html"><strong aria-hidden="true">138.</strong> 20180123-int2str</a></li><li class="chapter-item expanded affix "><li class="part-title">projects</li><li class="chapter-item expanded "><a href="../../posts/projects/20210820-開發mcu-up-銘傳金手指3-0-的那些事兒.html"><strong aria-hidden="true">139.</strong> 20210820-開發mcu-up-銘傳金手指3-0-的那些事兒</a></li><li class="chapter-item expanded "><a href="../../posts/projects/20220531-Decentral-Showroom-NTU-DApp-Term-project.html"><strong aria-hidden="true">140.</strong> 20220531-Decentral-Showroom-NTU-DApp-Term-project</a></li><li class="chapter-item expanded "><a href="../../posts/python使用pyinstaller製作桌面應用程式.html"><strong aria-hidden="true">141.</strong> python使用pyinstaller製作桌面應用程式</a></li><li class="chapter-item expanded "><a href="../../posts/quotes.html"><strong aria-hidden="true">142.</strong> quotes</a></li><li class="chapter-item expanded affix "><li class="part-title">security</li><li class="chapter-item expanded "><a href="../../posts/security/20171102-computer-virus.html"><strong aria-hidden="true">143.</strong> 20171102-computer-virus</a></li><li class="chapter-item expanded affix "><li class="part-title">shell</li><li class="chapter-item expanded "><a href="../../posts/shell/20230924-cmd-copy.html"><strong aria-hidden="true">144.</strong> 20230924-cmd-copy</a></li><li class="chapter-item expanded affix "><li class="part-title">software_engineering</li><li class="chapter-item expanded "><a href="../../posts/software_engineering/20171027-refactor.html"><strong aria-hidden="true">145.</strong> 20171027-refactor</a></li><li class="chapter-item expanded "><a href="../../posts/software_engineering/20171202-styleguide.html"><strong aria-hidden="true">146.</strong> 20171202-styleguide</a></li><li class="chapter-item expanded affix "><li class="part-title">startup</li><li class="chapter-item expanded "><a href="../../posts/startup/20230926-21-things-before-21.html"><strong aria-hidden="true">147.</strong> 20230926-21-things-before-21</a></li><li class="chapter-item expanded "><a href="../../posts/startup/20231115-How-to-Build-An-MVP-Startup-School.html"><strong aria-hidden="true">148.</strong> 20231115-How-to-Build-An-MVP-Startup-School</a></li><li class="chapter-item expanded affix "><li class="part-title">tools</li><li class="chapter-item expanded "><a href="../../posts/tools/20180119-hackmd.html"><strong aria-hidden="true">149.</strong> 20180119-hackmd</a></li><li class="chapter-item expanded "><a href="../../posts/tools/20230826-imgur.html"><strong aria-hidden="true">150.</strong> 20230826-imgur</a></li><li class="chapter-item expanded "><a href="../../posts/tools/20230827-notion-alternative.html"><strong aria-hidden="true">151.</strong> 20230827-notion-alternative</a></li><li class="chapter-item expanded affix "><li class="part-title">vector_database</li><li class="chapter-item expanded "><a href="../../posts/vector_database/20231115-Building-Multi-Modal-Search-with-Vector-Databases.html"><strong aria-hidden="true">152.</strong> 20231115-Building-Multi-Modal-Search-with-Vector-Databases</a></li><li class="chapter-item expanded "><a href="../../posts/vector_database/20231116-Vector-Databases-from-Embeddings-to-Applications.html"><strong aria-hidden="true">153.</strong> 20231116-Vector-Databases-from-Embeddings-to-Applications</a></li><li class="chapter-item expanded affix "><li class="part-title">vscode</li><li class="chapter-item expanded "><a href="../../posts/vscode/20230827-vscode-animate-extension.html"><strong aria-hidden="true">154.</strong> 20230827-vscode-animate-extension</a></li><li class="chapter-item expanded affix "><li class="part-title">web3</li><li class="chapter-item expanded "><a href="../../posts/web3/20211011-虛擬人課堂筆記-spark-ar.html"><strong aria-hidden="true">155.</strong> 20211011-虛擬人課堂筆記-spark-ar</a></li><li class="chapter-item expanded "><a href="../../posts/web3/20211018-虛擬人課堂筆記2.html"><strong aria-hidden="true">156.</strong> 20211018-虛擬人課堂筆記2</a></li><li class="chapter-item expanded "><a href="../../posts/web3/20211027-虛擬人課堂筆記3-unity-facecapture.html"><strong aria-hidden="true">157.</strong> 20211027-虛擬人課堂筆記3-unity-facecapture</a></li><li class="chapter-item expanded "><a href="../../posts/web3/20211028-虛擬人課堂筆記4-vroid.html"><strong aria-hidden="true">158.</strong> 20211028-虛擬人課堂筆記4-vroid</a></li><li class="chapter-item expanded "><a href="../../posts/web3/20220518-web3-世界裡的驗證機制-以Tezos為例.html"><strong aria-hidden="true">159.</strong> 20220518-web3-世界裡的驗證機制-以Tezos為例</a></li><li class="chapter-item expanded "><a href="../../posts/web3/20230827-orbitdb.html"><strong aria-hidden="true">160.</strong> 20230827-orbitdb</a></li><li class="chapter-item expanded "><a href="../../posts/web3/20230828-ipfs.html"><strong aria-hidden="true">161.</strong> 20230828-ipfs</a></li><li class="chapter-item expanded "><a href="../../posts/web3/20230828-libp2p.html"><strong aria-hidden="true">162.</strong> 20230828-libp2p</a></li><li class="chapter-item expanded "><a href="../../posts/web3/20230829-orbit-chat.html"><strong aria-hidden="true">163.</strong> 20230829-orbit-chat</a></li><li class="chapter-item expanded "><a href="../../posts/web3/20230919-hardhat.html"><strong aria-hidden="true">164.</strong> 20230919-hardhat</a></li><li class="chapter-item expanded affix "><li class="part-title">webrtc</li><li class="chapter-item expanded "><a href="../../posts/webrtc/20230829-peerjs.html"><strong aria-hidden="true">165.</strong> 20230829-peerjs</a></li><li class="chapter-item expanded "><a href="../../posts/windows下的套件管理-Chocolatey.html"><strong aria-hidden="true">166.</strong> windows下的套件管理-Chocolatey</a></li><li class="chapter-item expanded "><a href="../../posts/超簡單!一文理解如何使用私有大型語言模型LLM-Ollama＋OpenWebUI篇.html"><strong aria-hidden="true">167.</strong> 超簡單!一文理解如何使用私有大型語言模型LLM-Ollama＋OpenWebUI篇</a></li><li class="chapter-item expanded "><a href="../../posts/閱讀筆記-建中2021校內培訓簡報.html"><strong aria-hidden="true">168.</strong> 閱讀筆記-建中2021校內培訓簡報</a></li><li class="chapter-item expanded "><a href="../../posts/閱讀筆記-建中2021暑假資讀投影片-謝一.html"><strong aria-hidden="true">169.</strong> 閱讀筆記-建中2021暑假資讀投影片-謝一</a></li><li class="chapter-item expanded "><a href="../../posts/國外工作.html"><strong aria-hidden="true">170.</strong> 國外工作</a></li><li class="chapter-item expanded "><a href="../../posts/更快的影片學習方法.html"><strong aria-hidden="true">171.</strong> 更快的影片學習方法</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">alanhc-til</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <hr />
+<p>title: 20231026-ChatGPT-Prompt-Engineering-for-Developers
+date: 2023-10-26
+tags:</p>
+<ul>
+<li>llm</li>
+<li>course</li>
+</ul>
+<hr />
+<h2 id="introduction"><a class="header" href="#introduction">Introduction</a></h2>
+<h3 id="兩種llm模型"><a class="header" href="#兩種llm模型">兩種LLM模型</a></h3>
+<h4 id="1-base由訓練資料預測下一個word"><a class="header" href="#1-base由訓練資料預測下一個word">1. base：由訓練資料預測下一個word</a></h4>
+<h4 id="2-instruction-based-由指令fine-turn--rlhf強化學習人類回饋"><a class="header" href="#2-instruction-based-由指令fine-turn--rlhf強化學習人類回饋">2. instruction based ：由指令Fine-turn / RLHF(強化學習、人類回饋)</a></h4>
+<h2 id="guidelines"><a class="header" href="#guidelines">Guidelines</a></h2>
+<h3 id="setup"><a class="header" href="#setup">Setup</a></h3>
+<pre><code class="language-python">import openai
+import os
+
+from dotenv import load_dotenv, find_dotenv
+_ = load_dotenv(find_dotenv())
+
+openai.api_key  = os.getenv('OPENAI_API_KEY')
+</code></pre>
+<ul>
+<li>helper function</li>
+</ul>
+<pre><code class="language-python">def get_completion(prompt, model="gpt-3.5-turbo"):
+    messages = [{"role": "user", "content": prompt}]
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=messages,
+        temperature=0, # this is the degree of randomness of the model's output
+    )
+    return response.choices[0].message["content"]
+</code></pre>
+<h3 id="prompting-principles"><a class="header" href="#prompting-principles">Prompting Principles</a></h3>
+<h4 id="p1-寫具體且清晰的指令"><a class="header" href="#p1-寫具體且清晰的指令">P1 寫具體且清晰的指令</a></h4>
+<h5 id="1-使用分隔符號"><a class="header" href="#1-使用分隔符號">1. 使用分隔符號</a></h5>
+<pre><code class="language-html">Triple quotes: '''''
+Triple backticks:
+Triple dashes: ---,
+Angle brackets: ‹&gt;,
+XML tags: ‹ tag&gt; &lt;/tag&gt;
+</code></pre>
+<p>e.g.</p>
+<pre><code class="language-python">text = f"""
+You should express what you want a model to do by \ 
+providing instructions that are as clear and \ 
+specific as you can possibly make them. \ 
+This will guide the model towards the desired output, \ 
+and reduce the chances of receiving irrelevant \ 
+or incorrect responses. Don't confuse writing a \ 
+clear prompt with writing a short prompt. \ 
+In many cases, longer prompts provide more clarity \ 
+and context for the model, which can lead to \ 
+more detailed and relevant outputs.
+"""
+prompt = f"""
+Summarize the text delimited by triple backticks \ 
+into a single sentence.
+```{text}\```
+"""
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<h5 id="2-結構化輸出"><a class="header" href="#2-結構化輸出">2. 結構化輸出</a></h5>
+<pre><code class="language-python">prompt = f"""
+Generate a list of three made-up book titles along \ 
+with their authors and genres. 
+Provide them in JSON format with the following keys: 
+book_id, title, author, genre.
+"""
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<h5 id="3-檢查是否符合抹些條件"><a class="header" href="#3-檢查是否符合抹些條件">3. 檢查是否符合抹些條件</a></h5>
+<pre><code class="language-python">text_1 = f"""
+Making a cup of tea is easy! First, you need to get some \ 
+water boiling. While that's happening, \ 
+grab a cup and put a tea bag in it. Once the water is \ 
+hot enough, just pour it over the tea bag. \ 
+Let it sit for a bit so the tea can steep. After a \ 
+few minutes, take out the tea bag. If you \ 
+like, you can add some sugar or milk to taste. \ 
+And that's it! You've got yourself a delicious \ 
+cup of tea to enjoy.
+"""
+prompt = f"""
+You will be provided with text delimited by triple quotes. 
+If it contains a sequence of instructions, \ 
+re-write those instructions in the following format:
+
+Step 1 - ...
+Step 2 - …
+…
+Step N - …
+
+If the text does not contain a sequence of instructions, \ 
+then simply write \"No steps provided.\"
+
+\"\"\"{text_1}\"\"\"
+"""
+response = get_completion(prompt)
+print("Completion for Text 1:")
+print(response)
+</code></pre>
+<h5 id="4-少樣本-few-shot-prompting"><a class="header" href="#4-少樣本-few-shot-prompting">4. 少樣本 "Few-shot" prompting</a></h5>
+<pre><code class="language-python">prompt = f"""
+Your task is to answer in a consistent style.
+
+&lt;child&gt;: Teach me about patience.
+
+&lt;grandparent&gt;: The river that carves the deepest \ 
+valley flows from a modest spring; the \ 
+grandest symphony originates from a single note; \ 
+the most intricate tapestry begins with a solitary thread.
+
+&lt;child&gt;: Teach me about resilience.
+"""
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<h4 id="p2-給模型時間思考"><a class="header" href="#p2-給模型時間思考">P2 給模型時間思考</a></h4>
+<h5 id="1-定義完成一個task所需的步驟"><a class="header" href="#1-定義完成一個task所需的步驟">1. 定義完成一個task所需的步驟</a></h5>
+<pre><code class="language-python">text = f"""
+In a charming village, siblings Jack and Jill set out on \ 
+a quest to fetch water from a hilltop \ 
+well. As they climbed, singing joyfully, misfortune \ 
+struck—Jack tripped on a stone and tumbled \ 
+down the hill, with Jill following suit. \ 
+Though slightly battered, the pair returned home to \ 
+comforting embraces. Despite the mishap, \ 
+their adventurous spirits remained undimmed, and they \ 
+continued exploring with delight.
+"""
+# example 1
+prompt_1 = f"""
+Perform the following actions: 
+1 - Summarize the following text delimited by triple \
+backticks with 1 sentence.
+2 - Translate the summary into French.
+3 - List each name in the French summary.
+4 - Output a json object that contains the following \
+keys: french_summary, num_names.
+
+Separate your answers with line breaks.
+
+Text:
+```{text}\```
+"""
+response = get_completion(prompt_1)
+print("Completion for prompt 1:")
+print(response)
+</code></pre>
+<ul>
+<li>限制特定輸出</li>
+</ul>
+<pre><code class="language-python">prompt_2 = f"""
+Your task is to perform the following actions: 
+1 - Summarize the following text delimited by 
+  &lt;&gt; with 1 sentence.
+2 - Translate the summary into French.
+3 - List each name in the French summary.
+4 - Output a json object that contains the 
+  following keys: french_summary, num_names.
+
+Use the following format:
+Text: &lt;text to summarize&gt;
+Summary: &lt;summary&gt;
+Translation: &lt;summary translation&gt;
+Names: &lt;list of names in Italian summary&gt;
+Output JSON: &lt;json with summary and num_names&gt;
+
+Text: &lt;{text}&gt;
+"""
+response = get_completion(prompt_2)
+print("\nCompletion for prompt 2:")
+print(response)
+</code></pre>
+<h5 id="2-再做結論前先讓模型產生自己推論"><a class="header" href="#2-再做結論前先讓模型產生自己推論">2. 再做結論前先讓模型產生自己推論</a></h5>
+<ul>
+<li>讓模型自己檢查（錯誤例子）</li>
+</ul>
+<pre><code class="language-python">prompt = f"""
+Determine if the student's solution is correct or not.
+
+Question:
+I'm building a solar power installation and I need \
+ help working out the financials. 
+- Land costs $100 / square foot
+- I can buy solar panels for $250 / square foot
+- I negotiated a contract for maintenance that will cost \ 
+me a flat $100k per year, and an additional $10 / square \
+foot
+What is the total cost for the first year of operations 
+as a function of the number of square feet.
+
+Student's Solution:
+Let x be the size of the installation in square feet.
+Costs:
+1. Land cost: 100x
+2. Solar panel cost: 250x
+3. Maintenance cost: 100,000 + 100x
+Total cost: 100x + 250x + 100,000 + 100x = 450x + 100,000
+"""
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<ul>
+<li>讓模型自己先推論，在檢查</li>
+</ul>
+<pre><code class="language-python">prompt = f"""
+Your task is to determine if the student's solution \
+is correct or not.
+To solve the problem do the following:
+- First, work out your own solution to the problem. 
+- Then compare your solution to the student's solution \ 
+and evaluate if the student's solution is correct or not. 
+Don't decide if the student's solution is correct until 
+you have done the problem yourself.
+
+Use the following format:
+Question:
+\```
+question here
+\```
+Student's solution:
+\```
+student's solution here
+\```
+Actual solution:
+\```
+steps to work out the solution and your solution here
+\```
+Is the student's solution the same as actual solution \
+just calculated:
+\```
+yes or no
+\```
+Student grade:
+\```
+correct or incorrect
+\```
+
+Question:
+\```
+I'm building a solar power installation and I need help \
+working out the financials. 
+- Land costs $100 / square foot
+- I can buy solar panels for $250 / square foot
+- I negotiated a contract for maintenance that will cost \
+me a flat $100k per year, and an additional $10 / square \
+foot
+What is the total cost for the first year of operations \
+as a function of the number of square feet.
+\``` 
+Student's solution:
+\```
+Let x be the size of the installation in square feet.
+Costs:
+1. Land cost: 100x
+2. Solar panel cost: 250x
+3. Maintenance cost: 100,000 + 100x
+Total cost: 100x + 250x + 100,000 + 100x = 450x + 100,000
+\```
+Actual solution:
+"""
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<h4 id="模型限制"><a class="header" href="#模型限制">模型限制</a></h4>
+<h5 id="幻覺"><a class="header" href="#幻覺">幻覺</a></h5>
+<ul>
+<li>模型有可能推論出看似有道理的結論但事實上不是</li>
+</ul>
+<pre><code class="language-python">prompt = f"""
+Tell me about AeroGlide UltraSlim Smart Toothbrush by Boie
+"""
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<h5 id="如何減少幻覺"><a class="header" href="#如何減少幻覺">如何減少幻覺？</a></h5>
+<ul>
+<li>先找到相關資訊，再根據相關資訊回答問題</li>
+</ul>
+<h2 id="interative"><a class="header" href="#interative">Interative</a></h2>
+<p><img src="https://i.imgur.com/ePPGMPE.png" alt="" /></p>
+<h3 id="從說明書產生產品敘述"><a class="header" href="#從說明書產生產品敘述">從說明書產生產品敘述</a></h3>
+<pre><code class="language-python">fact_sheet_chair = """
+OVERVIEW
+- Part of a beautiful family of mid-century inspired office furniture, 
+including filing cabinets, desks, bookcases, meeting tables, and more.
+- Several options of shell color and base finishes.
+- Available with plastic back and front upholstery (SWC-100) 
+or full upholstery (SWC-110) in 10 fabric and 6 leather options.
+- Base finish options are: stainless steel, matte black, 
+gloss white, or chrome.
+- Chair is available with or without armrests.
+- Suitable for home or business settings.
+- Qualified for contract use.
+
+CONSTRUCTION
+- 5-wheel plastic coated aluminum base.
+- Pneumatic chair adjust for easy raise/lower action.
+
+DIMENSIONS
+- WIDTH 53 CM | 20.87”
+- DEPTH 51 CM | 20.08”
+- HEIGHT 80 CM | 31.50”
+- SEAT HEIGHT 44 CM | 17.32”
+- SEAT DEPTH 41 CM | 16.14”
+
+OPTIONS
+- Soft or hard-floor caster options.
+- Two choices of seat foam densities: 
+ medium (1.8 lb/ft3) or high (2.8 lb/ft3)
+- Armless or 8 position PU armrests 
+
+MATERIALS
+SHELL BASE GLIDER
+- Cast Aluminum with modified nylon PA6/PA66 coating.
+- Shell thickness: 10 mm.
+SEAT
+- HD36 foam
+
+COUNTRY OF ORIGIN
+- Italy
+"""
+prompt = f"""
+Your task is to help a marketing team create a 
+description for a retail website of a product based 
+on a technical fact sheet.
+
+Write a product description based on the information 
+provided in the technical specifications delimited by 
+triple backticks.
+
+Technical specifications: ```{fact_sheet_chair}\```
+"""
+response = get_completion(prompt)
+print(response)
+
+</code></pre>
+<h4 id="issue1-太長需要縮短"><a class="header" href="#issue1-太長需要縮短">issue1. 太長需要縮短</a></h4>
+<pre><code class="language-python">prompt = f"""
+Your task is to help a marketing team create a 
+description for a retail website of a product based 
+on a technical fact sheet.
+
+Write a product description based on the information 
+provided in the technical specifications delimited by 
+triple backticks.
+
+Use at most 50 words.
+
+Technical specifications: ```{fact_sheet_chair}\```
+"""
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<h4 id="issue2-故度專注在錯誤細節請他專注於目標受眾"><a class="header" href="#issue2-故度專注在錯誤細節請他專注於目標受眾">issue2. 故度專注在錯誤細節：請他專注於目標受眾</a></h4>
+<pre><code class="language-python">prompt = f"""
+Your task is to help a marketing team create a 
+description for a retail website of a product based 
+on a technical fact sheet.
+
+Write a product description based on the information 
+provided in the technical specifications delimited by 
+triple backticks.
+
+The description is intended for furniture retailers, 
+so should be technical in nature and focus on the 
+materials the product is constructed from.
+
+Use at most 50 words.
+
+Technical specifications: ```{fact_sheet_chair}\```
+"""
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<h4 id="issue3-需要有表格請他擷取資訊並組織在一個輸出html的table"><a class="header" href="#issue3-需要有表格請他擷取資訊並組織在一個輸出html的table">issue3. 需要有表格：請他擷取資訊並組織在一個輸出html的table</a></h4>
+<pre><code class="language-python">prompt = f"""
+Your task is to help a marketing team create a 
+description for a retail website of a product based 
+on a technical fact sheet.
+
+Write a product description based on the information 
+provided in the technical specifications delimited by 
+triple backticks.
+
+The description is intended for furniture retailers, 
+so should be technical in nature and focus on the 
+materials the product is constructed from.
+
+At the end of the description, include every 7-character 
+Product ID in the technical specification.
+
+After the description, include a table that gives the 
+product's dimensions. The table should have two columns.
+In the first column include the name of the dimension. 
+In the second column include the measurements in inches only.
+
+Give the table the title 'Product Dimensions'.
+
+Format everything as HTML that can be used in a website. 
+Place the description in a &lt;div&gt; element.
+
+Technical specifications: ```{fact_sheet_chair}\```
+"""
+
+response = get_completion(prompt)
+print(response)
+from IPython.display import display, HTML
+display(HTML(response))
+</code></pre>
+<p>好的prompt engineer不是找到一個最佳prompt，而是有個好的開發流程</p>
+<h2 id="summarizing"><a class="header" href="#summarizing">Summarizing</a></h2>
+<h3 id="1-特定字數句子限制"><a class="header" href="#1-特定字數句子限制">1. 特定字數、句子限制</a></h3>
+<pre><code class="language-python">prod_review = """
+Got this panda plush toy for my daughter's birthday, \
+who loves it and takes it everywhere. It's soft and \ 
+super cute, and its face has a friendly look. It's \ 
+a bit small for what I paid though. I think there \ 
+might be other options that are bigger for the \ 
+same price. It arrived a day earlier than expected, \ 
+so I got to play with it myself before I gave it \ 
+to her.
+"""
+</code></pre>
+<pre><code class="language-python">prompt = f"""
+Your task is to generate a short summary of a product \
+review from an ecommerce site. 
+
+Summarize the review below, delimited by triple 
+backticks, in at most 30 words. 
+
+Review: ```{prod_review}\```
+"""
+
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<h3 id="2-聚焦在送貨及投遞"><a class="header" href="#2-聚焦在送貨及投遞">2. 聚焦在送貨及投遞</a></h3>
+<pre><code class="language-python">prompt = f"""
+Your task is to generate a short summary of a product \
+review from an ecommerce site to give feedback to the \
+Shipping deparmtment. 
+
+Summarize the review below, delimited by triple 
+backticks, in at most 30 words, and focusing on any aspects \
+that mention shipping and delivery of the product. 
+
+Review: ```{prod_review}\```
+"""
+
+response = get_completion(prompt)
+print(response)
+
+</code></pre>
+<h3 id="3-聚焦在價格"><a class="header" href="#3-聚焦在價格">3. 聚焦在價格</a></h3>
+<pre><code class="language-python">prompt = f"""
+Your task is to generate a short summary of a product \
+review from an ecommerce site to give feedback to the \
+pricing deparmtment, responsible for determining the \
+price of the product.  
+
+Summarize the review below, delimited by triple 
+backticks, in at most 30 words, and focusing on any aspects \
+that are relevant to the price and perceived value. 
+
+Review: ```{prod_review}\```
+"""
+
+response = get_completion(prompt)
+print(response)
+
+</code></pre>
+<ul>
+<li>使用擷取</li>
+</ul>
+<pre><code class="language-python">prompt = f"""
+Your task is to extract relevant information from \ 
+a product review from an ecommerce site to give \
+feedback to the Shipping department. 
+
+From the review below, delimited by triple quotes \
+extract the information relevant to shipping and \ 
+delivery. Limit to 30 words. 
+
+Review: ```{prod_review}\```
+"""
+
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<h3 id="4-總結多個"><a class="header" href="#4-總結多個">4. 總結多個</a></h3>
+<pre><code class="language-python">
+review_1 = prod_review 
+
+# review for a standing lamp
+review_2 = """
+Needed a nice lamp for my bedroom, and this one \
+had additional storage and not too high of a price \
+point. Got it fast - arrived in 2 days. The string \
+to the lamp broke during the transit and the company \
+happily sent over a new one. Came within a few days \
+as well. It was easy to put together. Then I had a \
+missing part, so I contacted their support and they \
+very quickly got me the missing piece! Seems to me \
+to be a great company that cares about their customers \
+and products. 
+"""
+
+# review for an electric toothbrush
+review_3 = """
+My dental hygienist recommended an electric toothbrush, \
+which is why I got this. The battery life seems to be \
+pretty impressive so far. After initial charging and \
+leaving the charger plugged in for the first week to \
+condition the battery, I've unplugged the charger and \
+been using it for twice daily brushing for the last \
+3 weeks all on the same charge. But the toothbrush head \
+is too small. I’ve seen baby toothbrushes bigger than \
+this one. I wish the head was bigger with different \
+length bristles to get between teeth better because \
+this one doesn’t.  Overall if you can get this one \
+around the $50 mark, it's a good deal. The manufactuer's \
+replacements heads are pretty expensive, but you can \
+get generic ones that're more reasonably priced. This \
+toothbrush makes me feel like I've been to the dentist \
+every day. My teeth feel sparkly clean! 
+"""
+
+# review for a blender
+review_4 = """
+So, they still had the 17 piece system on seasonal \
+sale for around $49 in the month of November, about \
+half off, but for some reason (call it price gouging) \
+around the second week of December the prices all went \
+up to about anywhere from between $70-$89 for the same \
+system. And the 11 piece system went up around $10 or \
+so in price also from the earlier sale price of $29. \
+So it looks okay, but if you look at the base, the part \
+where the blade locks into place doesn’t look as good \
+as in previous editions from a few years ago, but I \
+plan to be very gentle with it (example, I crush \
+very hard items like beans, ice, rice, etc. in the \ 
+blender first then pulverize them in the serving size \
+I want in the blender then switch to the whipping \
+blade for a finer flour, and use the cross cutting blade \
+first when making smoothies, then use the flat blade \
+if I need them finer/less pulpy). Special tip when making \
+smoothies, finely cut and freeze the fruits and \
+vegetables (if using spinach-lightly stew soften the \ 
+spinach then freeze until ready for use-and if making \
+sorbet, use a small to medium sized food processor) \ 
+that you plan to use that way you can avoid adding so \
+much ice if at all-when making your smoothie. \
+After about a year, the motor was making a funny noise. \
+I called customer service but the warranty expired \
+already, so I had to buy another one. FYI: The overall \
+quality has gone done in these types of products, so \
+they are kind of counting on brand recognition and \
+consumer loyalty to maintain sales. Got it in about \
+two days.
+"""
+
+reviews = [review_1, review_2, review_3, review_4]
+for i in range(len(reviews)):
+    prompt = f"""
+    Your task is to generate a short summary of a product \ 
+    review from an ecommerce site. 
+
+    Summarize the review below, delimited by triple \
+    backticks in at most 20 words. 
+
+    Review: ```{reviews[i]}\```
+    """
+
+    response = get_completion(prompt)
+    print(i, response, "\n")
+
+</code></pre>
+<h2 id="inferring"><a class="header" href="#inferring">Inferring</a></h2>
+<ul>
+<li>傳統：ML訓練很複雜，LLM，藉由prompt可以有一個general solution</li>
+</ul>
+<h3 id="情緒正負面sentiment-positivenegative"><a class="header" href="#情緒正負面sentiment-positivenegative">情緒（正/負面）Sentiment (positive/negative)</a></h3>
+<pre><code class="language-python">lamp_review = """
+Needed a nice lamp for my bedroom, and this one had \
+additional storage and not too high of a price point. \
+Got it fast.  The string to our lamp broke during the \
+transit and the company happily sent over a new one. \
+Came within a few days as well. It was easy to put \
+together.  I had a missing part, so I contacted their \
+support and they very quickly got me the missing piece! \
+Lumina seems to me to be a great company that cares \
+about their customers and products!!
+"""
+prompt = f"""
+What is the sentiment of the following product review, 
+which is delimited with triple backticks?
+
+Review text: '''{lamp_review}'''
+"""
+response = get_completion(prompt)
+print(response)
+prompt = f"""
+What is the sentiment of the following product review, 
+which is delimited with triple backticks?
+
+Give your answer as a single word, either "positive" \
+or "negative".
+
+Review text: '''{lamp_review}'''
+"""
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<h3 id="識別情緒種類"><a class="header" href="#識別情緒種類">識別情緒種類</a></h3>
+<pre><code class="language-python">prompt = f"""
+Identify a list of emotions that the writer of the \
+following review is expressing. Include no more than \
+five items in the list. Format your answer as a list of \
+lower-case words separated by commas.
+
+Review text: '''{lamp_review}'''
+"""
+response = get_completion(prompt)
+print(response)
+prompt = f"""
+Is the writer of the following review expressing anger?\
+The review is delimited with triple backticks. \
+Give your answer as either yes or no.
+
+Review text: '''{lamp_review}'''
+"""
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<h3 id="從顧客回饋擷取產品及公司名稱"><a class="header" href="#從顧客回饋擷取產品及公司名稱">從顧客回饋擷取產品及公司名稱</a></h3>
+<pre><code class="language-python">prompt = f"""
+Identify the following items from the review text: 
+- Item purchased by reviewer
+- Company that made the item
+
+The review is delimited with triple backticks. \
+Format your response as a JSON object with \
+"Item" and "Brand" as the keys. 
+If the information isn't present, use "unknown" \
+as the value.
+Make your response as short as possible.
+  
+Review text: '''{lamp_review}'''
+"""
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<h3 id="一次全部做"><a class="header" href="#一次全部做">一次全部做</a></h3>
+<pre><code class="language-python">prompt = f"""
+Identify the following items from the review text: 
+- Sentiment (positive or negative)
+- Is the reviewer expressing anger? (true or false)
+- Item purchased by reviewer
+- Company that made the item
+
+The review is delimited with triple backticks. \
+Format your response as a JSON object with \
+"Sentiment", "Anger", "Item" and "Brand" as the keys.
+If the information isn't present, use "unknown" \
+as the value.
+Make your response as short as possible.
+Format the Anger value as a boolean.
+
+Review text: '''{lamp_review}'''
+"""
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<h3 id="擷取主題"><a class="header" href="#擷取主題">擷取主題</a></h3>
+<pre><code class="language-python">prompt = f"""
+Determine five topics that are being discussed in the \
+following text, which is delimited by triple backticks.
+
+Make each item one or two words long. 
+
+Format your response as a list of items separated by commas.
+
+Text sample: '''{story}'''
+"""
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<h3 id="製作特定新聞通知"><a class="header" href="#製作特定新聞通知">製作特定新聞通知</a></h3>
+<pre><code class="language-python">prompt = f"""
+Determine whether each item in the following list of \
+topics is a topic in the text below, which
+is delimited with triple backticks.
+
+Give your answer as list with 0 or 1 for each topic.\
+
+List of topics: {", ".join(topic_list)}
+
+Text sample: '''{story}'''
+"""
+response = get_completion(prompt)
+print(response)
+topic_dict = {i.split(': ')[0]: int(i.split(': ')[1]) for i in response.split(sep='\n')}
+if topic_dict['nasa'] == 1:
+    print("ALERT: New NASA story!")
+</code></pre>
+<h2 id="transforming"><a class="header" href="#transforming">Transforming</a></h2>
+<ul>
+<li>LLM適合轉換，比如 翻譯、格式轉換等等</li>
+</ul>
+<h3 id="翻譯"><a class="header" href="#翻譯">翻譯</a></h3>
+<pre><code class="language-python"># 翻譯
+prompt = f"""
+Translate the following English text to Spanish: \ 
+```Hi, I would like to order a blender```
+"""
+response = get_completion(prompt)
+print(response)
+# 識別語言
+prompt = f"""
+Tell me which language this is: 
+```Combien coûte le lampadaire?```
+"""
+response = get_completion(prompt)
+print(response)
+
+prompt = f"""
+Translate the following  text to French and Spanish
+and English pirate: \
+```I want to order a basketball```
+"""
+response = get_completion(prompt)
+print(response)
+# 有些語言會有正式用法跟非正式用法
+prompt = f"""
+Translate the following text to Spanish in both the \
+formal and informal forms: 
+'Would you like to order a pillow?'
+"""
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<h3 id="萬能翻譯器"><a class="header" href="#萬能翻譯器">萬能翻譯器</a></h3>
+<pre><code class="language-python">user_messages = [
+  "La performance du système est plus lente que d'habitude.",  # System performance is slower than normal         
+  "Mi monitor tiene píxeles que no se iluminan.",              # My monitor has pixels that are not lighting
+  "Il mio mouse non funziona",                                 # My mouse is not working
+  "Mój klawisz Ctrl jest zepsuty",                             # My keyboard has a broken control key
+  "我的屏幕在闪烁"                                               # My screen is flashing
+] 
+for issue in user_messages:
+    prompt = f"Tell me what language this is: ```{issue}```"
+    lang = get_completion(prompt)
+    print(f"Original message ({lang}): {issue}")
+
+    prompt = f"""
+    Translate the following  text to English \
+    and Korean: ```{issue}\```
+    """
+    response = get_completion(prompt)
+    print(response, "\n")
+</code></pre>
+<h3 id="使用不同的語氣"><a class="header" href="#使用不同的語氣">使用不同的語氣</a></h3>
+<pre><code class="language-python">prompt = f"""
+Translate the following from slang to a business letter: 
+'Dude, This is Joe, check out this spec on this standing lamp.'
+"""
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<h3 id="格式轉換"><a class="header" href="#格式轉換">格式轉換</a></h3>
+<pre><code class="language-python">data_json = { "resturant employees" :[ 
+    {"name":"Shyam", "email":"shyamjaiswal@gmail.com"},
+    {"name":"Bob", "email":"bob32@gmail.com"},
+    {"name":"Jai", "email":"jai87@gmail.com"}
+]}
+
+prompt = f"""
+Translate the following python dictionary from JSON to an HTML \
+table with column headers and title: {data_json}
+"""
+response = get_completion(prompt)
+print(response)
+from IPython.display import display, Markdown, Latex, HTML, JSON
+display(HTML(response))
+</code></pre>
+<h3 id="拼字語法檢查"><a class="header" href="#拼字語法檢查">拼字/語法檢查</a></h3>
+<pre><code class="language-python">text = [ 
+  "The girl with the black and white puppies have a ball.",  # The girl has a ball.
+  "Yolanda has her notebook.", # ok
+  "Its going to be a long day. Does the car need it’s oil changed?",  # Homonyms
+  "Their goes my freedom. There going to bring they’re suitcases.",  # Homonyms
+  "Your going to need you’re notebook.",  # Homonyms
+  "That medicine effects my ability to sleep. Have you heard of the butterfly affect?", # Homonyms
+  "This phrase is to cherck chatGPT for speling abilitty"  # spelling
+]
+for t in text:
+    prompt = f"""Proofread and correct the following text
+    and rewrite the corrected version. If you don't find
+    and errors, just say "No errors found". Don't use 
+    any punctuation around the text:
+    ```{t}```"""
+    response = get_completion(prompt)
+    print(response)
+</code></pre>
+<h4 id="修改文章"><a class="header" href="#修改文章">修改文章</a></h4>
+<pre><code class="language-python">text = f"""
+Got this for my daughter for her birthday cuz she keeps taking \
+mine from my room.  Yes, adults also like pandas too.  She takes \
+it everywhere with her, and it's super soft and cute.  One of the \
+ears is a bit lower than the other, and I don't think that was \
+designed to be asymmetrical. It's a bit small for what I paid for it \
+though. I think there might be other options that are bigger for \
+the same price.  It arrived a day earlier than expected, so I got \
+to play with it myself before I gave it to my daughter.
+"""
+prompt = f"proofread and correct this review: ```{text}```"
+response = get_completion(prompt)
+print(response)
+from redlines import Redlines
+
+diff = Redlines(text,response)
+display(Markdown(diff.output_markdown))
+</code></pre>
+<h4 id="改進文章並遵從ooostyle"><a class="header" href="#改進文章並遵從ooostyle">改進文章並遵從OOOstyle</a></h4>
+<pre><code class="language-python">prompt = f"""
+proofread and correct this review. Make it more compelling. 
+Ensure it follows APA style guide and targets an advanced reader. 
+Output in markdown format.
+Text: ```{text}\```
+"""
+response = get_completion(prompt)
+display(Markdown(response))
+</code></pre>
+<h2 id="expanding"><a class="header" href="#expanding">Expanding</a></h2>
+<ul>
+<li>temperature：給模型的隨機seed</li>
+</ul>
+<h3 id="setup-1"><a class="header" href="#setup-1">setup</a></h3>
+<pre><code class="language-python">import openai
+import os
+
+from dotenv import load_dotenv, find_dotenv
+_ = load_dotenv(find_dotenv()) # read local .env file
+
+openai.api_key  = os.getenv('OPENAI_API_KEY')
+def get_completion(prompt, model="gpt-3.5-turbo",temperature=0): # Andrew mentioned that the prompt/ completion paradigm is preferable for this class
+    messages = [{"role": "user", "content": prompt}]
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=messages,
+        temperature=temperature, # this is the degree of randomness of the model's output
+    )
+    return response.choices[0].message["content"]
+</code></pre>
+<h3 id="客製化自動回覆"><a class="header" href="#客製化自動回覆">客製化自動回覆</a></h3>
+<pre><code class="language-python"># given the sentiment from the lesson on "inferring",
+# and the original customer message, customize the email
+sentiment = "negative"
+
+# review for a blender
+review = f"""
+So, they still had the 17 piece system on seasonal \
+sale for around $49 in the month of November, about \
+half off, but for some reason (call it price gouging) \
+around the second week of December the prices all went \
+up to about anywhere from between $70-$89 for the same \
+system. And the 11 piece system went up around $10 or \
+so in price also from the earlier sale price of $29. \
+So it looks okay, but if you look at the base, the part \
+where the blade locks into place doesn’t look as good \
+as in previous editions from a few years ago, but I \
+plan to be very gentle with it (example, I crush \
+very hard items like beans, ice, rice, etc. in the \ 
+blender first then pulverize them in the serving size \
+I want in the blender then switch to the whipping \
+blade for a finer flour, and use the cross cutting blade \
+first when making smoothies, then use the flat blade \
+if I need them finer/less pulpy). Special tip when making \
+smoothies, finely cut and freeze the fruits and \
+vegetables (if using spinach-lightly stew soften the \ 
+spinach then freeze until ready for use-and if making \
+sorbet, use a small to medium sized food processor) \ 
+that you plan to use that way you can avoid adding so \
+much ice if at all-when making your smoothie. \
+After about a year, the motor was making a funny noise. \
+I called customer service but the warranty expired \
+already, so I had to buy another one. FYI: The overall \
+quality has gone done in these types of products, so \
+they are kind of counting on brand recognition and \
+consumer loyalty to maintain sales. Got it in about \
+two days.
+"""
+prompt = f"""
+You are a customer service AI assistant.
+Your task is to send an email reply to a valued customer.
+Given the customer email delimited by ```, \
+Generate a reply to thank the customer for their review.
+If the sentiment is positive or neutral, thank them for \
+their review.
+If the sentiment is negative, apologize and suggest that \
+they can reach out to customer service. 
+Make sure to use specific details from the review.
+Write in a concise and professional tone.
+Sign the email as `AI customer agent`.
+Customer review: ```{review}\```
+Review sentiment: {sentiment}
+"""
+response = get_completion(prompt)
+print(response)
+</code></pre>
+<p><img src="https://i.imgur.com/XvG5DYk.png" alt="" /></p>
+<h3 id="根據客戶情緒回覆"><a class="header" href="#根據客戶情緒回覆">根據客戶情緒回覆</a></h3>
+<pre><code class="language-python">prompt = f"""
+You are a customer service AI assistant.
+Your task is to send an email reply to a valued customer.
+Given the customer email delimited by ```, \
+Generate a reply to thank the customer for their review.
+If the sentiment is positive or neutral, thank them for \
+their review.
+If the sentiment is negative, apologize and suggest that \
+they can reach out to customer service. 
+Make sure to use specific details from the review.
+Write in a concise and professional tone.
+Sign the email as `AI customer agent`.
+Customer review: ```{review}\```
+Review sentiment: {sentiment}
+"""
+response = get_completion(prompt, temperature=0.7)
+print(response)
+</code></pre>
+<h2 id="chatbot"><a class="header" href="#chatbot">chatbot</a></h2>
+<ul>
+<li>透過messages可以帶入對話</li>
+</ul>
+<pre><code class="language-python">import os
+import openai
+from dotenv import load_dotenv, find_dotenv
+_ = load_dotenv(find_dotenv()) # read local .env file
+
+openai.api_key  = os.getenv('OPENAI_API_KEY')
+def get_completion(prompt, model="gpt-3.5-turbo"):
+    messages = [{"role": "user", "content": prompt}]
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=messages,
+        temperature=0, # this is the degree of randomness of the model's output
+    )
+    return response.choices[0].message["content"]
+
+def get_completion_from_messages(messages, model="gpt-3.5-turbo", temperature=0):
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=messages,
+        temperature=temperature, # this is the degree of randomness of the model's output
+    )
+#     print(str(response.choices[0].message))
+    return response.choices[0].message["content"]
+messages =  [  
+{'role':'system', 'content':'You are an assistant that speaks like Shakespeare.'},    
+{'role':'user', 'content':'tell me a joke'},   
+{'role':'assistant', 'content':'Why did the chicken cross the road'},   
+{'role':'user', 'content':'I don\'t know'}  ]
+response = get_completion_from_messages(messages, temperature=1)
+print(response)
+
+messages =  [  
+{'role':'system', 'content':'You are friendly chatbot.'},    
+{'role':'user', 'content':'Hi, my name is Isa'}  ]
+response = get_completion_from_messages(messages, temperature=1)
+print(response)
+messages =  [  
+{'role':'system', 'content':'You are friendly chatbot.'},    
+{'role':'user', 'content':'Yes,  can you remind me, What is my name?'}  ]
+response = get_completion_from_messages(messages, temperature=1)
+print(response)
+
+messages =  [  
+{'role':'system', 'content':'You are friendly chatbot.'},
+{'role':'user', 'content':'Hi, my name is Isa'},
+{'role':'assistant', 'content': "Hi Isa! It's nice to meet you. \
+Is there anything I can help you with today?"},
+{'role':'user', 'content':'Yes, you can remind me, What is my name?'}  ]
+response = get_completion_from_messages(messages, temperature=1)
+print(response)
+</code></pre>
+<h3 id="例子orderbot"><a class="header" href="#例子orderbot">例子：OrderBot</a></h3>
+<pre><code class="language-python">def collect_messages(_):
+    prompt = inp.value_input
+    inp.value = ''
+    context.append({'role':'user', 'content':f"{prompt}"})
+    response = get_completion_from_messages(context) 
+    context.append({'role':'assistant', 'content':f"{response}"})
+    panels.append(
+        pn.Row('User:', pn.pane.Markdown(prompt, width=600)))
+    panels.append(
+        pn.Row('Assistant:', pn.pane.Markdown(response, width=600, style={'background-color': '#F6F6F6'})))
+ 
+    return pn.Column(*panels)
+import panel as pn  # GUI
+pn.extension()
+
+panels = [] # collect display 
+
+context = [ {'role':'system', 'content':"""
+You are OrderBot, an automated service to collect orders for a pizza restaurant. \
+You first greet the customer, then collects the order, \
+and then asks if it's a pickup or delivery. \
+You wait to collect the entire order, then summarize it and check for a final \
+time if the customer wants to add anything else. \
+If it's a delivery, you ask for an address. \
+Finally you collect the payment.\
+Make sure to clarify all options, extras and sizes to uniquely \
+identify the item from the menu.\
+You respond in a short, very conversational friendly style. \
+The menu includes \
+pepperoni pizza  12.95, 10.00, 7.00 \
+cheese pizza   10.95, 9.25, 6.50 \
+eggplant pizza   11.95, 9.75, 6.75 \
+fries 4.50, 3.50 \
+greek salad 7.25 \
+Toppings: \
+extra cheese 2.00, \
+mushrooms 1.50 \
+sausage 3.00 \
+canadian bacon 3.50 \
+AI sauce 1.50 \
+peppers 1.00 \
+Drinks: \
+coke 3.00, 2.00, 1.00 \
+sprite 3.00, 2.00, 1.00 \
+bottled water 5.00 \
+"""} ]  # accumulate messages
+
+
+inp = pn.widgets.TextInput(value="Hi", placeholder='Enter text here…')
+button_conversation = pn.widgets.Button(name="Chat!")
+
+interactive_conversation = pn.bind(collect_messages, button_conversation)
+
+dashboard = pn.Column(
+    inp,
+    pn.Row(button_conversation),
+    pn.panel(interactive_conversation, loading_indicator=True, height=300),
+)
+
+dashboard
+</code></pre>
+<pre><code class="language-python">messages =  context.copy()
+messages.append(
+{'role':'system', 'content':'create a json summary of the previous food order. Itemize the price for each item\
+ The fields should be 1) pizza, include size 2) list of toppings 3) list of drinks, include size   4) list of sides include size  5)total price '},    
+)
+ #The fields should be 1) pizza, price 2) list of toppings 3) list of drinks, include size include price  4) list of sides include size include price, 5)total price '},    
+
+response = get_completion_from_messages(messages, temperature=0)
+print(response)
+</code></pre>
+<p><img src="https://i.imgur.com/jbCDYh1.png" alt="" /></p>
+<h2 id="ref"><a class="header" href="#ref">Ref</a></h2>
+<ul>
+<li>https://learn.deeplearning.ai/chatgpt-prompt-eng</li>
+<li></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../posts/llm/20231023-Pair-Programming-with-a-Large-Language-Model.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../posts/llm/20231029-Building-Systems-with-the-ChatGPT-API.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../posts/llm/20231023-Pair-Programming-with-a-Large-Language-Model.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../posts/llm/20231029-Building-Systems-with-the-ChatGPT-API.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
