@@ -26,6 +26,7 @@ fi
 
 cp -r "$POSTS_PATH"/ src/posts/
 echo "# title" > "$OUTPUT_FILE"
+echo " # 1" >> "$OUTPUT_FILE"
 # 创建或清空 summary.md 文件
 # echo -e "[Introduction](README.md)\n" > "$OUTPUT_FILE"
 # 开始生成链接
