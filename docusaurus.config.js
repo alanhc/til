@@ -89,16 +89,18 @@ const config = {
         },
         items: [
           {
-            type: 'search',
-            position: 'right',
-          },
-          {
             type: 'docSidebar',
             sidebarId: 'tutorialSidebar',
             position: 'left',
             label: 'Tutorial',
           },
-          {to: '/blog', label: 'Blog', position: 'left'},
+          {to: '/blog', label: 'Sample Blog', position: 'left'},
+          { type: 'search', position: 'right' },
+          {
+            href: 'https://alanhc.github.io/logA',
+            label: 'Blog',
+            position: 'right',
+          },
           {
             href: 'https://alanhc.github.io',
             label: 'Homepage',
