@@ -1,6 +1,4 @@
----
-title: Linked List 101
----
+# Linked List 101
 
 首先我們要使用 `main.c` 來實作一個簡單的 linked list。這個 linked list 會包含以下功能：
 1. 插入節點到 linked list 的尾端。
