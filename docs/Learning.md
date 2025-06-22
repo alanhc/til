@@ -55,5 +55,8 @@
 重要的點：intellectual honesty、curiosity、intention
 Coachable 的潛值
 
+https://alanhc.github.io/logA/blog/20231023-learning-from-lin
+
+
 How to scale sequence analysis? | with Sean @Motif Analytics
 [[Youtube][YvonneJiu] Obsidian to Anki tutorial: The most simple & efficient way to automate your learning](https://www.youtube.com/watch?v=S0fDdArNtRo&ab_channel=YvonneJiu)
