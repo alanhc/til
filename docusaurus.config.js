@@ -80,6 +80,12 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
+      algolia: {
+        appId: 'TBL44VJRTD',
+        apiKey: '0286276bc17f1b09ecf9cfe0130a1301',
+        indexName: 'https://alanhc.github.io/til',
+        contextualSearch: true,
+      },
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
         title: 'alanhc\'s TIL',
