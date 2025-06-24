@@ -5,7 +5,7 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
-    "prebuild": "cp -r  /Users/alantseng/workspace/til/docs/ ~/Library/Mobile\\ Documents/iCloud\\~md\\~obsidian/Documents/work_notes/外 ",
+    "sync": "cp -r  /Users/alantseng/workspace/til/docs/ ~/Library/Mobile\\ Documents/iCloud\\~md\\~obsidian/Documents/work_notes/外 ",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
