@@ -81,10 +81,12 @@ const config = {
     ({
       // Replace with your project's social card
       algolia: {
-        appId: 'TBL44VJRTD',
-        apiKey: '0286276bc17f1b09ecf9cfe0130a1301',
-        indexName: 'https://alanhc.github.io/til',
+        appId: '87B0UMILN7',
+        apiKey: 'ed3b99a7e1e616b527442b479b40fe93',
+        indexName: 'alanhcio',
         contextualSearch: true,
+        insights: true,
+
       },
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
