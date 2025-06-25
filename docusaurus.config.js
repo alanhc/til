@@ -38,8 +38,8 @@ const config = {
   // useful metadata like html lang. For example, if your site is Chinese, you
   // may want to replace "en" with "zh-Hans".
   i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
+    defaultLocale: 'zh-Hant',
+    locales: ['zh-Hant', 'en'],
   },
 
   presets: [
@@ -86,7 +86,6 @@ const config = {
         indexName: 'alanhcio',
         contextualSearch: true,
         insights: true,
-
       },
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
