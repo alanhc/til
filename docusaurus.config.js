@@ -82,10 +82,13 @@ const config = {
       // Replace with your project's social card
       algolia: {
         appId: '87B0UMILN7',
-        apiKey: 'ed3b99a7e1e616b527442b479b40fe93',
+        apiKey: 'fa70277f5ba8a90d8a5642ade2b3f460',
         indexName: 'alanhcio',
         contextualSearch: true,
         insights: true,
+        algoliaOptions: {
+          'facetFilters': ['lang:zh-Hant', 'lang:en-US'],
+        }
       },
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
