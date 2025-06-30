@@ -3,7 +3,8 @@
 // (when paired with `@ts-check`).
 // There are various equivalent ways to declare your Docusaurus config.
 // See: https://docusaurus.io/docs/api/docusaurus-config
-
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import {themes as prismThemes} from 'prism-react-renderer';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
@@ -53,6 +54,8 @@ const config = {
           // Remove this to remove the "edit this page" links.
           editUrl:
             'https://github.com/alanhc/til/tree/main/',
+          remarkPlugins: [remarkMath],
+          rehypePlugins: [rehypeKatex],
         },
         blog: {
           showReadingTime: true,
@@ -159,6 +162,12 @@ const config = {
         darkTheme: prismThemes.dracula,
       },
     }),
+   themes: ['@docusaurus/theme-mermaid'],
+  // In order for Mermaid code blocks in Markdown to work,
+  // you also need to enable the Remark plugin with this option
+  markdown: {
+    mermaid: true,
+  },
 };
 
 export default config;
