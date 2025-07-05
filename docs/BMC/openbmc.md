@@ -1,0 +1,1 @@
+[The overview and future of Open Source FW for server industry](https://youtu.be/cnC4zmxm5AY?si=c0G3e_4zOFUZe7g2)
