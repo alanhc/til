@@ -1,6 +1,14 @@
 # Device Driver
 
+probe
 
+kconfig
+
+makefile
+
+dmesg
+
+/sys/class/hwmon/hwmonX/current1_input
 
 改 driver 通常會動到的是 Driver 及 Device Tree
 ```mermaid

@@ -1,0 +1,3 @@
+/proc/interrupts
+
+irq handler
