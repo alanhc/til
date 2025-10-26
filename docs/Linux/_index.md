@@ -1,8 +1,0 @@
-
-vmlinux
-
-initramdisk
-
-initramfs
-
-rootfs
