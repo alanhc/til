@@ -2,6 +2,11 @@
 
 https://hackmd.io/@sysprog/info2024/https%3A%2F%2Fhackmd.io%2F%40sysprog%2FH1-4KbanC
 
+- Fuck you money
+[A Level Of Fuck You -- John Goodman [The Gambler] -- fuck you money](https://youtu.be/qGC9FY65HBo?si=S4i4Hy5UNx4bnT0y)
+[The Position of Fuck You by jlcollinsnh](https://youtu.be/eikbQPldhPY?si=bPtoel8EPfCQW5kI)
+[A Level Of Fuck You -- John Goodman [The Gambler] -- fuck you money](https://youtu.be/qGC9FY65HBo?si=dr_onvCaZe5-WEoW)
+
 
 - [EP60｜帶領團隊向前衝！矽谷PM都在忙什麼？ feat. @chloeshih](https://youtu.be/coCHGiehxS0?si=fVQMbE7XM0Z8AA0j)
 - https://hackmd.io/@sysprog/info2024/https%3A%2F%2Fhackmd.io%2F%40sysprog%2FH1-4KbanC
