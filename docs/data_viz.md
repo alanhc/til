@@ -41,5 +41,9 @@ fig.show()
 ## Chord Diagram
 系統 A → 系統 B → 又回 A
 經濟模型中存在雙向交易
-![alt text](assets/image-3.png)
+跟sankey diagram 不同的是Chord Diagram強調兩個節點的雙向關係
 
+
+
+## Treemap
+![alt text](assets/image-4.png)
