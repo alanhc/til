@@ -1,4 +1,3 @@
-
 ## 了解自己的目標
 假設我想要在40歲時，讓我每個月有3萬元的被動收入（約等於基本薪資），接下來可以來思考需要存多少錢？
 假設我現在26歲，所以距離40還有14年的時間。
@@ -22,6 +21,20 @@
 r 是我們設定的預期年化報酬，i = r/12 是月化報酬，
 算出來，若以平均複利年報酬8%來算，每個月存 NT$38,958元，14年後可以存到約1200萬。
 
+![alt text](assets/image-5.png)
+https://docs.google.com/spreadsheets/d/1YUxhozkRM6cVerxMCcI-50orvxZRavgVtHWyXH8_4RA/edit?usp=sharing
+
+
+## 積極與防禦資產
+積極/保守 7:3
+
+## 投資標的
+- 股票
+- 債券
+REITs
+- 黃金
+- 現金
+
 
 ## 有哪些書可以參考
 - 持續買進
@@ -32,4 +45,4 @@ https://www.threads.com/@alanhc.316/post/DJvc_KGyFji
 
 
 
-
+https://www.threads.com/@alanhc.316/post/DJKR7J4SRM3?
