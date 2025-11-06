@@ -19,7 +19,7 @@
 
 我們要知道到底每個月要存多少
 r 是我們設定的預期年化報酬，i = r/12 是月化報酬，
-算出來，若以平均複利年報酬8%來算，每個月存 NT$38,958元，14年後可以存到約1200萬。
+算出來，若以平均複利年報酬8%來算，每個月存 NT$38,958元，14年後可以存到約 1200 萬。
 
 ![alt text](assets/image-5.png)
 https://docs.google.com/spreadsheets/d/1YUxhozkRM6cVerxMCcI-50orvxZRavgVtHWyXH8_4RA/edit?usp=sharing
