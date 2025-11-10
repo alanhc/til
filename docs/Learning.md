@@ -1,5 +1,10 @@
 # 學習
 
+https://youtu.be/EViSmcCPK5g?si=vVYVKPKvZ5nQrKLI
+我是如何快速学习一个领域的
+
+框架、脈絡
+
 
 在學習的時候我們可以先使用高層次概覽（Roadmap），並且提取中間重要的部分 e.g. Pattern，而不是細節
 
@@ -7,6 +12,8 @@
 步驟是 理解 > 分解 > 在構築 > 整理
 
 中間可能遇到挫折 e.g. 痛苦 > (快樂＋意義) 會導致 拖延
+
+[破解大腦學習密碼🧠！用『心智圖』快速學會任何困難知識⚡️](https://youtu.be/P88ahuUNwow?si=2zCPuTV_nPa65M6a)
 
 心智圖
 1. 先列關鍵字
