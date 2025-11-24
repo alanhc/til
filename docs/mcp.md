@@ -77,3 +77,6 @@ MCP Server URL 要填寫剛才cloudflare tunnel 提供的網址/mcp
 
 ## 直接在 ChatGPT 裡面呼叫剛才新增的 My MCP 
 ![alt text](assets/image-10.png)
+
+小範例參考
+https://github.com/alanhc/yt-mcp-server
