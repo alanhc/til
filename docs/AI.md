@@ -30,3 +30,10 @@ https://youtu.be/6hRO1q8vv60
 ## mcp
 
 https://developers.openai.com/apps-sdk/build/mcp-server
+| 類型 / 公司                                  | OpenAI                                                           | Google                                                          | Anthropic                                               |
+| ---------------------------------------- | ---------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------- |
+| Agent framework                          | Model Context Protocol (MCP) + OpenAI Agents SDK（Agent 標準 + SDK） | Agent Development Kit (ADK)、Vertex AI Agent Builder（雲端部署 Agent） | Claude Agent SDK（搭配 Claude Code / Claude 模型的 Agent SDK） |
+| Web-based AI editor / IDE（不含 NotebookLM） | Codex 線上編輯 / ChatGPT Code Interpreter                            | Google AI Studio、Firebase Studio、Gemini for Web、                | Claude Code Web App（claude.ai）                          |
+| Local AI editor / IDE                    | （OpenAI：目前無本地 IDE）                                               | Gemini in Zed Editor、Antigravity（本地運行）、VSCode Gemini Plugin     | Claude Code CLI（帶編輯能力）                                  |
+| CLI tool                                 | OpenAI CLI、Codex CLI（直接在終端呼叫 OpenAI API / 模型）                    | Gemini CLI（開源 AI agent，帶 Gemini 到你的 terminal）                   | Claude Code CLI（終端內的 Claude coding / agent 工具）          |
+| Research / Note-taking Tools | （OpenAI：暫無專門筆記工具） | NotebookLM（AI 筆記與研究工具） | （Anthropic：暫無專門工具） |
