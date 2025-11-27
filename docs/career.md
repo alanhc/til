@@ -70,3 +70,6 @@ https://www.threads.com/@alanhc.316/post/DJVMemEzy45
 
 https://www.threads.com/@alanhc.316/post/DJJ2-HgSjpZ?
 
+希望自己50也能像我爸一樣
+Old, but not obsolete
+https://youtu.be/DQtg9011iDQ
