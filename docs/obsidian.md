@@ -4,3 +4,4 @@
 
 
 
+![](assets/obsidian/file-20251206225649111.png)
