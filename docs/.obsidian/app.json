@@ -1,4 +1,4 @@
 {
-  "newLinkFormat": "relative",
-  "useMarkdownLinks": true
+  "newLinkFormat": "shortest",
+  "useMarkdownLinks": false
 }
