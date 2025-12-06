@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "obsidian.md",
+                "file": "人際.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "obsidian"
+              "title": "人際"
             }
           }
         ]
@@ -186,6 +186,18 @@
   },
   "active": "e8e61b022fb722ce",
   "lastOpenFiles": [
+    "反直覺.md",
+    "投資計劃.md",
+    "酒田戰法.md",
+    "投資.md",
+    "人際.md",
+    "learning.md",
+    "life.md",
+    "obsidian.md",
+    "mcp.md",
+    "health.md",
+    "android_build_project.md",
+    "AI.md",
     "assets/obsidian/file-20251206225649111.png",
     "assets/obsidian",
     "assets/obsidian/file-20251206225633195.png",
@@ -196,15 +208,9 @@
     "assets/obsidian/file-20251206225226687.png",
     "assets/obsidian/file-20251206225220004.png",
     "assets/obsidian/file-20251206225126183.png",
-    "obsidian.md",
     "assets/obsidian/file-20251206225145146.png",
     "assets/obsidian/file-20251206225017624.png",
-    "assets/obsidian/file-20251206224957087.png",
     "android.md",
-    "簡報.md",
-    "反直覺.md",
-    "投資.md",
-    "人際.md",
-    "android_build_project.md"
+    "簡報.md"
   ]
 }
