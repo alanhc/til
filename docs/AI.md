@@ -24,6 +24,11 @@ codex
 ## Materials
 https://www.deeplearning.ai/
 
+
+## claude 
+https://platform.claude.com/docs/zh-TW/agents-and-tools/agent-skills/overview
+
+
 ## Tools
 ChatGPT Atlas
 comet
@@ -49,3 +54,11 @@ https://developers.openai.com/apps-sdk/build/mcp-server
 claude 
 claude.md
 https://youtu.be/Hr24rIDDyPU?si=8KZNRJZ0NEuHuSFZ
+
+gemini
+GEMINI.md
+
+## AI 歷史
+2020 gpt-3
+2022 chatgpt
+2023 gpt-4

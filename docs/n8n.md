@@ -6,3 +6,8 @@ Apple Podcast是抓取音檔後使用whisper轉成文字
 
 
 https://muki.tw/n8n-mcp-workflow-introduce/
+
+
+## 其他
+Intro to Agent Builder
+https://youtu.be/44eFf-tRiSg?si=qzh-L6SZetsoqmya
