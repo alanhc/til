@@ -73,3 +73,6 @@ https://www.threads.com/@alanhc.316/post/DJJ2-HgSjpZ?
 希望自己50也能像我爸一樣
 Old, but not obsolete
 https://youtu.be/DQtg9011iDQ
+
+"You want to be surrounded by people more competent than you. because otherwise what's the point"
+https://youtu.be/mfv0V1SxbNA?si=xBvtS_zR_JuMBzUU&t=1332

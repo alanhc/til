@@ -15,7 +15,11 @@ https://platform.openai.com/agent-builder
 
 mcp
 
-
+## cli
+claude code cli
+會產生 CLAUDE.md
+codex
+會產生 AGENTS.md
 
 ## Materials
 https://www.deeplearning.ai/
@@ -37,3 +41,11 @@ https://developers.openai.com/apps-sdk/build/mcp-server
 | Local AI editor / IDE                    | （OpenAI：目前無本地 IDE）                                               | Gemini in Zed Editor、Antigravity（本地運行）、VSCode Gemini Plugin     | Claude Code CLI（帶編輯能力）                                  |
 | CLI tool                                 | OpenAI CLI、Codex CLI（直接在終端呼叫 OpenAI API / 模型）                    | Gemini CLI（開源 AI agent，帶 Gemini 到你的 terminal）                   | Claude Code CLI（終端內的 Claude coding / agent 工具）          |
 | Research / Note-taking Tools | （OpenAI：暫無專門筆記工具） | NotebookLM（AI 筆記與研究工具） | （Anthropic：暫無專門工具） |
+
+![alt text](assets/image-19.png)
+
+## Coding
+无限免费Claude Code，免费模型有满血版几成功力？
+claude 
+claude.md
+https://youtu.be/Hr24rIDDyPU?si=8KZNRJZ0NEuHuSFZ
