@@ -11,12 +11,14 @@
             "id": "e8e61b022fb722ce",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "assets/截圖 2025-11-05 晚上7.24.58.png"
+                "file": "obsidian.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-image",
-              "title": "截圖 2025-11-05 晚上7.24.58"
+              "icon": "lucide-file",
+              "title": "obsidian"
             }
           }
         ]
@@ -92,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "assets/截圖 2025-11-05 晚上7.24.58.png",
+                "file": "obsidian.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for 截圖 2025-11-05 晚上7.24.58"
+              "title": "Backlinks for obsidian"
             }
           },
           {
@@ -111,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "assets/截圖 2025-11-05 晚上7.24.58.png",
+                "file": "obsidian.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from 截圖 2025-11-05 晚上7.24.58"
+              "title": "Outgoing links from obsidian"
             }
           },
           {
@@ -154,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "assets/截圖 2025-11-05 晚上7.24.58.png",
+                "file": "obsidian.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of 截圖 2025-11-05 晚上7.24.58"
+              "title": "Outline of obsidian"
             }
           }
         ]
@@ -184,23 +186,24 @@
   },
   "active": "e8e61b022fb722ce",
   "lastOpenFiles": [
+    "assets/obsidian/file-20251206225017624.png",
+    "assets/obsidian/file-20251206224957087.png",
+    "obsidian.md",
+    "assets/obsidian",
+    "openwebui.md",
+    "assets/截圖 2025-11-05 晚上7.24.58.png",
     "assets/截圖 2025-11-05 晚上7.24.21.png",
     "assets/obsidian/截圖 2025-12-06 晚上10.47.26.png",
+    "assets/obsidian/file-20251206224931348.png",
+    "assets/obsidian/file-20251206224914227.png",
+    "assets/obsidian/file-20251206224750562.png",
     "assets/obsidian/file-20251206224049151.png",
     "assets/obsidian/file-20251206224324852.png",
     "assets/obsidian/file-20251206224436541.png",
-    "assets/obsidian/file-20251206224756106.png",
-    "assets/obsidian/file-20251206224049782.png",
-    "assets/obsidian/file-20251206224730151.png",
-    "assets/obsidian/file-20251206224436816.png",
-    "assets/obsidian/file-20251206224434729.png",
-    "assets/obsidian/file-20251206224047713.png",
     "android.md",
     "簡報.md",
     "反直覺.md",
     "投資.md",
-    "obsidian.md",
-    "assets/obsidian",
     "人際.md",
     "android_build_project.md"
   ]
