@@ -28,6 +28,8 @@ https://www.deeplearning.ai/
 ## claude 
 https://platform.claude.com/docs/zh-TW/agents-and-tools/agent-skills/overview
 
+claude and n8n
+
 
 ## Tools
 ChatGPT Atlas

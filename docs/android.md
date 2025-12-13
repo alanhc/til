@@ -15,3 +15,4 @@ https://developer.android.com/guide/platform?hl=zh-tw
 A Deep Dive into the Android Boot Process: Step-by-Step Breakdown.https://www.linkedin.com/pulse/deep-dive-android-boot-process-step-by-step-breakdown-santilli-9cdbf/
 
 ## linux boot vs android boot
+
