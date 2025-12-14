@@ -1,6 +1,4 @@
 
-Google Agentspace
-
 
 
 
@@ -11,17 +9,17 @@ mcp
 
 ## 比較表格
 
-|            | OpenAI        | Google            | Anthropic | Perplexity AI    |
-| ---------- | ------------- | :---------------- | --------- | ---------------- |
-| Chat       | ChatGPT       |                   |           | Perplexity       |
-| POC        |               | Google AI Studio  |           |                  |
-| Browser    | ChatGPT Atlas | Chrome AI 模式      |           | Perplexity Comet |
-| AI 筆記與研究工具 | Notebook LM   |                   |           |                  |
-| 地端IDE      |               | Antigravity       |           |                  |
-| 企業AI 搜尋    |               | Google Agentspace |           |                  |
-| CLI        | Codex CLI     |                   |           |                  |
-|            |               |                   |           |                  |
-|            |               |                   |           |                  |
+|                 | OpenAI        | Google            | Anthropic | Perplexity AI    |
+| --------------- | ------------- | :---------------- | --------- | ---------------- |
+| Chat            | ChatGPT       |                   |           | Perplexity       |
+| POC             |               | Google AI Studio  |           |                  |
+| Browser         | ChatGPT Atlas | Chrome AI 模式      |           | Perplexity Comet |
+| AI 筆記與研究工具      | Notebook LM   |                   |           |                  |
+| 地端IDE           |               | Antigravity       |           |                  |
+| 企業AI 搜尋         |               | Google Agentspace |           |                  |
+| CLI             | Codex CLI     |                   |           |                  |
+| Agent Framework |               | Agent builder     |           |                  |
+|                 |               |                   |           |                  |
 ## AI 歷史
 2020 gpt-3
 2022 chatgpt
