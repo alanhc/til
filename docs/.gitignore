@@ -1,2 +1,7 @@
 Excalidraw
 .obsidian/
+
+
+
+# Ignore Smart Environment folder
+.smart-env
