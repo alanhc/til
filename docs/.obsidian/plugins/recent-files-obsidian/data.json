@@ -1,0 +1,52 @@
+{
+  "recentFiles": [
+    {
+      "basename": "ai",
+      "path": "ai.md"
+    },
+    {
+      "basename": "automation",
+      "path": "automation.md"
+    },
+    {
+      "basename": "ai_google_ai",
+      "path": "ai_google_ai.md"
+    },
+    {
+      "basename": "ai_inference",
+      "path": "ai_inference.md"
+    },
+    {
+      "basename": "ai_testing",
+      "path": "ai_testing.md"
+    },
+    {
+      "basename": "ai_antigravaty",
+      "path": "ai_antigravaty.md"
+    },
+    {
+      "basename": "ai_google_notebook_lm",
+      "path": "ai_google_notebook_lm.md"
+    },
+    {
+      "basename": "ai_google_ai_studio",
+      "path": "ai_google_ai_studio.md"
+    },
+    {
+      "basename": "android",
+      "path": "android.md"
+    },
+    {
+      "basename": "docker_debug_network",
+      "path": "docker_debug_network.md"
+    },
+    {
+      "basename": "openwebui",
+      "path": "openwebui.md"
+    }
+  ],
+  "omittedPaths": [],
+  "omittedTags": [],
+  "updateOn": "file-open",
+  "omitBookmarks": false
+}
