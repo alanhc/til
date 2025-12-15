@@ -69,12 +69,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "ai_inference.md",
+                "file": "ai_jan_ai.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "ai_inference"
+              "title": "ai_jan_ai"
             }
           }
         ],
@@ -110,7 +110,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "openweb",
+                "query": "jan",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -262,13 +262,24 @@
   },
   "active": "2d92c447a03ef9a6",
   "lastOpenFiles": [
-    "automation.md",
     "ai_testing.md",
+    "ai_jan_ai.md",
+    "ai_inference.md",
+    "說不.md",
+    "人際.md",
+    "投資.md",
+    "assets/ai_jan_ai/file-20251215212318633.png",
+    "assets/ai_jan_ai",
+    "Pasted image 20251215212216.png",
+    "Pasted image 20251215212016.png",
+    "Pasted image 20251215212005.png",
+    "Pasted image 20251215211819.png",
+    "Pasted image 20251215211812.png",
+    "automation.md",
     "ai_google_notebook_lm.md",
     "ai_google_ai_studio.md",
     "ai_google_ai.md",
     "docker_debug_network.md",
-    "ai_inference.md",
     "openwebui.md",
     "ai_antigravaty.md",
     "copilot/copilot-custom-prompts/Rewrite as tweet thread.md",
@@ -289,20 +300,10 @@
     "assets/ai_antigravaty/file-20251213101447420.png",
     "assets/ai_antigravaty/file-20251213090755274.png",
     "assets/ai_antigravaty",
-    "android.md",
-    "ai.md",
-    "android_build_project.md",
-    "arm_trust_firmware.md",
     "assets/arm_trust_firmware/file-20251206232722738.png",
     "assets/arm_trust_firmware/file-20251206232655455.png",
-    "assets/arm_trust_firmware/file-20251206232646002.png",
-    "assets/arm_trust_firmware/file-20251206232543489.png",
-    "assets/arm_trust_firmware/file-20251206232407742.png",
-    "assets/arm_trust_firmware/file-20251206232336567.png",
     "assets/arm_trust_firmware",
     "Excalidraw",
-    "assets/android/file-20251206231603405.png",
-    "assets/android/file-20251206231507911.png",
     "assets/android",
     "assets/obsidian"
   ]
