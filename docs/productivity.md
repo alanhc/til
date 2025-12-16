@@ -3,6 +3,6 @@
 
 ## use case
 由shortcut 輸入
-![alt text](assets/image-17.png)
+![alt text](image-17.png)
 由n8nwebhook處理
-![alt text](assets/image-18.png)
+![alt text](image-18.png)

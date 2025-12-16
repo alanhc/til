@@ -1,8 +1,36 @@
 {
   "recentFiles": [
     {
+      "basename": "緩解焦慮app",
+      "path": "side-projects/緩解焦慮app.md"
+    },
+    {
       "basename": "ai",
       "path": "ai.md"
+    },
+    {
+      "basename": "ai整理.excalidraw",
+      "path": "ai整理.excalidraw.md"
+    },
+    {
+      "basename": "ai_antigravaty",
+      "path": "ai_antigravaty.md"
+    },
+    {
+      "basename": "tools",
+      "path": "tools.md"
+    },
+    {
+      "basename": "ai_testing",
+      "path": "ai_testing.md"
+    },
+    {
+      "basename": "android",
+      "path": "android.md"
+    },
+    {
+      "basename": "ai_google_notebook_lm",
+      "path": "ai_google_notebook_lm.md"
     },
     {
       "basename": "automation",
@@ -17,24 +45,8 @@
       "path": "ai_inference.md"
     },
     {
-      "basename": "ai_testing",
-      "path": "ai_testing.md"
-    },
-    {
-      "basename": "ai_antigravaty",
-      "path": "ai_antigravaty.md"
-    },
-    {
-      "basename": "ai_google_notebook_lm",
-      "path": "ai_google_notebook_lm.md"
-    },
-    {
       "basename": "ai_google_ai_studio",
       "path": "ai_google_ai_studio.md"
-    },
-    {
-      "basename": "android",
-      "path": "android.md"
     },
     {
       "basename": "docker_debug_network",

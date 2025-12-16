@@ -68,15 +68,15 @@ cloudflared tunnel --url http://127.0.0.1:8000
 ## ChatGPT 使用 MCP server
 接下來要去ChatGPT 設定 MCP server
 去設定
-![alt text](assets/image-6.png)
+![alt text](image-6.png)
 連接器
-![alt text](assets/image-8.png)
+![alt text](image-8.png)
 建立
 MCP Server URL 要填寫剛才cloudflare tunnel 提供的網址/mcp
-![alt text](assets/image-9.png)
+![alt text](image-9.png)
 
 ## 直接在 ChatGPT 裡面呼叫剛才新增的 My MCP 
-![alt text](assets/image-10.png)
+![alt text](image-10.png)
 
 小範例參考
 https://github.com/alanhc/yt-mcp-server

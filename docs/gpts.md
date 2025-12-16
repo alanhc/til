@@ -175,7 +175,7 @@ cloudflared tunnel --url http://127.0.0.1:8000
 
 從 URL 匯入 e.g. https://information-stationery-nations-conventional.trycloudflare.com/openapi.json
 
-![alt text](assets/image-11.png)
+![alt text](image-11.png)
 
 ### 撰寫 prompt 並測試
-![alt text](assets/image-12.png)
+![alt text](image-12.png)
