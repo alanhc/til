@@ -1,6 +1,46 @@
 {
   "recentFiles": [
     {
+      "basename": "Pasted Graphic 21",
+      "path": "Pasted Graphic 21.png"
+    },
+    {
+      "basename": "Pasted Graphic 27",
+      "path": "Pasted Graphic 27.png"
+    },
+    {
+      "basename": "Pasted Graphic 37",
+      "path": "Pasted Graphic 37.png"
+    },
+    {
+      "basename": "Pasted image 20251215211812",
+      "path": "Pasted image 20251215211812.png"
+    },
+    {
+      "basename": "Pasted image 20251215211819",
+      "path": "Pasted image 20251215211819.png"
+    },
+    {
+      "basename": "Pasted image 20251215212005",
+      "path": "Pasted image 20251215212005.png"
+    },
+    {
+      "basename": "Pasted image 20251215212216",
+      "path": "Pasted image 20251215212216.png"
+    },
+    {
+      "basename": "截圖 2025-11-05 晚上7.24.21",
+      "path": "截圖 2025-11-05 晚上7.24.21.png"
+    },
+    {
+      "basename": "截圖 2025-11-05 晚上7.24.58",
+      "path": "截圖 2025-11-05 晚上7.24.58.png"
+    },
+    {
+      "basename": "ai_google_ai_studio",
+      "path": "ai_google_ai_studio.md"
+    },
+    {
       "basename": "緩解焦慮app",
       "path": "side-projects/緩解焦慮app.md"
     },
@@ -43,10 +83,6 @@
     {
       "basename": "ai_inference",
       "path": "ai_inference.md"
-    },
-    {
-      "basename": "ai_google_ai_studio",
-      "path": "ai_google_ai_studio.md"
     },
     {
       "basename": "docker_debug_network",

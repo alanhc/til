@@ -39,14 +39,12 @@
             "id": "fb3a66fec2c96004",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "image",
               "state": {
-                "file": "side-projects/緩解焦慮app.md",
-                "mode": "source",
-                "source": false
+                "file": "Pasted Graphic 21.png"
               },
-              "icon": "lucide-file",
-              "title": "緩解焦慮app"
+              "icon": "lucide-image",
+              "title": "Pasted Graphic 21"
             }
           },
           {
@@ -209,13 +207,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "side-projects/緩解焦慮app.md",
+                "file": "Pasted Graphic 21.png",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of 緩解焦慮app"
+              "title": "Outline of Pasted Graphic 21"
             }
           },
           {
@@ -287,23 +285,25 @@
   },
   "active": "fb3a66fec2c96004",
   "lastOpenFiles": [
+    "Pasted Graphic 27.png",
+    "Pasted Graphic 37.png",
+    "Pasted image 20251215211812.png",
+    "Pasted image 20251215211819.png",
+    "Pasted image 20251215212005.png",
+    "Pasted image 20251215212216.png",
+    "截圖 2025-11-05 晚上7.24.21.png",
+    "截圖 2025-11-05 晚上7.24.58.png",
+    "ai_google_ai_studio.md",
+    "side-projects/緩解焦慮app.md",
     "assets/ai_jan_ai/file-20251215212318633.png",
     "assets/ai_jan_ai",
     "assets",
     "ai_jan_ai.md",
-    "Pasted image 20251215212216.png",
     "Pasted image 20251215212016.png",
-    "Pasted image 20251215212005.png",
-    "Pasted image 20251215211819.png",
-    "Pasted image 20251215211812.png",
     "side-projects/assets/緩解焦慮app/file-20251216225949034.png",
-    "side-projects/assets/緩解焦慮app/file-20251216225844773.png",
-    "side-projects/assets/緩解焦慮app/file-20251216225752449.png",
-    "side-projects/assets/緩解焦慮app/file-20251216225526544.png",
     "side-projects/assets/緩解焦慮app",
     "side-projects/assets",
     "Untitled.md",
-    "side-projects/緩解焦慮app.md",
     "side-projects",
     "ai.md",
     "ai整理.excalidraw.md",
@@ -315,12 +315,10 @@
     "ai_testing.md",
     "android.md",
     "ai_google_notebook_lm.md",
-    "file-20251215212211500.png",
     "assets/ai",
     "automation.md",
     "ai_google_ai.md",
     "ai_inference.md",
-    "ai_google_ai_studio.md",
     "docker_debug_network.md",
     "openwebui.md",
     "copilot/copilot-custom-prompts/Rewrite as tweet thread.md",
