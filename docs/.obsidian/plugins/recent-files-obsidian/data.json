@@ -1,8 +1,28 @@
 {
   "recentFiles": [
     {
+      "basename": "youtube總結",
+      "path": "n8n/youtube總結.md"
+    },
+    {
       "basename": "Pasted Graphic 21",
       "path": "Pasted Graphic 21.png"
+    },
+    {
+      "basename": "用問卷找回你的時間精力",
+      "path": "side-projects/用問卷找回你的時間精力.md"
+    },
+    {
+      "basename": "supabase",
+      "path": "supabase.md"
+    },
+    {
+      "basename": "ai_vscode",
+      "path": "ai_vscode.md"
+    },
+    {
+      "basename": "automation",
+      "path": "automation.md"
     },
     {
       "basename": "Pasted Graphic 27",
@@ -71,10 +91,6 @@
     {
       "basename": "ai_google_notebook_lm",
       "path": "ai_google_notebook_lm.md"
-    },
-    {
-      "basename": "automation",
-      "path": "automation.md"
     },
     {
       "basename": "ai_google_ai",
