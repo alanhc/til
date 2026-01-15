@@ -1,0 +1,10 @@
+- Youtube
+	- [DeepSRT](https://chromewebstore.google.com/detail/deepsrt-experience-the-fa/mdaaadlpcanoofcoeanghbmpbdbhladd)
+	- [vidiq](https://app.vidiq.com/?auto-login=true)
+- Page
+	- [Smart TOC](https://chromewebstore.google.com/detail/smart-toc/lifgeihcfpkmmlfjbailfpfhbahhibba)
+- 翻譯
+	- [Immersive Translate - Translate Web & PDF](https://chromewebstore.google.com/detail/immersive-translate-trans/bpoadfkcbjbfhfodiogcnhhhpibjhbnh)
+- dev
+	- [wappalyzer](https://www.wappalyzer.com/)
+	- [Cookie-Editor](https://chromewebstore.google.com/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm)
