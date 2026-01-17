@@ -83,3 +83,9 @@ https://www.antutu.com/html5/
 https://alanhc.github.io/wasm-coremark/
 ![](assets/browser_performance_benchmark/file-20260117082037203.png)
 ![](assets/browser_performance_benchmark/file-20260117092810533.png)
+
+
+
+## 看cpu gpu memory 狀態
+https://ui.perfetto.dev/#!/viewer?local_cache_key
+![](assets/browser_performance_benchmark/file-20260117102424135.png)
