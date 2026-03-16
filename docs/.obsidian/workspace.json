@@ -66,6 +66,118 @@
             }
           },
           {
+            "id": "d5ccd69edcc84649",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "claude_install.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "claude_install"
+            }
+          },
+          {
+            "id": "48d2ffe6c78445b7",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "claude_use_ollama.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "claude_use_ollama"
+            }
+          },
+          {
+            "id": "7807eecd3aa4d865",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "agent.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "agent"
+            }
+          },
+          {
+            "id": "174349b9fb669cef",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "agent.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "agent"
+            }
+          },
+          {
+            "id": "d6b9a795064fd621",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "android_sepolicy.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "android_sepolicy"
+            }
+          },
+          {
+            "id": "196b8ba8d8c4b07c",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "claude_use_ollama.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "claude_use_ollama"
+            }
+          },
+          {
+            "id": "d0ac51de3e551065",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "claude_code.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "claude_code"
+            }
+          },
+          {
+            "id": "813d89ef1bc5b6a9",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "openclaw.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "openclaw"
+            }
+          },
+          {
             "id": "b26db633d1997c35",
             "type": "leaf",
             "state": {
@@ -94,7 +206,7 @@
             }
           }
         ],
-        "currentTab": 3
+        "currentTab": 11
       }
     ],
     "direction": "vertical"
@@ -126,7 +238,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "adb",
+                "query": "opencla",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -229,13 +341,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "stock_個股風險.md",
+                "file": "openclaw.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "stock_個股風險 的大綱"
+              "title": "openclaw 的大綱"
             }
           },
           {
@@ -296,10 +408,20 @@
       "bases:建立新的 base": false
     }
   },
-  "active": "2f32bf52407c0b34",
+  "active": "813d89ef1bc5b6a9",
   "lastOpenFiles": [
-    "pixel_study.md",
+    "assets/openclaw/file-20260316205958715.png",
+    "assets/openclaw",
+    "claude_code.md",
+    "openclaw.md",
+    "claude_use_ollama.md",
+    "房.md",
+    "android_sepolicy.md",
+    "agent.md",
+    "security.md",
+    "claude_install.md",
     "stock_個股風險.md",
+    "pixel_study.md",
     "pixel_flash_another_version.md",
     "assets/pixel_flash_another_version/file-20260307152717311.png",
     "assets/pixel_flash_another_version/file-20260307152715776.png",
@@ -323,27 +445,17 @@
     "assets/pixel_study/IMG_7832.heic",
     "android_build_project.md",
     "振奮人心的音樂.md",
-    "side-projects/評論音樂段落.md",
-    "money.md",
-    "mcp.md",
-    "obsidian.md",
     "Pasted Graphic 37.png",
     "Pasted image 20251215212216.png",
-    "intro.md",
-    "openwebui.md",
-    "raspberry pi.md",
     "assets/晶片/file-20260201140045503.png",
     "assets/晶片/file-20260201135930889.png",
     "assets/晶片",
-    "benchmark.md",
-    "BMC/hardware.md",
     "assets/pixel_study",
     "assets/aosp_codebase",
     "assets/VAD語音喚醒",
     "assets/語音喚醒",
     "assets/benchmark_ipad_air",
     "assets/benchmark",
-    "assets/power_benchmark",
     "Untitled.canvas"
   ]
 }
