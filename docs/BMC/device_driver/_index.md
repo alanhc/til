@@ -29,13 +29,13 @@ graph TD
 ```
 
 ## smbus
-![alt text](assets/image-4.png)
-![alt text](assets/image-5.png)
+![alt text](../../image-4.png)
+![alt text](../../image-5.png)
 
 ## pmbus
 
 ### Linear11 Floating-Point Format
-![alt text](assets/image-1.png)
+![alt text](../../image-1.png)
 
 $$
 \text{Value Represented} = Y \times 2^N
@@ -54,7 +54,7 @@ mpc42013_read_word_data(client, page, reg)
 
 可以用 `i2cdetect` 查看是否有 driver 佔用
 
-![alt text](assets/image.png)
+![alt text](../../image.png)
 
 上圖代表在 i2c-7 有 address `0x63` 的裝置， `63` 代表 no device driver，`UU` 代表目前有 driver 佔用。
 
@@ -90,10 +90,10 @@ config {driver}
       }
       ```
 ### Driver Structure
-![alt text](assets/image-3.png)
+![alt text](../../image-3.png)
 ### Functions
 - `probe`
-![alt text](assets/image-2.png)
+![alt text](../../image-2.png)
 
 ```c
 int pmbus_read_word_data(struct i2c_client *client, u8 page, u8 phase, u8 reg);
@@ -105,7 +105,7 @@ int pmbus_write_word_data(struct i2c_client *client, u8 page, u8 reg, u16 word);
 
 ### 觀察
 - `ls /sys/class/hwmon/hwmon16`
-![alt text](assets/image-6.png)
+![alt text](../../image-6.png)
 
 ## Ref
 - https://en.wikipedia.org/wiki/Power_Management_Bus

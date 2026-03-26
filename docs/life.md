@@ -1,14 +1,14 @@
 # 人生
 
 Prioritizing your life
-![alt text](assets/image.png)
+![alt text](image.png)
 
 
 [李琳山教授 信號與人生 2023](https://youtu.be/MxoQV4M0jY8)
 - 如何 培養多元能力、體驗
     - 機會 vs 挑戰 ， 厲害人 掌握機會 面對挑戰 
 -     - 最佳控制理論 從一個點到一個點 切線方向 都是最佳的方向 ， 很像 機器學習裡面的gradient desent
-![alt text](<assets/Pasted Graphic 21.png>)
+![alt text](<Pasted Graphic 21.png>)
 - 學習
     - 如何最有收穫？最有發展？
     - 單一跑道很成功
@@ -18,7 +18,7 @@ Prioritizing your life
     - 路徑可能有40年 可能更多
     - 最佳控制理論 從一個點到一個點 切線方向 都是最佳的方向 ， 很像 機器學習裡面的gradient desent
 
-![alt text](<assets/Pasted Graphic 27.png>)
+![alt text](<Pasted Graphic 27.png>)
     * 幾年以後不會有人在意你是第幾名
     * 每個人能不能成功/快樂 不是每一個課有沒有贏別人
 * 把自己變成朝陽工程師
@@ -57,5 +57,5 @@ Prioritizing your life
     * 具體成績
     * 避免overfit在很小的目標
 * 課業內
-![alt text](<assets/Pasted Graphic 36.png>)
-![alt text](<assets/Pasted Graphic 37.png>)
+![alt text](<Pasted Graphic 36.png>)
+![alt text](<Pasted Graphic 37.png>)

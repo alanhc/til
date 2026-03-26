@@ -1,9 +1,9 @@
 目前體感上還蠻喜歡的建立幾個App
-![alt text](assets/image-14.png)
+![alt text](image-14.png)
 類似Anki的閃卡App
-![alt text](assets/image-15.png)
+![alt text](image-15.png)
 看起來是CSR
-![alt text](assets/image-16.png)
+![alt text](image-16.png)
 可以從下載的folder發現
 ```
 .

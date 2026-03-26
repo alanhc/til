@@ -38,8 +38,8 @@ repo has been initialized in /home/alanhc/aosp
 
 4 directories, 2 files
 ```
-![alt text](<assets/截圖 2025-11-05 晚上7.24.58.png>)
-![alt text](<assets/截圖 2025-11-05 晚上7.24.21.png>)
+![alt text](<截圖 2025-11-05 晚上7.24.58.png>)
+![alt text](<截圖 2025-11-05 晚上7.24.21.png>)
 ![[Pasted image 20251105192430.png]]
 ![[Pasted image 20251105192502.png]]
 

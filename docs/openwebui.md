@@ -1,6 +1,6 @@
 
 
-![alt text](assets/image-20.png)
+![alt text](image-20.png)
 使用openwebui
 ```
 curl -N \  'https://openwebui.0xfanslab.com/api/chat/completions' \  -H 'Authorization: Bearer <API Key>' \

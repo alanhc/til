@@ -1,2 +1,3 @@
 # health
-![alt text](assets/image-1.png)
+當你心情不好或處於慢性壓力中，腦下垂體會促使腎上腺分泌大量「皮質醇」（又稱壓力荷爾蒙）。
+![alt text](image-1.png)

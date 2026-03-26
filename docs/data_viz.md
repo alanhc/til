@@ -1,6 +1,6 @@
 # data viz
 ## sankey diagram
-![alt text](assets/image-2.png)
+![alt text](image-2.png)
 
 Sankiey Diagram 的重點是能量流向的視覺化，適合用來表示流程、資源分配等情境。
 
@@ -46,4 +46,4 @@ fig.show()
 
 
 ## Treemap
-![alt text](assets/image-4.png)
+![alt text](image-4.png)
