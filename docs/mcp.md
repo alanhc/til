@@ -1,3 +1,4 @@
+https://github.com/modelcontextprotocol/servers
 
 ## 撰寫 MCP Server
 先看 python 版本的 MCP server 範例：
@@ -80,3 +81,7 @@ MCP Server URL 要填寫剛才cloudflare tunnel 提供的網址/mcp
 
 小範例參考
 https://github.com/alanhc/yt-mcp-server
+
+
+## MCPs
+- https://github.com/line/line-bot-mcp-server?tab=readme-ov-file

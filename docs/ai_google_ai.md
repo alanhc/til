@@ -1,3 +1,7 @@
+
+https://labs.google.com/mariner/landing
+
+https://jules.google/
 antigravity
 Google Antigravity 的語境中，task.md 通常是 Agent 在執行任務時自動產生的「任務說明文件」(Task Artifact)。
 ## task.md 的用途是什麼？

@@ -1,0 +1,1 @@
+https://www.ichiayi.com/tech/gemini_cli
