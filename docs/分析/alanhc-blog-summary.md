@@ -792,22 +792,22 @@
   ⎿  Search(pattern: "/Users/alantseng/workspace/alanhc.github.io/content/blog/**/*.md")
   ⎿  Bash(find /Users/alantseng/workspace/alanhc.github.io/content/blog -name "*.md" | wc -l)
   ⎿  Bash(find /Users/alantseng/workspace/alanhc.github.io/content/blog -name "*.md" | sort)
-  ⎿  Bash(cat > /tmp/analyze_blog.py << 'EOF'
+  ⎿  Bash(cat > /tmp/analyze_blog.py &lt;&lt; 'EOF'
   ⎿  Error: Exit code 1
-  ⎿  Bash(cat > /tmp/analyze_blog.py << 'EOF'
+  ⎿  Bash(cat > /tmp/analyze_blog.py &lt;&lt; 'EOF'
   ⎿  Bash(cat /tmp/articles.json | head -100)
-  ⎿  Bash(cat > /tmp/categorize.py << 'EOF'
-  ⎿  Bash(cat > /tmp/detailed_analysis.py << 'EOF'
+  ⎿  Bash(cat > /tmp/categorize.py &lt;&lt; 'EOF'
+  ⎿  Bash(cat > /tmp/detailed_analysis.py &lt;&lt; 'EOF'
   ⎿  Read(/Users/alantseng/workspace/alanhc.github.io/content/blog/20231023-Pair-Programming-with-a-Large-Language-Model.md ·
   ⎿  Read(/Users/alantseng/workspace/alanhc.github.io/content/blog/20230926-21-things-before-21.md · lines 1-40)
   ⎿  Read(/Users/alantseng/workspace/alanhc.github.io/content/blog/20240215-Deck-of-cards-ood.md · lines 1-30)
   ⎿  Read(/Users/alantseng/workspace/alanhc.github.io/content/blog/20231110-80分鐘快速了解大型語言模型-5-30有咒術迴戰雷.md · lines
   ⎿  Read(/Users/alantseng/workspace/alanhc.github.io/content/blog/20240409-你要如何衡量你的人生.md · lines 1-30)
   ⎿  Read(/Users/alantseng/workspace/alanhc.github.io/content/blog/20220406-使用bloom-filter及web3-py來做疫苗認證-ntu-dapp-期中pro
-  ⎿  Bash(cat > /tmp/final_report.py << 'EOF'
-  ⎿  Bash(cat > /tmp/notable_articles.py << 'EOF'
-  ⎿  Bash(cat << 'EOF'
-  ⎿  Bash(cat << 'EOF'
+  ⎿  Bash(cat > /tmp/final_report.py &lt;&lt; 'EOF'
+  ⎿  Bash(cat > /tmp/notable_articles.py &lt;&lt; 'EOF'
+  ⎿  Bash(cat &lt;&lt; 'EOF'
+  ⎿  Bash(cat &lt;&lt; 'EOF'
   ⎿  Response:
        Perfect! Now let me create a final summary document:
 
