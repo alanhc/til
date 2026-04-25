@@ -1,3 +1,6 @@
+![alt text](assets/image.png)
+
+
 可以把 Hermes on Kubernetes 的安全架構想成一句話：
 
 Hermes gateway 只負責對話與決策；所有高風險工具執行、MCP、瀏覽器、自動化、Calendar/GitHub/K8S 操作都拆出去，用 Kubernetes 做隔離、授權、網路限制與審計。
