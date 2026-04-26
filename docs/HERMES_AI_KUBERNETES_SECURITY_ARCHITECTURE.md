@@ -1,5 +1,5 @@
 # 為何 Kubernetes 是部署 Hermes AI Agent 的較佳治理與隔離架構
-
+![alt text](<assets/ChatGPT Image Apr 26 2026 from Hermes AI.png>)
 ## 摘要
 
 Hermes 不應被視為單純的聊天服務。它是一個具備工具調用能力的代理系統，可能持有 API keys、bot tokens、sessions、memory，並且可能連接 Discord、Telegram、Slack、GitHub、Google Calendar、Kubernetes、資料庫或瀏覽器自動化工具。

@@ -1,5 +1,5 @@
 # Why Kubernetes Is a Better Governance and Isolation Architecture for Deploying Hermes AI Agents
-
+![alt text](<assets/ChatGPT Image Apr 26 2026 from Hermes AI-1.png>)
 ## Executive Summary
 
 Hermes should not be treated as a simple chat service. It is an agentic system with tool-use capabilities. In practice, it may hold API keys, bot tokens, sessions, memory, and access to systems such as Discord, Telegram, Slack, GitHub, Google Calendar, Kubernetes, databases, browsers, and automation tools.
