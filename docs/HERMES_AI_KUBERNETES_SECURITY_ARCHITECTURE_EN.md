@@ -18,11 +18,11 @@ As LLM capabilities improve, AI agent systems based on function calling, tool us
 
 Hermes is an AI agent system with these capabilities. It may connect simultaneously to Discord, Telegram, Slack, GitHub, Google Calendar, Kubernetes clusters, and browser automation tools, while holding corresponding API keys, bot tokens, sessions, and long-term memory. As a result, Hermes' primary threat vector is not "conversation quality," but whether high-privilege tools can be abused through external input or prompt injection.
 
-Zhang et al. (2025) point out that the threat model of LLM agents has expanded beyond input validation to include tools, protocols, and workflow layers [3]. Wallace et al. (2024) argue that security rules expressed only through prompts may be overridden when instruction-priority conflicts occur [4]. Together, these observations point to one conclusion: AI agent security cannot rely solely on the model itself. It must be enforced by the execution environment through external constraints.
+Ferrag et al. (2025) point out that the threat model of LLM agents has expanded beyond input validation to include tools, protocols, and workflow layers [3]. Wallace et al. (2024) argue that security rules expressed only through prompts may be overridden when instruction-priority conflicts occur [4]. Together, these observations point to one conclusion: AI agent security cannot rely solely on the model itself. It must be enforced by the execution environment through external constraints.
 
 This paper argues that Kubernetes provides an architectural foundation for meeting those requirements. Compared with single-node Docker deployment or VM deployment, Kubernetes' core advantage is that its namespace isolation, RBAC, NetworkPolicy, Pod Security Standards, PVC management, and audit log mechanisms can impose **mandatory, auditable, and fine-grained constraints** on the capability boundaries of AI agents without modifying the model itself.
 
-Section 2 analyzes the Hermes threat model. Section 3 introduces the overall Kubernetes security architecture. Sections 4 through 9 discuss each security mechanism. Section 10 maps the design to existing regulatory guidance. Section 11 proposes a production security baseline. Section 12 concludes the paper.
+Section 2 analyzes the Hermes threat model. Section 3 introduces the overall Kubernetes security architecture. Sections 4 through 12 discuss each security mechanism and governance framework. Section 13 maps the design to existing regulatory guidance. Section 14 proposes a production security baseline. Section 15 concludes the paper.
 
 ---
 
@@ -46,7 +46,7 @@ This security design is based on the following assumption:
 
 > **Any input from an external channel may contain malicious prompt-injection instructions; any tool output must not be treated as a trusted high-priority instruction.**
 
-This assumption is also aligned with Saltzer and Schroeder's (1975) principle of complete mediation: every access to a protected resource must be authorized, rather than being authorized only once during initialization [1].
+This assumption is also aligned with Saltzer and Schroeder's (1975) principle of complete mediation: every access to a protected resource must be authorized, rather than being authorized only once during initialization. Zhang et al. (2025) further apply this principle to the security design of LLM agents [1].
 
 ### 2.3 Sensitivity of `/opt/data`
 
@@ -121,10 +121,10 @@ Internet / Discord / Telegram / Slack
 |  github-mcp                 |
 |  k8s-readonly-mcp           |
 +-------------+---------------+
-              |
-              v
-+-----------------------------+
-| namespace: hermes-sandbox   |
+              |                 \
+              v                  \ (tool router dispatch)
++-----------------------------+   \
+| namespace: hermes-sandbox   |<---+
 |  code-runner Job (ephemeral)|
 |  browser-sandbox Pod        |
 |  strict NetworkPolicy       |
@@ -413,11 +413,15 @@ Third-party Skills should complete the following review steps before installatio
 
 1. Do not install unreviewed Skills directly into the production gateway.
 2. Review Skill source code manually.
-3. Use tools such as Trivy, Grype, Semgrep, and secret scanning to detect suspicious behavior.
+3. Apply layered scanning based on the Skill's form:
+   - **Static analysis**: Scan Skill text and code for malicious instruction embedding (including DDIPE patterns [12]) and suspicious API calls;
+   - **Secret scanning** (gitleaks, trufflehog): Detect credential leakage within Skill content;
+   - **Behavioral verification**: Execute the Skill in an isolated sandbox and observe actual behavior — external network connections, file access, token reads [11];
+   - If the Skill is packaged as a container image, additionally run Trivy/Grype to scan image dependency vulnerabilities.
 4. Treat a Skill as high-risk if it downloads external files, connects to unknown domains, executes shell commands, reads tokens, or modifies memory.
 5. Production should only allow Skills from an internal registry or an approved allowlist.
 
-This process corresponds to the Administration for Cyber Security's (2026) recommendation that malicious code in third-party Skill extensions is an important attack vector for AI agent systems [9].
+This process corresponds to the Administration for Cyber Security's (2026) recommendation that malicious code in third-party Skill extensions is an important attack vector for AI agent systems [9]. Li et al. (2026) systematically defined seven threat categories across the Skill lifecycle and identified "the absence of mandatory marketplace security review" as a core structural vulnerability [13]. Liu et al. (2026) conducted a large-scale scan of 98,380 Skills, confirming 157 malicious Skills exhibiting two attack archetypes — "Data Thieves" (credential exfiltration) and "Agent Hijackers" (decision-making subversion) [11]. Bhardwaj (2026) proposed the SkillFortify framework, combining static analysis with capability sandboxing to achieve an F1 score of 96.95% [10]. Qu et al. (2026) further showed that while static analysis detects most malicious Skills, 2.5% can simultaneously evade detection and alignment defenses — underscoring the necessity of manual review [12].
 
 ### 10.2 Security Controls for Long-Term Memory
 
@@ -556,3 +560,11 @@ A truly secure Hermes deployment should clearly separate the "reasoning layer" f
 [8] Kubernetes SIG Apps, "kubernetes-sigs/agent-sandbox," GitHub repository. https://github.com/kubernetes-sigs/agent-sandbox
 
 [9] Administration for Cyber Security, Ministry of Digital Affairs, Taiwan, "Beware of AI agents becoming cybersecurity risks: ACS reminds organizations to implement five cybersecurity safeguards when adopting AI agents," 2026-03-25. https://moda.gov.tw/ACS/press/news/press/19294
+
+[10] Varun Pratap Bhardwaj, "Formal Analysis and Supply Chain Security for Agentic AI Skills," arXiv:2603.00195, 2026. https://arxiv.org/abs/2603.00195
+
+[11] Yi Liu, Zhihao Chen, Yanjun Zhang, Gelei Deng, Yuekang Li, Jianting Ning, Ying Zhang, Leo Yu Zhang, "Malicious Agent Skills in the Wild: A Large-Scale Security Empirical Study," arXiv:2602.06547, 2026. https://arxiv.org/abs/2602.06547
+
+[12] Yubin Qu, Yi Liu, Tongcheng Geng, Gelei Deng, Yuekang Li, Leo Yu Zhang, Ying Zhang, Lei Ma, "Supply-Chain Poisoning Attacks Against LLM Coding Agent Skill Ecosystems," arXiv:2604.03081, 2026. https://arxiv.org/abs/2604.03081
+
+[13] Zhiyuan Li, Jingzheng Wu, Xiang Ling, Xing Cui, Tianyue Luo, "Towards Secure Agent Skills: Architecture, Threat Taxonomy, and Security Analysis," arXiv:2604.02837, 2026. https://arxiv.org/abs/2604.02837
