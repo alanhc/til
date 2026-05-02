@@ -121,5 +121,3 @@ Agentic AI isn't about replacing engineers — it's about freeing them from repe
 Let AI handle the builds. You solve the hard parts.
 
 本文相關的 AOSP build skill 已開源：github.com/alanhc/aosp-build
-
-這樣可以嗎？有沒有想補充的實際數字（例如你一次跑幾個 project、省了多少時間）或具體案例？加進去會讓文章更有說服力。
