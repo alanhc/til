@@ -78,9 +78,37 @@
               "icon": "lucide-file",
               "title": "aosp_pixel_full_workflow"
             }
+          },
+          {
+            "id": "0a0c8d84d8513292",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "android_engineer_skills.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "android_engineer_skills"
+            }
+          },
+          {
+            "id": "5676dbed0cc9ebf9",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "aosp_pixel_full_workflow.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "aosp_pixel_full_workflow"
+            }
           }
         ],
-        "currentTab": 4
+        "currentTab": 6
       }
     ],
     "direction": "vertical"
@@ -112,7 +140,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "repo init",
+                "query": "aosp",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -133,7 +161,8 @@
               "title": "Bookmarks"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -282,17 +311,23 @@
       "bases:建立新的 base": false
     }
   },
-  "active": "c56f1a960055b62c",
+  "active": "5676dbed0cc9ebf9",
   "lastOpenFiles": [
+    "claude_skills.md",
+    "未命名.md",
+    "android_engineer_skills.md",
+    "skills",
+    "aosp_pixel_full_workflow.md",
+    "android_boot_flow.md",
+    "pixel_flash_another_version.md",
+    "pixel_fastboot_deepdive.md",
+    "pixel_can_not_run_as_root.md",
+    "pixel_driver.md",
+    "pixel_hardware.md",
     "Android_build_number.md",
     "power_benchmark.md",
     "pixel_study.md",
     "pixel_root.md",
-    "pixel_hardware.md",
-    "pixel_fastboot_deepdive.md",
-    "pixel_flash_another_version.md",
-    "pixel_can_not_run_as_root.md",
-    "aosp_pixel_full_workflow.md",
     "claude_use_ollama.md",
     "gpts.md",
     "claude_channel.md",
@@ -303,18 +338,13 @@
     "booting/riscv_linux_boot_flow.md",
     "booting/x86_linux_boot_flow.md",
     "BMC/openbmc_boot_flow.md",
-    "android_boot_flow.md",
-    "claude_skills.md",
     "vercel_skills.md",
     "assets/vercel_skills/file-20260406151002920.png",
     "assets/vercel_skills",
     "openclaw_jan_ai.md",
-    "ai_bmc.md",
-    "claude.md",
     "ai-articles",
     "assets/claude/file-20260405203359007.png",
     "assets/claude",
-    "claude_code.md",
     "分析",
     "英文",
     "assets/openclaw/file-20260316205958715.png",
@@ -329,7 +359,6 @@
     "assets/pixel_study/IMG_7832.heic",
     "Pasted Graphic 37.png",
     "assets/晶片",
-    "assets/pixel_study",
     "Untitled.canvas"
   ]
 }

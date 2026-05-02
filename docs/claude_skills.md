@@ -11,3 +11,7 @@ https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md
 https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf
 
 https://support.claude.com/en/articles/12512198-how-to-create-custom-skills
+
+
+## Skills
+- https://kaochenlong.com/ai-superpowers-skills

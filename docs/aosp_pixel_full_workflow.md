@@ -1,27 +1,156 @@
 ---
-title: AOSP 完整工作流程：從 repo init、repo sync 到燒錄進 Pixel 手機
+title: Pixel 8 AOSP 完整工作流程：從查 build ID、選版本、編譯到燒錄
 sidebar_position: 1
 ---
+# Pixel 8 AOSP 完整工作流程：從查 build ID、選版本、編譯到燒錄
 
-# AOSP 完整工作流程：從 repo init、repo sync 到燒錄進 Pixel 手機
+本文是給開發者的完整教學。和「把 Pixel 刷回原廠」不同，這篇要做的是：
 
-本篇記錄從零開始下載 AOSP 原始碼、編譯，一路到用 `fastboot` 燒錄進 Pixel 8（代號 `shiba`）的完整流程，以及常見錯誤與救磚方法。
+1. **教你怎麼決定要 build 哪個版本**（手機 build ID ↔ AOSP tag ↔ Vendor driver，三者必須對齊）
+2. **從零 `repo init` → `repo sync` → 下載對應 vendor driver → `m` 編譯 → `fastboot flashall` 燒回手機**
 
-:::tip 我的機器版本
-本機 Pixel 8（`shiba`）目前系統版本為 **BP4A.251205.006**，對應 **Android 16 QPR2**（2025 年 12 月 2 日釋出）。  
-Build ID 格式解析：`B`(Baklava=Android 16) `P`(Support Vertical) `4A`(Branch) `.251205`(分支日期 2025/12/05) `.006`(patch 序號)
+整個流程的核心觀念用圖解釋，避免把指令當咒語死背。
+
+:::info 適用機型
+- Pixel 8（codename `shiba`）
+- Pixel 8 Pro（codename `husky`）只要把 `shiba` 換成 `husky` 就一樣可用
+- 其他 Pixel 機型流程相同，差別只在 codename 與對應的 driver tarball 名稱
 :::
 
 ---
 
-## 1. 環境準備
+## Part 0：先理解三個觀念
 
-### 硬體需求
+### 觀念 1：純 AOSP ≠ 可用的 Pixel ROM
 
-- **主機**：Ubuntu 22.04 / 24.04 LTS（x86_64），建議 RAM ≥ 32 GB、硬碟空間 ≥ 300 GB
-- **手機**：Pixel 8（`shiba`）或 Pixel 8 Pro（`husky`）
+純 AOSP 是 Google 開源的部分。Pixel 手機要正常運作，還需要一層 **vendor proprietary blob**（modem firmware、camera HAL、ISP/GPU 驅動、Tensor 專屬模組）。這些 blob 是閉源的，所以 AOSP 樹**不會包含**它們。
 
-### 安裝系統套件
+```mermaid
+flowchart TB
+    A[AOSP 開源原始碼<br/>repo sync 下載] --> M[完整可燒錄的 Pixel ROM]
+    V[Vendor Proprietary Blob<br/>從 developers.google.com/android/drivers 下載] --> M
+    M --> F[fastboot flashall 燒進手機]
+
+    style A fill:#cfe8ff,stroke:#1a73e8
+    style V fill:#fde7c0,stroke:#f9ab00
+    style M fill:#cfead4,stroke:#188038
+```
+
+ASCII 版：
+
+```
+   ┌─────────────────────┐         ┌──────────────────────────┐
+   │  AOSP 原始碼        │         │  Vendor Proprietary Blob │
+   │  (開源, repo sync)  │         │  (閉源, Google 官方下載) │
+   └──────────┬──────────┘         └──────────────┬───────────┘
+              │                                   │
+              └───────────┬───────────────────────┘
+                          ▼
+               ┌──────────────────────┐
+               │  完整 Pixel ROM       │
+               │  (m → out/.../*.img) │
+               └──────────┬───────────┘
+                          ▼
+               ┌──────────────────────┐
+               │  fastboot flashall   │
+               └──────────────────────┘
+```
+
+只跑純 AOSP 也能 build 出 image 燒進手機，但會缺**相機、modem、指紋、5G、部分感測器**等需要 blob 的功能。所以 vendor blob 是必要的。
+
+---
+
+### 觀念 2：三個版本必須對齊
+
+最容易踩雷的地方。**手機 build ID、AOSP source tag、Vendor driver** 這三個版本要互相對應，不然會：
+
+- AOSP 比 vendor 新 → 編譯時找不到對應的 module / API
+- AOSP 比 vendor 舊 → vendor blob 用到 AOSP 還沒有的 framework 介面
+- bootloader / radio 版本對不上 → 燒進去開不了機
+
+```mermaid
+flowchart LR
+    BID[手機 Build ID<br/>例: BP4A.251205.006]
+    BID --> Q1{查表 1<br/>build-numbers}
+    BID --> Q2{查表 2<br/>android/drivers}
+    Q1 --> TAG[AOSP Tag<br/>例: android-16.0.0_rXX]
+    Q2 --> DRV[Vendor Driver<br/>例: google_devices-shiba-bp4a.251205.006-HASH.tgz]
+
+    TAG -.必須匹配.- DRV
+
+    style BID fill:#fff4d6
+    style TAG fill:#cfe8ff
+    style DRV fill:#fde7c0
+```
+
+ASCII 版：
+
+```
+       手機 Build ID (從手機端讀出)
+       ┌──────────────────────────┐
+       │  BP4A.251205.006         │
+       └────────────┬─────────────┘
+                    │
+        ┌───────────┴───────────┐
+        ▼                       ▼
+  source.android.com    developers.google.com
+  /docs/setup/.../      /android/drivers
+  build-numbers
+        │                       │
+        ▼                       ▼
+   AOSP Source Tag        Vendor Driver tarball
+   android-16.0.0_rXX     google_devices-shiba-
+                          bp4a.251205.006-<HASH>.tgz
+
+           ↑ 兩邊必須對應同一個 build ID ↑
+```
+
+這個對齊步驟在 Part 2 會一步一步做。
+
+---
+
+### 觀念 3：build → flash 的 pipeline
+
+知道哪些檔案會被產出、哪些被燒進手機，後面看到 fastboot 輸出才不會迷路。
+
+```mermaid
+flowchart TB
+    SRC[~/aosp/<br/>原始碼 + vendor blob]
+    LUNCH["lunch aosp_shiba-userdebug<br/>(設定 TARGET_PRODUCT)"]
+    BUILD["m<br/>(編譯)"]
+    OUT[~/aosp/out/target/product/shiba/<br/>boot.img · vendor.img · super.img · ...]
+    FB["fastboot flashall -w"]
+    PHONE[Pixel 8]
+
+    SRC --> LUNCH --> BUILD --> OUT --> FB --> PHONE
+
+    style SRC fill:#eee
+    style OUT fill:#cfead4
+    style PHONE fill:#fde7c0
+```
+
+ASCII 版：
+
+```
+~/aosp/                                      手機 (Pixel 8)
+  ├─ frameworks/                                ▲
+  ├─ packages/                                  │ fastboot flashall -w
+  ├─ vendor/google_devices/shiba/   ──┐         │
+  └─ ...                              │      ┌──┴──────────────────┐
+                                      │      │ out/target/product/  │
+   source build/envsetup.sh           ├─►    │   shiba/             │
+   lunch aosp_shiba-userdebug         │      │     boot.img         │
+   m                                  ┘      │     vendor.img       │
+                                             │     super.img        │
+                                             │     ...              │
+                                             └──────────────────────┘
+```
+
+---
+
+## Part 1：環境準備（一次性）
+
+### 系統套件
 
 ```bash
 sudo apt-get update
@@ -32,367 +161,534 @@ sudo apt-get install -y \
   lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig
 ```
 
-### 安裝 `repo` 工具
+### ADB / fastboot
+
+```bash
+sudo apt install -y android-tools-adb android-tools-fastboot
+adb version          # 1.0.41 / 34.x
+fastboot --version   # 34.x
+```
+
+### `repo`
 
 ```bash
 mkdir -p ~/bin
 curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
 chmod a+x ~/bin/repo
+echo 'export PATH=~/bin:$PATH' >> ~/.bashrc
 export PATH=~/bin:$PATH
 ```
 
-建議將 `export PATH=~/bin:$PATH` 加到 `~/.bashrc` 或 `~/.zshrc` 中，避免每次重新設定。
+### 手機端設定
 
-### 安裝 ADB / fastboot
+1. **設定 → 關於手機 → 連點「版本號」7 下** 開啟開發人員選項
+2. **開發人員選項 → 打開「USB 偵錯」**
+3. **開發人員選項 → 打開「OEM 解鎖」**（第一次燒 AOSP 必須）
+4. USB 接電腦，手機跳出對話框點「永遠允許」
 
 ```bash
-sudo apt install -y android-tools-adb android-tools-fastboot
-# 確認版本
-adb version
-fastboot --version
+adb devices
+# 38011FDJH00C9F   device   ← 看到 device 就 OK
 ```
 
 ---
 
-## 2. 下載 AOSP 原始碼
+## Part 2：決定要用哪個 build ID（三步對齊）
 
-### 建立工作目錄
+### 2.1 查手機目前 build ID
+
+```bash
+adb shell getprop ro.build.id
+# 例: BP4A.251205.006
+
+adb shell getprop ro.build.fingerprint
+# 例: google/shiba/shiba:16/BP4A.251205.006/.../user/release-keys
+```
+
+> 也可以直接打開手機 **設定 → 關於手機 → 版本號** 看。
+
+把這個 build ID 記下來（以下用 `<BUILD_ID>` 代稱）。例如 `BP4A.251205.006`。
+
+#### Build ID 怎麼解讀
+
+```
+B  P    4A    .  251205      .  006
+│  │    │      │             │
+│  │    │      │             └── patch 序號
+│  │    │      └─────────────── 分支日期 (2025-12-05)
+│  │    └────────────────────── 分支代號
+│  └─────────────────────────── support vertical
+└────────────────────────────── 主版本 (B = Baklava = Android 16)
+```
+
+### 2.2 用 build ID 查 AOSP source tag
+
+打開 [https://source.android.com/docs/setup/reference/build-numbers](https://source.android.com/docs/setup/reference/build-numbers)
+
+在頁面用 Ctrl+F 搜 `<BUILD_ID>`（如 `BP4A.251205.006`），會看到對應的 tag，例如：
+
+```
+Build              Branch                   Tag
+BP4A.251205.006    android16-qpr2-release   android-16.0.0_rXX
+```
+
+把 tag 記下（以下用 `<AOSP_TAG>` 代稱）。
+
+> 如果該 build ID 還沒推送到 AOSP（剛 release 的 build 通常會延遲幾週），就只能改用更早一個對應的 tag，或直接用 `android-latest-release` branch。
+
+### 2.3 用 build ID 查 Vendor driver
+
+打開 [https://developers.google.com/android/drivers](https://developers.google.com/android/drivers)
+
+頁面上會列出每個 device + build ID 的 vendor driver。Ctrl+F 搜 `shiba` 找對應 `<BUILD_ID>` 的那一列：
+
+```
+Hardware Component         Company    Download             SHA-256 Checksum
+Vendor image (shiba)       Google     Link                 abcdef...
+```
+
+點 Link 會看到下載 URL，格式類似：
+
+```
+https://dl.google.com/dl/android/aosp/google_devices-shiba-bp4a.251205.006-<HASH>.tgz
+```
+
+把 URL 與 SHA-256 記下。
+
+> **沒有對應 vendor 時**：跟 AOSP tag 同理，可能還沒 release。選下一個更早的 build ID 或選有 vendor 的最新版本作為 build target。
+
+### 2.4 對齊檢查
+
+到這一步你應該有：
+
+| 項目 | 範例值 | 來源 |
+|---|---|---|
+| `<BUILD_ID>` | `BP4A.251205.006` | `adb shell getprop` |
+| `<AOSP_TAG>` | `android-16.0.0_rXX` | source.android.com 查表 |
+| Vendor URL | `https://dl.google.com/.../google_devices-shiba-bp4a.251205.006-<HASH>.tgz` | developers.google.com/android/drivers |
+
+三者都指向同一個 `<BUILD_ID>` 才能繼續。
+
+---
+
+## Part 3：下載 AOSP 原始碼
+
+### 3.1 建立工作目錄
 
 ```bash
 mkdir -p ~/aosp && cd ~/aosp
 ```
 
-### `repo init`
-
-以下指令使用 `--partial-clone` 加速下載，並指定 `--no-use-superproject` 避免部分機器上的網路問題：
+### 3.2 repo init（用 Part 2.2 查到的 tag）
 
 ```bash
 repo init \
   --partial-clone \
   --no-use-superproject \
-  -b android-latest-release \
+  -b <AOSP_TAG> \
   -u https://android.googlesource.com/platform/manifest
 ```
 
-執行完會看到：
+例如：
 
-```
-repo has been initialized in /home/alanhc/aosp
-```
-
-目錄結構會多出 `.repo/`：
-
-```
-.repo/
-├── manifest.xml
-├── manifests/
-├── manifests.git/
-└── repo/
+```bash
+repo init --partial-clone --no-use-superproject \
+  -b android-16.0.0_rXX \
+  -u https://android.googlesource.com/platform/manifest
 ```
 
-> **針對 BP4A.251205.006（Android 16 QPR2）**：使用 `android-latest-release` 即可（2026 年 4 月 AOSP 已推送此版本的原始碼）。若要精確 pin 住特定 tag，請至 [source.android.com/docs/setup/reference/build-numbers](https://source.android.com/docs/setup/reference/build-numbers) 查詢 `BP4A.251205.006` 對應的 `android-16.0.0_r*` tag，再改用：
-> ```bash
-> repo init -u https://android.googlesource.com/platform/manifest -b android-16.0.0_rXX
-> ```
-> 其中 `XX` 為查表得到的號碼。
->
-> **Android 14 舊版範例**（`ap1a.240305.019`）：
-> ```bash
-> repo init -u https://android.googlesource.com/platform/manifest -b android-14.0.0_r17
-> ```
+成功後 `~/aosp/.repo/` 會被建立。
 
-### `repo sync`
+### 3.3 repo sync
 
 ```bash
 repo sync -c -j8 2>&1 | tee -a repo_sync.log
 ```
 
-- `-c`：只 sync 目前 branch，節省空間
-- `-j8`：8 個並行執行緒（**建議不要用 `$(nproc)` 全開**，容易遇到 fetch error）
-- `tee -a repo_sync.log`：同時輸出到 log 檔方便事後查錯
+- `-c`：只 sync 當前 branch（節省約 50% 空間）
+- `-j8`：8 並行（**不要用 `$(nproc)` 全開**，容易撞 fetch error 和 503）
+- 中斷後重跑同指令會續傳
 
-完成後看到：
+預期輸出：
 
 ```
+Fetching: 100% (XXXX/XXXX), done in XXh XXm XXs
 repo sync has finished successfully.
 ```
 
-整個過程視網路狀況約需 30～90 分鐘。若中途遇到錯誤，可重跑指令，`repo sync` 支援斷點續傳。
+視網路 30~90 分鐘。完成後 `~/aosp/` 會看到熟悉的 AOSP 目錄結構：
 
-> **AI 輔助除錯**：sync 過程若遇到奇怪的 fetch error，可以貼 log 給 Gemini CLI 或 Claude 幫忙分析。
+```
+art/  bionic/  bootable/  build/  cts/  dalvik/  developers/
+device/  external/  frameworks/  hardware/  kernel/  libcore/
+packages/  pdk/  platform_testing/  prebuilts/  system/  test/  toolchain/  tools/
+```
 
 ---
 
-## 3. 下載 Vendor Proprietary Drivers
+## Part 4：下載對應的 Vendor Driver
 
-Google 的閉源驅動（Baseband、Vendor image 等）需另外從官方下載，放進 AOSP 目錄才能成功編譯 Pixel 版本。
-
-前往：  
-**https://developers.google.com/android/drivers**（正式版，依裝置 + Build ID 查詢）
-
-**針對 BP4A.251205.006（Android 16 QPR2）**，在該頁面搜尋 `shiba` + `BP4A.251205.006`，取得對應的下載連結（URL 格式如下），SHA-256 以頁面上的為準：
+### 4.1 下載
 
 ```bash
 cd ~/aosp
-# 將下方 URL 的 <HASH> 換成頁面上標示的實際 checksum 前段
-wget https://dl.google.com/dl/android/aosp/google_devices-shiba-bp4a.251205.006-<HASH>.tgz
+wget '<Part 2.3 取得的 URL>'
+# 例:
+# wget https://dl.google.com/dl/android/aosp/google_devices-shiba-bp4a.251205.006-<HASH>.tgz
+```
+
+### 4.2 驗 SHA-256
+
+```bash
+sha256sum google_devices-shiba-*.tgz
+# 對照 Part 2.3 在網頁上看到的 SHA-256
+```
+
+**hash 對不上絕對不要繼續** — 表示檔案損毀或下載到錯版本。
+
+### 4.3 解壓
+
+```bash
+cd ~/aosp
 tar -xzf google_devices-shiba-bp4a.251205.006-*.tgz
-# 執行解壓腳本（需同意授權協議，輸入 'I ACCEPT' 即可）
+ls extract-*.sh
+# extract-google_devices-shiba.sh
+```
+
+### 4.4 跑 extract 腳本（同意授權）
+
+```bash
 ./extract-google_devices-shiba.sh
 ```
 
-> **Android 14 AP1A 舊版範例**（僅供參考，請務必下載與自己 Build ID 相符的版本）：
-> ```bash
-> wget https://dl.google.com/dl/android/aosp/google_devices-shiba-uq1a.231205.015-9a0b48c0.tgz
-> ```
-
-成功後會在 `vendor/google_devices/shiba/` 產出以下內容：
+腳本會把授權合約用 `more` 印出來，按 SPACE 翻到底，最後輸入：
 
 ```
-vendor/google_devices/shiba/proprietary/
-├── bootloader.img
-├── radio.img
-├── vendor.img
-├── vendor_dlkm.img
-├── vbmeta_vendor.img
-├── device-vendor.mk
-├── Android.bp / Android.mk
-└── ...（其他 .so 與 .apk）
+I ACCEPT
 ```
+
+回車後會解壓到 `vendor/google_devices/shiba/`。
+
+### 4.5 確認 vendor 結構
+
+```mermaid
+flowchart TD
+    R[~/aosp/]
+    V[vendor/google_devices/shiba/]
+    P[proprietary/]
+    BL[bootloader.img]
+    RD[radio.img]
+    VI[vendor.img]
+    VDLKM[vendor_dlkm.img]
+    VBV[vbmeta_vendor.img]
+    DV[device-vendor.mk]
+    AB[Android.bp / Android.mk]
+
+    R --> V --> P
+    P --> BL
+    P --> RD
+    P --> VI
+    P --> VDLKM
+    P --> VBV
+    P --> DV
+    P --> AB
+
+    style V fill:#fde7c0,stroke:#f9ab00
+```
+
+ASCII：
+
+```
+~/aosp/
+└── vendor/google_devices/shiba/
+    └── proprietary/
+        ├── bootloader.img        ← 第三方 bootloader
+        ├── radio.img             ← modem firmware
+        ├── vendor.img            ← vendor 分區內容
+        ├── vendor_dlkm.img
+        ├── vbmeta_vendor.img
+        ├── device-vendor.mk      ← Android.mk 整合進 build
+        ├── Android.bp / Android.mk
+        └── ... (其他 .so / .apk)
+```
+
+驗證：
+
+```bash
+ls vendor/google_devices/shiba/proprietary/ | head
+```
+
+> 有些 build 還會要求第二個 tarball（例如 `qcom-shiba-...tgz`），照同樣流程下載 + extract 即可。**以 driver 頁面實際列出的為準。**
 
 ---
 
-## 4. 設定 Build 環境與選擇目標
+## Part 5：Lunch 與編譯
+
+### 5.1 設定 lunch target
 
 ```bash
 cd ~/aosp
 source build/envsetup.sh
+lunch aosp_shiba-userdebug
 ```
 
-接著執行 `lunch` 選擇編譯目標。對 Pixel 8（`shiba`）使用 userdebug variant：
-
-```bash
-lunch aosp_shiba-trunk_staging-userdebug
-```
-
-成功後會輸出當前 build 設定（Android 16 版本範例）：
+預期輸出：
 
 ```
-============================================
-PLATFORM_VERSION_CODENAME=REL
-PLATFORM_VERSION=16
 TARGET_PRODUCT=aosp_shiba
 TARGET_BUILD_VARIANT=userdebug
 TARGET_ARCH=arm64
-HOST_OS=linux
-BUILD_ID=BP4A.251205.006
-OUT_DIR=out
-============================================
+PRODUCT_SOONG_NAMESPACES=...
 ```
 
-> **Pixel 8 Pro（husky）** 的 lunch target 為 `aosp_husky-trunk_staging-userdebug`。  
-> **16 KB page size 支援**（Android 16 新功能）：Pixel 8 亦可選擇 `aosp_shiba_pgagnostic-trunk_staging-userdebug`，但一般開發用 `aosp_shiba-trunk_staging-userdebug` 即可。
+> Pixel 8 Pro：`lunch aosp_husky-userdebug`
 
----
-
-## 5. 編譯
+### 5.2 編譯
 
 ```bash
 m
 ```
 
-`m` 等同 `make`，會自動偵測 CPU 核心數。首次編譯視硬體需要 1～3 小時：
+第一次編譯約 1~3 小時，視 CPU / SSD 而定。完成標誌：
 
 ```
-#### build completed successfully (01:03:22 (hh:mm:ss)) ####
+#### build completed successfully (XX:XX:XX (hh:mm:ss)) ####
 ```
 
-編譯產物位於：
+### 5.3 確認產物
 
 ```bash
 echo $PRODUCT_OUT
-# out/target/product/shiba
+# /home/<you>/aosp/out/target/product/shiba
+
+ls $PRODUCT_OUT/*.img | head
 ```
+
+預期看到：
+
+```
+boot.img            init_boot.img         vbmeta.img
+bootloader.img      pvmfw.img             vbmeta_system.img
+dtbo.img            radio.img             vbmeta_vendor.img
+super_empty.img     system.img            vendor_boot.img
+system_dlkm.img     system_ext.img        vendor.img
+system_other.img    userdata.img          vendor_dlkm.img
+                                          vendor_kernel_boot.img
+```
+
+#### 為什麼產出這麼多 .img？— 分區結構
+
+```mermaid
+flowchart TB
+    subgraph Boot ["Boot 相關 (固定大小)"]
+        B[boot.img]
+        IB[init_boot.img]
+        VB[vendor_boot.img]
+        VKB[vendor_kernel_boot.img]
+        DT[dtbo.img]
+        PV[pvmfw.img]
+    end
+
+    subgraph Verity ["Verified Boot Metadata"]
+        VM1[vbmeta.img]
+        VM2[vbmeta_system.img]
+        VM3[vbmeta_vendor.img]
+    end
+
+    subgraph Super ["Dynamic Partition (super)"]
+        S1[system.img]
+        S2[system_ext.img]
+        S3[product.img]
+        S4[vendor.img]
+        S5[vendor_dlkm.img]
+        S6[system_dlkm.img]
+    end
+
+    subgraph Other ["其他"]
+        BL[bootloader.img]
+        RD[radio.img]
+        UD[userdata.img]
+    end
+
+    style Super fill:#cfe8ff
+    style Boot fill:#fde7c0
+    style Verity fill:#f3e5f5
+```
+
+> **Dynamic Partition / super**：Android 10 之後，`system / vendor / product / system_ext / *_dlkm` 不再是固定大小分區，而是塞進一個叫 `super` 的容器裡，互相可以動態調整大小。`fastboot` 燒的時候會看到 `Sending sparse 'super' 1/N`，就是在分塊塞進這個 super 分區。
 
 ---
 
-## 6. 連接 Pixel 手機（ADB 設定）
+## Part 6：燒錄到手機
 
-### 手機端設定
-
-1. **設定 → 關於手機 → 連點「版本號」7 下**，開啟開發人員選項
-2. **開發人員選項 → 打開「USB 偵錯」**
-3. **開發人員選項 → 打開「OEM 解鎖」**（第一次燒錄 AOSP 必須）
-4. 用 USB 線接到電腦，手機跳出授權視窗選「允許」
-
-### 主機端確認連線
-
-```bash
-adb devices
-# List of devices attached
-# 38011FDJH00C9F  device
-```
-
-狀態是 `device` 代表連線成功；`unauthorized` 代表手機還沒授權，點選手機的允許即可。
-
-### 常見問題：unauthorized 無法解決
-
-```bash
-# 清除舊有金鑰並重啟 daemon
-rm -f ~/.android/adbkey ~/.android/adbkey.pub
-adb kill-server
-adb start-server
-adb devices
-```
-
----
-
-## 7. 進入 Bootloader 並燒錄
-
-### 進入 fastboot 模式
+### 6.1 進 fastboot
 
 ```bash
 adb reboot bootloader
 ```
 
-手機螢幕會進入黑底的 fastboot 介面。確認 fastboot 有看到裝置：
+確認：
 
 ```bash
 fastboot devices
 # 38011FDJH00C9F   fastboot
+
+fastboot getvar product   # product: shiba
+fastboot getvar unlocked  # unlocked: yes  ← 必須是 yes
 ```
 
-### 解鎖 Bootloader（第一次必做，會清除資料）
+> **`fastboot devices` 顯示為 `Mass Storage`** 是正常的（USB descriptor 字串差異），只要 `getvar` 能回應就 OK。
+
+### 6.2（第一次必做）解鎖 bootloader
 
 ```bash
 fastboot flashing unlock
 ```
 
-手機螢幕會出現確認畫面，用音量鍵選「Unlock the bootloader」後按電源鍵確認。
+手機螢幕用音量鍵選 **"Unlock the bootloader"**，電源鍵確認。**會清除 userdata**。
 
-### 燒錄所有分區
+### 6.3 燒錄
 
 ```bash
 cd ~/aosp
 source build/envsetup.sh
-lunch aosp_shiba-trunk_staging-userdebug   # 或你選的 target
+lunch aosp_shiba-userdebug
 cd "$(get_build_var PRODUCT_OUT)"
 fastboot flashall -w
 ```
 
-`-w` 代表同時清除 userdata（相當於恢復出廠設定）。完整輸出範例：
+> **`-w` 會清 userdata**（恢復出廠設定）。日常迭代不想清資料就拿掉 `-w`。
+
+或者直接帶環境變數：
+
+```bash
+cd ~/aosp/out/target/product/shiba
+ANDROID_PRODUCT_OUT=$(pwd) fastboot flashall -w
+```
+
+#### A/B Slot 機制
+
+Pixel 採 A/B 雙 slot 設計。每次 `flashall` 會把 image 寫進 inactive slot，再切 active 過去：
+
+```
+燒錄前         flashall 寫入        切換 active        重開機
+─────────       ────────────        ──────────        ────────
+  slot a *      slot a              slot a              slot a
+  slot b        slot b ← write      slot b *            slot b *
+                                    (切換)              (從 b 開機)
+
+* = active slot
+```
+
+下次再燒會反過來寫到 slot a。**這代表壞了一個 slot 還能切回另一個**，是內建的 fail-safe。
+
+#### 預期輸出（70 秒左右）
 
 ```
 --------------------------------------------
-Bootloader Version...: ripcurrent-16.4-14097582
-Baseband Version.....: g5300i-250909-251024-B-14326967
-Serial Number........: 38011FDJH00C9F
+Bootloader Version...: ripcurrent-16.4-XXXXXXXX
+Baseband Version.....: g5300i-XXXXXX-XXXXXX-B-XXXXXXXX
+Serial Number........: XXXXXXXXXXXXX
 --------------------------------------------
-Checking 'product'                                 OKAY [  0.000s]
-Setting current slot to 'a'                        OKAY [  0.074s]
-Sending 'boot_a' (65536 KB)                        OKAY [  1.596s]
-Writing 'boot_a'                                   OKAY [  0.099s]
-...（中間略）
-Sending sparse 'super' 9/9 (211236 KB)             OKAY [  5.163s]
-Writing 'super'                                    OKAY [  0.333s]
-Rebooting                                          OKAY [  0.000s]
-Finished. Total time: 65.786s
+Checking 'product'                                 OKAY
+Setting current slot to 'b'                        OKAY
+Sending 'boot_b' (65536 KB)                        OKAY
+Writing 'boot_b'                                   OKAY
+... (init_boot / dtbo / pvmfw / vbmeta×3 / vendor_boot / vendor_kernel_boot)
+Sending sparse 'super' 1/10 ...                    OKAY
+Writing 'super'                                    OKAY
+... (super 共 ~10 chunks)
+Erasing 'userdata'                                 OKAY
+Erase successful, but not automatically formatting.
+File system type raw not supported.
+wipe task partition not found: cache
+Erasing 'metadata'                                 OKAY
+Rebooting                                          OKAY
+Finished. Total time: ~70s
 ```
 
-燒錄完成後手機會自動重開機，進入剛才編譯的 AOSP 系統。
+#### 三個會嚇到人但其實正常的訊息
+
+| 訊息 | 為什麼正常 |
+|---|---|
+| `Erase successful, but not automatically formatting. File system type raw not supported.` | userdata 被 erase 但沒 format。**Android 第一次 boot 時會自動 format /data**。 |
+| `wipe task partition not found: cache` | Pixel 8 用 A/B + dynamic partition，**根本沒有獨立 cache 分區**。 |
+| `Setting current slot to 'b'` | A/B 機制，slot 會輪流。下次燒會切回 `a`。 |
+
+### 6.4 第一次開機
+
+第一次開機要做 dexopt + format /data，比較久（5~10 分鐘）。等進入 launcher 即可。
+
+驗證：
+
+```bash
+adb shell getprop ro.build.fingerprint
+# Android/aosp_shiba/shiba:16/.../userdebug/test-keys
+```
+
+看到 `aosp_shiba` 和 `userdebug` 就確認跑的是你 build 出來的那版。
 
 ---
 
-## 8. 常見錯誤排解
+## Part 7：日常迭代
 
-### 錯誤：`image (bl1_a): rejected, anti-rollback`
-
-```
-(bootloader) image (bl1_a): rejected, anti-rollback
-FAILED (remote: 'failed to flash partition (bootloader_a): -7')
-```
-
-**原因**：試圖刷入比目前 bootloader 版本更舊的 bootloader，反回滾機制擋下。  
-**解法**：下載與目前 bootloader 版本相符（或更新）的官方 factory image 來刷。
-
-### 錯誤：`Device version-bootloader is X. Update requires Y.`
-
-```
-Device version-bootloader is 'ripcurrent-16.4-14097582'.
-Update requires 'ripcurrent-14.4-11322024'.
-fastboot: error: requirements not met!
-```
-
-**原因**：factory image 的版本比目前 bootloader 舊。  
-**解法**：到 [https://developers.google.com/android/images](https://developers.google.com/android/images) 下載**最新版**或與目前 bootloader 版本相符的 factory image。
-
-### 燒錄後無法開機（變磚）
-
-按住 **電源 + 音量下鍵** 強制進入 fastboot，然後用官方 factory image 救回：
+之後改 code 想重燒：
 
 ```bash
-# 1. 到 https://developers.google.com/android/images 下載對應機型的 factory image
-# 2. 解壓縮
-cd ~/shiba-bp4a.260205.001
-# 3. 執行官方燒錄腳本
+cd ~/aosp
+repo sync -c -j8                     # (可選) 拉新 code
+source build/envsetup.sh
+lunch aosp_shiba-userdebug
+m                                    # 增量編譯，只重 build 改動模組
+
+adb reboot bootloader
+cd "$(get_build_var PRODUCT_OUT)"
+fastboot flashall                    # 不加 -w 保留資料
+```
+
+只改 kernel 想加速：
+
+```bash
+fastboot flash boot boot.img
+fastboot reboot
+```
+
+---
+
+## Part 8：常見錯誤與救磚
+
+### `image (bl1_a): rejected, anti-rollback`
+
+刷的 bootloader 比手機目前舊。**解法**：用 ≥ 目前版本的 build ID。
+
+### `Update requires Y. fastboot: error: requirements not met!`
+
+factory image 太舊。**解法**：下載匹配或更新版本。
+
+### `Bootloader is locked`
+
+`fastboot flashall` 直接被擋。**解法**：`fastboot flashing unlock`（會清資料）。
+
+### 變磚（無法開機）
+
+按住 **電源 + 音量下鍵** 強制進 fastboot，用官方 factory image 救：
+
+```bash
+# 1. 到 https://developers.google.com/android/images 下載對應 build 的 zip
+unzip shiba-<build-id>-factory-*.zip
+cd shiba-<build-id>
 ./flash-all.sh
 ```
 
-成功輸出的最後幾行：
-
-```
-Rebooting                                          OKAY [  0.000s]
-Finished. Total time: 189.060s
-```
-
-這樣就救回來了。
-
----
-
-## 9. 重新 sync 並重新燒錄的快速流程
-
-之後要更新 AOSP 並重燒，只需：
-
-```bash
-# 1. 更新原始碼
-cd ~/aosp
-repo sync -c -j8 2>&1 | tee repo_sync.log
-
-# 2. 重新編譯
-source build/envsetup.sh
-lunch aosp_shiba-trunk_staging-userdebug
-m
-
-# 3. 燒錄
-adb reboot bootloader
-cd "$(get_build_var PRODUCT_OUT)"
-fastboot flashall -w
-```
-
----
-
-## 10. 補充：停用 AVB 並以 R/W 模式 Remount
-
-如果需要修改系統分區（例如推 `.so` 到 `/system`），需要先停用 AVB：
-
-```bash
-fastboot -w --disable-verity --disable-verification flashall
-```
-
-燒錄完畢後，在 adb shell 中 remount：
-
-```bash
-adb root
-adb remount
-```
+只要還能進 fastboot，這個指令幾乎都救得回來。
 
 ---
 
 ## 參考資料
 
-- [AOSP 官方建置指南](https://source.android.com/docs/setup/start?hl=zh-tw)
-- [AOSP Build Numbers & Tags 對照表](https://source.android.com/docs/setup/reference/build-numbers)（查 BP4A.251205.006 對應的 `android-16.0.0_rXX` tag）
-- [Google Pixel Factory Images](https://developers.google.com/android/images)
-- [Google Pixel Vendor Drivers](https://developers.google.com/android/drivers)（下載 shiba + BP4A.251205.006 的 proprietary blobs）
-- [Android 16 QPR2 Factory Images](https://developer.android.com/about/versions/16/qpr2/download)
-- [LineageOS Pixel 8 Build Guide](https://wiki.lineageos.org/devices/shiba/build/)
+- [AOSP 官方建置指南](https://source.android.com/docs/setup/start)
+- [AOSP Build Numbers & Tags 對照表](https://source.android.com/docs/setup/reference/build-numbers) — Part 2.2 查 AOSP tag
+- [Google Pixel Vendor Drivers](https://developers.google.com/android/drivers) — Part 2.3 查 vendor URL
+- [Google Pixel Factory Images](https://developers.google.com/android/images) — Part 8 救磚
+- [Android A/B System Updates](https://source.android.com/docs/core/ota/ab) — A/B slot 細節
+- [Dynamic Partitions](https://source.android.com/docs/core/ota/dynamic_partitions) — super 分區細節
