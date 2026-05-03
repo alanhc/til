@@ -692,3 +692,34 @@ cd shiba-<build-id>
 - [Google Pixel Factory Images](https://developers.google.com/android/images) — Part 8 救磚
 - [Android A/B System Updates](https://source.android.com/docs/core/ota/ab) — A/B slot 細節
 - [Dynamic Partitions](https://source.android.com/docs/core/ota/dynamic_partitions) — super 分區細節
+
+
+**1. Phase 0 — 版本對齊**
+
+- 從手機讀到 build ID `BP1A.250505.005.B1`，裝置 `shiba`（Pixel 8）
+- 查 source.android.com 得到 AOSP tag：`android-15.0.0_r34`
+- 查 developers.google.com/android/drivers 得到 vendor tarball URL 和 SHA-256
+
+**2. Phase 1 — repo sync**
+
+- `repo init -b android-15.0.0_r34`
+- `repo sync -c -j8`（中途降到 j4 重試一次）
+
+**3. Phase 2 — Vendor driver**
+
+- `wget` 下載 `google_devices-shiba-bp1a.250505.005.b1-ef15dd6d.tgz`
+- SHA-256 驗證通過
+- `tar -xzf` 解壓，執行 `extract-google_devices-shiba.sh`（自動接受 EULA）
+- 這個 script 把 vendor blob 複製到 `~/aosp/vendor/google_devices/shiba/`
+
+**4. Phase 3 — Build**
+
+- 第一次 `lunch aosp_shiba-userdebug` 失敗（Android 15 格式改了）
+- 改用 `lunch aosp_shiba-bp1a-userdebug` 成功
+- `m` 編譯約 136,226 個 target，花了 1 小時 28 分
+
+**5. Phase 4 — Flash**
+
+- `adb reboot bootloader`
+- 確認 codename=shiba、bootloader unlocked
+- `fastboot flashall -w`（slot 切到 b，清除 userdata）
