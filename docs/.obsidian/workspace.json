@@ -313,6 +313,7 @@
   },
   "active": "5676dbed0cc9ebf9",
   "lastOpenFiles": [
+    "pixel_img.md",
     "pixel_flash_debug.md",
     "android_firmware_development_and_agentic_ai.md",
     "android_firmware_development_and_agentic_ai.mc",
@@ -340,7 +341,6 @@
     "分析/android-summary.md",
     "booting/riscv_linux_boot_flow.md",
     "booting/x86_linux_boot_flow.md",
-    "BMC/openbmc_boot_flow.md",
     "assets/vercel_skills/file-20260406151002920.png",
     "assets/vercel_skills",
     "ai-articles",
