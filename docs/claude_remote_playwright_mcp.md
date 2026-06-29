@@ -44,3 +44,105 @@ Playwright 連的精確 WS URL 通常長這樣:
 以你的需求(從遠端 Linux 操作本地 Windows),架構是反過來的——通常 MCP / 自動化主機在本地、瀏覽器也在本地。你這邊是**控制端在遠端、被控端(瀏覽器)在本地**,所以隧道方向、防火牆規則都要以「Windows 為服務提供者」來設計,反向 SSH 轉發是最乾淨的。
 
 要我幫你寫一份完整的 Windows 端 Chrome 啟動指令 + 反向 tunnel + Linux 端 Playwright MCP 連線設定嗎?
+Chrome 啟動需要指定一個獨立的 user-data-dir,否則會去附掛到已開啟的 Chrome 實例,debug port 就掛不上。我把完整流程分四步給你。
+
+## 1. Windows 端:啟動帶 debug port 的 Chrome
+
+開 PowerShell 或 cmd,用獨立 profile 啟動:
+
+```powershell
+& "C:\Program Files\Google\Chrome\Application\chrome.exe" `
+  --remote-debugging-port=9222 `
+  --user-data-dir="C:\chrome-debug-profile"
+```
+
+幾個重點:
+- `--user-data-dir` 指向一個**全新或專用**資料夾。這會是個乾淨 profile(沒有你平常的書籤/登入),如果你需要既有登入狀態,把它指到你真實 profile 的複本,別直接指原本那個正在用的。
+- 啟動後先在本機驗證:瀏覽器開 `http://localhost:9222/json/version`,有 JSON 跑出來就代表 CDP 起來了。
+- 確認 `webSocketDebuggerUrl` 欄位存在,這就是 Playwright 要連的 endpoint。
+
+## 2. Windows 端:建立反向 SSH 隧道
+
+Windows 10/11 內建 OpenSSH client,直接用:
+
+```powershell
+ssh -N -R 9222:localhost:9222 user@linux-server
+```
+
+- `-R 9222:localhost:9222`:把 Linux server 的 `localhost:9222` 反向轉發到 Windows 的 `localhost:9222`。
+- `-N`:不開遠端 shell,純做轉發。
+- 這條指令要**保持執行**(隧道存活期間)。斷了就要重連。
+
+**一個常見坑:** Linux server 的 `sshd` 預設 `GatewayPorts no`,反向轉發出來的 port 只綁在 server 的 `127.0.0.1`。這對你正好——你要的就是只有 server 本機(Playwright MCP)連得到,不對外。保持預設即可,不要去開 `GatewayPorts yes`。
+
+## 3. Linux 端:驗證隧道通了
+
+在 Linux server 上:
+
+```bash
+curl http://localhost:9222/json/version
+```
+
+跑出跟你在 Windows 看到的同一份 JSON,就代表隧道 + CDP 全線打通。
+
+## 4. Linux 端:Playwright MCP 連線設定
+
+Playwright MCP 用 `--cdp-endpoint` 連既有瀏覽器,不要讓它自己啟瀏覽器:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--cdp-endpoint", "http://localhost:9222"
+      ]
+    }
+  }
+}
+```
+
+說明:
+- 給 `http://localhost:9222` 即可,Playwright MCP 會自己去 `/json/version` 抓那個帶 UUID 的 `webSocketDebuggerUrl`,你不用手動填 WS URL。
+- 因為走隧道,Linux 這邊看起來就是在連本機,Playwright 完全無感。
+
+如果你是用程式碼直接呼叫 Playwright 而非 MCP:
+
+```python
+from playwright.sync_api import sync_playwright
+
+with sync_playwright() as p:
+    browser = p.chromium.connect_over_cdp("http://localhost:9222")
+    context = browser.contexts[0]        # 用既有 context
+    page = context.pages[0] if context.pages else context.new_page()
+    page.goto("https://example.com")
+    print(page.title())
+```
+
+## 整體資料流
+
+```
+[Linux: Playwright MCP]
+      │ 連 localhost:9222 (以為是本機)
+      ▼
+[Linux sshd: 127.0.0.1:9222]  ← 反向轉發出口
+      │ SSH 加密隧道
+      ▼
+[Windows ssh client]
+      │ 轉回 localhost:9222
+      ▼
+[Windows: Chrome CDP :9222]  ← 真正的瀏覽器
+```
+
+## 給你的兩個提醒
+
+**穩定性**:`ssh -R` 隧道斷線不會自動重連。長期跑的話在 Windows 端用 `autossh`,或在 ssh 指令加 keepalive:
+
+```powershell
+ssh -N -R 9222:localhost:9222 -o ServerAliveInterval=30 -o ServerAliveCountInterval=3 user@linux-server
+```
+
+**安全性**:整條鏈路只要 `GatewayPorts` 保持 `no`,9222 就永遠不會暴露到公網,風險可控。唯一能控制你瀏覽器的就是 Linux server 上的本機程序——確保那台 server 你自己掌握存取權即可。
+
+需要我幫你把 Windows 端那兩條指令(啟 Chrome + 開隧道)包成一個 `.ps1` 一鍵啟動腳本嗎?
