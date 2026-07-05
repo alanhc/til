@@ -22,6 +22,14 @@ Industry framing puts it even more bluntly: AI agents lack the legal accountabil
 
 My own take: people are willing to answer for their own judgment because they can't escape it — they'll be reviewed, it'll affect their performance rating, it'll have career consequences. An agent has none of that. So when a process shifts from "this engineer is responsible" to "this agent is responsible," responsibility isn't transferred — it **evaporates**. That's what managers are truly afraid of.
 
+And it gets worse: even if you want to assign an owner, you find responsibility isn't a *point* — it's a *chain*. The person who wrote the agent, the person who reviewed its output, the person who hit merge, the person who configured the automated checks — every link touched that code. When something breaks, each of them can reasonably say "it wasn't only me." This is exactly the "problem of many hands": when responsibility is spread across many hands, no single hand is responsible.
+
+I think you have to be honest about this: **there's no clean right answer, and anyone who says "it should just be person X" is oversimplifying.** But it can be decomposed. The key is to separate two things that get conflated: *causal responsibility* (whose lapse produced the bug) — usually multi-causal, established after the fact — and *accountability* (who answers for it) — which the system assigns *in advance*, and shouldn't be argued about only after something breaks. Most organizational pain comes from thinking they're looking for the first (whose fault) when what they actually lack is the second (who's accountable) — and the second never had to equal the person who erred. Like aviation safety: the captain is accountable for the whole aircraft, which doesn't mean they tightened every screw.
+
+The pragmatic move isn't to elect "the one person responsible" — it's to make *each link accountable for its own decision*: whoever designs the agent and its automated checks owns the *capability boundary* (what the agent is authorized to do, what the checks cover, whether that's reasonable); whoever reviews owns *that particular judgment* (given the information they had, should this change pass); whoever hits merge owns the *release decision* — the final gate. That's fairer than anointing a single super-owner, and far more auditable. Which is exactly why "merge authority exclusive to humans + immutable audit logs" matters so much: rather than argue about fault after the fact, make every decision leave a named trail beforehand. When something breaks, you don't argue — you read the log and trace each layer back.
+
+Worth adding: a plane has a captain, but an agent pipeline has none by default — it's missing exactly that role that's accountable for the release as a whole. So merge authority isn't something that pre-exists and we assign; it's a captain we **deliberately manufacture**. That's also why "let the agent auto-merge" is so dangerous in accountability terms: it's a plane with no captain.
+
 ## Wall #3: Colleagues Fear Being Replaced
 
 After the technical conversation and the governance conversation, this last wall is the quietest — and the hardest to take down.
@@ -54,7 +62,7 @@ I won't pretend to have a complete solution, but after this year, here are the d
 
 **First, make the agent observable before you talk about autonomy.** Before trust is established, a human review checkpoint isn't the enemy of autonomy — it's the entry ticket that gives the agent a chance to be accepted. Understand it first, then loosen the reins.
 
-**Second, treat "named owner" as a precondition for deployment, not an afterthought.** Every agent that ships should be tied to a person who can answer "if it breaks, come find me." The accountability gap isn't something technology can patch — it's something the system has to be designed for up front.
+**Second, treat "layered, named accountability" as a precondition for deployment, not an afterthought.** Stop asking "who's the one person responsible" — there isn't one. Make every decision in the chain named and logged: who authorized the agent, who approved, who merged, which checks passed at the time. The accountability gap isn't something technology can patch — it's something the system has to design for by distributing responsibility across layers up front. When something breaks, you should be able to read the log and trace it back, not argue about it in a meeting room.
 
 **Third, make employees co-designers, not the ones being replaced.** Let engineers help define what the agent should and shouldn't do, and they shift from "the person under threat" to "the person holding the reins" — resistance loosens on its own.
 
