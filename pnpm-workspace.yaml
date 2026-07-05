@@ -1,3 +1,6 @@
-onlyBuiltDependencies:
-  - core-js
-  - core-js-pure
+# pnpm 10+ blocks dependency build scripts by default and fails the install
+# in CI (ERR_PNPM_IGNORED_BUILDS). The only dependency with a build script here
+# is core-js (a trusted postinstall funding notice), so allow builds to run.
+# NOTE: onlyBuiltDependencies / ignoredBuiltDependencies do NOT suppress the
+# error on pnpm 11.10.x; dangerouslyAllowAllBuilds is the option that works.
+dangerouslyAllowAllBuilds: true
