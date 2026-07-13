@@ -33,14 +33,14 @@ const config = {
   trailingSlash: false,
   
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenMarkdownLinks: 'throw',
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
   // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'zh-Hant',
-    locales: ['zh-Hant', 'en'],
+    locales: ['zh-Hant'],
   },
 
   presets: [
@@ -89,9 +89,6 @@ const config = {
         indexName: 'alanhcio',
         contextualSearch: true,
         insights: true,
-        algoliaOptions: {
-          'facetFilters': ['lang:zh-Hant', 'lang:en-US'],
-        }
       },
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
@@ -105,7 +102,7 @@ const config = {
             type: 'docSidebar',
             sidebarId: 'tutorialSidebar',
             position: 'left',
-            label: 'Tutorial',
+            label: '筆記',
           },
           {to: '/blog', label: 'Blog', position: 'left'},
           { type: 'search', position: 'right' },
