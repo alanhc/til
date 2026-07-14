@@ -116,6 +116,6 @@ OpenBMC 上執行 `systemctl status xyz-sensor.service` 顯示 failed，
 ## 參考資源
 
 - [OpenBMC 官方文件](https://github.com/openbmc/docs)
-- [PMBus Spec](https://pmbus.org/specs.html)
+- [PMBus Spec](https://pmbus.org/specification-archives/)
 - [Linux hwmon pmbus-core](https://www.kernel.org/doc/html/latest/hwmon/pmbus-core.html)
 - [phosphor-dbus-interfaces](https://github.com/openbmc/phosphor-dbus-interfaces)

@@ -419,7 +419,7 @@ Host:                                      [BIOS/UEFI]──[OS]── 持續運
 
 - [OpenBMC GitHub](https://github.com/openbmc/openbmc)
 - [OpenBMC Documentation](https://github.com/openbmc/docs)
-- [ASPEED AST2600 Datasheet](https://www.aspeedtech.com/server_bmc/)
+- [ASPEED AST2600 產品頁](https://www.aspeedtech.com/products.php?fPath=20)
 - [Phosphor D-Bus Interfaces](https://github.com/openbmc/phosphor-dbus-interfaces)
-- [OpenBMC Architecture Overview](https://github.com/openbmc/docs/blob/master/architecture/openbmc-architecture.md)
+- [OpenBMC Architecture Overview](https://github.com/openbmc/docs/tree/master/architecture)
 - [Yocto Project](https://www.yoctoproject.org/)

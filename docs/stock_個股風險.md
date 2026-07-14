@@ -7,10 +7,6 @@
 
 區分高風險與低風險個股，本質上是在評估「不確定性」與「波動度」的大小。在台股市場中，我們通常可以從**量化指標**、**公司基本面**、**籌碼面**與**產業特性**四個維度來拆解。
 
-![Risk and Return Tradeoff graph (由 AI 生成)](https://encrypted-tbn3.gstatic.com/licensed-image?q=tbn:ANd9GcSRki0ZmpyDca-oyUcWs-k1fTD00mB6u_ZCPJk99yV-T06B6-mL7birabqSt_5uIHjoJaE87FcOnAm7WMggOubwfprSU7NCJAHw1ArzjsZU2-ikElY)
-
-Getty Images
-
 探索
 
 ### 1. 量化指標 (Beta 值 $\beta$)
