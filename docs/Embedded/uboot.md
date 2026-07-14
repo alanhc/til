@@ -33,4 +33,4 @@ booti 0x80000000 - 0x88000000
 
 `booti` 的三個引數為 kernel、initrd（`-` 表示無）、device tree blob 的載入位址。
 
-參考：<https://docs.u-boot.org/>
+參考：https://docs.u-boot.org/

@@ -19,4 +19,4 @@ bitbake core-image-minimal    # 建構目標 image
 
 產物在 `tmp/deploy/images/<machine>/`，包含 kernel、device tree 與 **rootfs image**（如 `.wic`、`.ext4`、`.tar.bz2`），可燒錄到目標板。
 
-參考：<https://docs.yoctoproject.org/>
+參考：https://docs.yoctoproject.org/
