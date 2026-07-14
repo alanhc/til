@@ -173,7 +173,7 @@ cloudflared tunnel --url http://127.0.0.1:8000
 
 ### 建立動作
 
-從 URL 匯入 e.g. https://information-stationery-nations-conventional.trycloudflare.com/openapi.json
+從 URL 匯入 e.g. `https://information-stationery-nations-conventional.trycloudflare.com/openapi.json`
 
 ![alt text](image-11.png)
 
