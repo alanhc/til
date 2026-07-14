@@ -27,16 +27,18 @@ jobs:
       - name: Check links with lychee
         uses: lycheeverse/lychee-action@v2
         with:
-          # Exclude every internal link (the site's baseUrl is /til/, so all
-          # internal links start with /til) — those are already validated at
-          # build time and can't be resolved against local files. This check
-          # is only for external dead links.
+          # This check is only for external dead links; internal links are
+          # already validated at build time. --base resolves the site's
+          # root-relative /til links to full URLs so they don't error as
+          # "unresolvable", and the alanhc.github.io exclude then skips them
+          # (no need to re-check internal links over the network).
           #   --exclude-all-private: skip localhost / private IPs pasted in notes
           #   --accept 403: academic/publisher sites (doi.org, medium, ACM,
           #     researchgate, arm developer...) return 403 to bots, not real 404s
           #   --accept 429: rate limited, treated as alive
           args: >-
-            --exclude "^/til"
+            --base https://alanhc.github.io
+            --exclude "alanhc\.github\.io"
             --exclude-all-private
             --no-progress
             --max-concurrency 8
