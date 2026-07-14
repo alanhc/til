@@ -30,12 +30,17 @@ jobs:
           # Exclude every internal link (the site's baseUrl is /til/, so all
           # internal links start with /til) — those are already validated at
           # build time and can't be resolved against local files. This check
-          # is only for external dead links. 429 accepted to avoid flake.
+          # is only for external dead links.
+          #   --exclude-all-private: skip localhost / private IPs pasted in notes
+          #   --accept 403: academic/publisher sites (doi.org, medium, ACM,
+          #     researchgate, arm developer...) return 403 to bots, not real 404s
+          #   --accept 429: rate limited, treated as alive
           args: >-
             --exclude "^/til"
+            --exclude-all-private
             --no-progress
             --max-concurrency 8
             --max-retries 2
-            --accept 200,206,429
+            --accept 200,206,403,429
             "build/**/*.html"
           fail: true
