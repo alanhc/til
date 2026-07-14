@@ -1,6 +1,7 @@
-# Hosts that block automated requests (return 403/999 to bots) and would
+# Hosts that block automated requests (return 403/999/521 to bots) and would
 # otherwise show up as false-positive dead links.
 linkedin.com
 x.com
 twitter.com
 threads.net
+blog.csdn.net

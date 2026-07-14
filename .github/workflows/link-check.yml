@@ -27,12 +27,13 @@ jobs:
       - name: Check links with lychee
         uses: lycheeverse/lychee-action@v2
         with:
-          # Only check external http/https URLs — internal/root-relative links
-          # are already validated at build time, and checking them here against
-          # local files produces false positives. 429 accepted to avoid flake.
+          # Exclude every internal link (the site's baseUrl is /til/, so all
+          # internal links start with /til) — those are already validated at
+          # build time and can't be resolved against local files. This check
+          # is only for external dead links. 429 accepted to avoid flake.
           args: >-
-            --scheme https
-            --scheme http
+            --exclude "^/til"
+            --exclude-mail
             --no-progress
             --max-concurrency 8
             --max-retries 2
