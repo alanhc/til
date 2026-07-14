@@ -5,6 +5,8 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
+    "lint:md": "markdownlint-cli2 \"docs/**/*.md\" \"blog/**/*.{md,mdx}\"",
+    "preflight": "yarn lint:md && yarn build",
     "sync": "cp -r  /Users/alantseng/workspace/til/docs/ ~/Library/Mobile\\ Documents/iCloud\\~md\\~obsidian/Documents/work_notes/外 ",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
@@ -29,7 +31,8 @@
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.8.1",
-    "@docusaurus/types": "3.8.1"
+    "@docusaurus/types": "3.8.1",
+    "markdownlint-cli2": "^0.23.0"
   },
   "browserslist": {
     "production": [

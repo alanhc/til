@@ -1,0 +1,25 @@
+#!/bin/sh
+# Preflight: build the site before pushing so broken internal links,
+# broken image refs, or bad [[wikilinks]] are caught locally instead of
+# failing in CI. Skipped for Obsidian "vault backup" commits.
+#
+# Enabled via: git config core.hooksPath .githooks  (run once, see README)
+# Bypass a single push with: git push --no-verify
+
+last_msg=$(git log -1 --pretty=%s 2>/dev/null)
+case "$last_msg" in
+  "vault backup:"*)
+    echo "[preflight] vault backup commit — skipping build check."
+    exit 0
+    ;;
+esac
+
+echo "[preflight] Running 'yarn preflight' (markdownlint + build) before push (bypass with --no-verify)..."
+if ! yarn preflight >/tmp/til-preflight.log 2>&1; then
+  echo "[preflight] PREFLIGHT FAILED — push aborted. Last 20 lines:"
+  tail -20 /tmp/til-preflight.log
+  echo "[preflight] Full log: /tmp/til-preflight.log"
+  exit 1
+fi
+echo "[preflight] Build OK — pushing."
+exit 0

@@ -7,6 +7,11 @@ on:
     # Review gh actions docs if you want to further define triggers, paths, etc
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
 
+# Cancel superseded runs when a PR is updated.
+concurrency:
+  group: test-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-deploy:
     name: Test deployment
@@ -22,5 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+      - name: Lint Markdown
+        run: yarn lint:md
       - name: Test build website
         run: yarn build

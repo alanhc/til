@@ -11,6 +11,7 @@
 | **BL3-1** | **ARM Trusted Firmware (ATF)** | 實作 Secure Monitor（TrustZone 切換） | EL3            |
 | **BL3-2** | **OP-TEE OS**                  | Secure World 的 OS               | Secure EL1     |
 | **BL3-3** | **U-Boot / Linux Kernel**      | Normal World 的 OS               | Non-secure EL1 |
+
 ROM → 2. ATF (EL3) → 3. OP-TEE (Secure EL1) → 4. U-Boot (Non-secure EL1) → 5. Linux
 
 
@@ -62,6 +63,7 @@ ROM → 2. ATF (EL3) → 3. OP-TEE (Secure EL1) → 4. U-Boot (Non-secure EL1) �
 | **BL3-1** | **ARM Trusted Firmware (ATF)** | 實作 Secure Monitor（TrustZone 切換） | EL3            |
 | **BL3-2** | **OP-TEE OS**                  | Secure World 的 OS               | Secure EL1     |
 | **BL3-3** | **U-Boot / Linux Kernel**      | Normal World 的 OS               | Non-secure EL1 |
+
 **順序範例：**
 1. ROM → 2. ATF (EL3) → 3. OP-TEE (Secure EL1) → 4. U-Boot (Non-secure EL1) → 5. Linux
 
@@ -79,6 +81,7 @@ ARM TrustZone = Secure World 保護 SoC 裡的信任根
 | 層級   | CPU 架構級別（ARMv8-A, ARMv9）                                                        | 系統與雲端平台層級                                                      |
 | 實作方式 | 透過硬體隔離 + TrustZone Address Space Controller (TZASC) + Secure Monitor Call (SMC) | 透過 TEE（Trusted Execution Environment）或 SEV、TDX、TrustZone 等技術實現 |
 | 範例   | ARM TrustZone, OP-TEE                                                           | Intel SGX, AMD SEV, ARM CCA, Azure Confidential VM             |
+
 ARM 的方案是：
 - 在 SoC 層建立 **Secure World（TEE）**；
 - 使用 TrustZone 來保護敏感運算，例如金鑰管理、支付、DRM；

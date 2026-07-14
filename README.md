@@ -24,6 +24,23 @@ yarn build
 
 This command generates static content into the `build` directory and can be served using any static contents hosting service.
 
+## Quality checks
+
+- `yarn lint:md` — Markdown lint (only rules that catch broken Markdown; config in `.markdownlint.jsonc`).
+- `yarn preflight` — runs `lint:md` + `build`; the same checks CI runs before deploy.
+
+### Pre-push hook (one-time setup)
+
+A versioned git hook in `.githooks/` runs `yarn preflight` before every push so
+broken links/build errors are caught locally instead of failing CI. Enable it
+once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Bypass for a single push with `git push --no-verify`.
+
 ## Deployment
 
 Using SSH:

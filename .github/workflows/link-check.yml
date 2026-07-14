@@ -1,0 +1,38 @@
+name: Link Check
+
+# Checks external links in the built site. Internal links are already
+# validated at build time (onBrokenLinks / onBrokenMarkdownLinks: throw),
+# so this focuses on catching rotted external URLs in the notes.
+on:
+  schedule:
+    - cron: "0 3 * * 1" # Every Monday 03:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  link-check:
+    name: Check links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build website
+        run: yarn build
+
+      - name: Check links with lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # Run against built HTML so links resolve exactly as they do live.
+          # 429 (rate limited) is accepted to avoid flaky failures.
+          args: >-
+            --no-progress
+            --max-concurrency 8
+            --max-retries 2
+            --accept 200,206,429
+            "build/**/*.html"
+          fail: true
