@@ -27,9 +27,12 @@ jobs:
       - name: Check links with lychee
         uses: lycheeverse/lychee-action@v2
         with:
-          # Run against built HTML so links resolve exactly as they do live.
-          # 429 (rate limited) is accepted to avoid flaky failures.
+          # Only check external http/https URLs — internal/root-relative links
+          # are already validated at build time, and checking them here against
+          # local files produces false positives. 429 accepted to avoid flake.
           args: >-
+            --scheme https
+            --scheme http
             --no-progress
             --max-concurrency 8
             --max-retries 2
