@@ -348,7 +348,7 @@ persistentvolumes, mutatingwebhookconfigurations,
 verbs: ["*"], resources: ["*"]
 ```
 
-This design is aligned with Singh and Madisetti's (2026) recommendations for MCP tool security: MCP tools should use scoped access, read-only defaults, and approval-gated privilege elevation, instead of letting the agent directly obtain full tool permissions [5].
+This design is aligned with the direction of recent MCP security research. Narajala and Habler (2025) argue from an enterprise perspective that MCP implementations should be grounded in systematic threat modeling, applying scoped access and least-privilege principles, and offer actionable security patterns against attack vectors such as tool poisoning [5]. Errico et al. (2025) add a governance perspective, recommending per-user scoped authorization, sandboxed execution environments, and approval-gated privilege elevation, so that the agent never obtains full tool permissions directly [5a].
 
 ---
 
@@ -541,6 +541,19 @@ A truly secure Hermes deployment should clearly separate the "reasoning layer" f
 
 ---
 
+## Appendix: Reference Verification Record
+
+Every citation was checked against online sources before publication. The results:
+
+| Citation | Result | Notes |
+|---|---|---|
+| **[2] arXiv:2603.28166** | ✅ Confirmed | The paper is available on arxiv.org and appears at ICLR 2026. "GrantBox" is the evaluation sandbox framework the paper proposes; this is now explained in Section 7.1. |
+| **Former [5] MCP-Secure (Singh & Madisetti)** | ❌ Could not be confirmed | The paper could not be found in any academic database. Judged a hallucinated reference and replaced with two verifiable MCP security papers ([5] and [5a]). |
+| **[7] Google Cloud documentation URL** | ✅ URL correct | `docs.cloud.google.com/kubernetes-engine/docs/how-to/agent-sandbox` is the real domain and path of the official Google Cloud documentation. An earlier concern about this URL was a false alarm. |
+| **[9] ACS press release (OpenClaw)** | ✅ Confirmed and appropriate | The press release exists. OpenClaw (nicknamed "the lobster") is an AI agent platform widely used in Taiwan; the release uses it as an example, and its five safeguards are general enough to apply to any AI agent system, so the citation holds. Background on OpenClaw has been added. |
+
+---
+
 ## References
 
 [1] Kaiyuan Zhang, Zian Su, Pin-Yu Chen, Elisa Bertino, Xiangyu Zhang, Ninghui Li, "LLM Agents Should Employ Security Principles," arXiv:2505.24019, 2025. https://arxiv.org/abs/2505.24019
@@ -551,15 +564,18 @@ A truly secure Hermes deployment should clearly separate the "reasoning layer" f
 
 [4] Eric Wallace, Kai Xiao, Reimar Leike, Lilian Weng, Johannes Heidecke, Alex Beutel, "The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions," arXiv:2404.13208, 2024. https://arxiv.org/abs/2404.13208
 
-[5] Gamini Singh, Vijay K. Madisetti, "MCP-Secure: A Runtime Access Control Layer for Privilege-Aware LLM Agent Tooling," *IEEE Open Journal of the Computer Society*, 2026.
+[5] Vineeth Sai Narajala, Idan Habler, "Enterprise-Grade Security for the Model Context Protocol (MCP): Frameworks and Mitigation Strategies," arXiv:2504.08623, 2025. https://arxiv.org/abs/2504.08623
+
+[5a] Herman Errico, Jiquan Ngiam, Shanita Sojan, "Securing the Model Context Protocol (MCP): Risks, Controls, and Governance," arXiv:2511.20920, 2025. https://arxiv.org/abs/2511.20920
 
 [6] Kubernetes Blog, "Running Agents on Kubernetes with Agent Sandbox," 2026. https://kubernetes.io/blog/2026/03/20/running-agents-on-kubernetes-with-agent-sandbox/
 
-[7] Google Cloud Documentation, "Isolate AI code execution with Agent Sandbox," 2026.
+[7] Google Cloud Documentation, "Isolate AI code execution with Agent Sandbox," GKE AI/ML documentation, 2026. https://docs.cloud.google.com/kubernetes-engine/docs/how-to/agent-sandbox
 
 [8] Kubernetes SIG Apps, "kubernetes-sigs/agent-sandbox," GitHub repository. https://github.com/kubernetes-sigs/agent-sandbox
 
-[9] Administration for Cyber Security, Ministry of Digital Affairs, Taiwan, "Beware of AI agents becoming cybersecurity risks: ACS reminds organizations to implement five cybersecurity safeguards when adopting AI agents," 2026-03-25. https://moda.gov.tw/ACS/press/news/press/19294
+[9] Administration for Cyber Security, Ministry of Digital Affairs, Taiwan, "Beware of AI agents becoming cybersecurity risks: ACS reminds organizations to implement five cybersecurity safeguards when adopting OpenClaw," 2026-03-25. https://moda.gov.tw/ACS/press/news/press/19294
+> **Note:** OpenClaw (nicknamed "the lobster") is an AI agent platform widely used in Taiwan. The press release uses OpenClaw as its example, but the five safeguards it proposes are general and apply to any AI agent system with tool-execution capability.
 
 [10] Varun Pratap Bhardwaj, "Formal Analysis and Supply Chain Security for Agentic AI Skills," arXiv:2603.00195, 2026. https://arxiv.org/abs/2603.00195
 
