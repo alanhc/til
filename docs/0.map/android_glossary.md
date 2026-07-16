@@ -117,36 +117,65 @@ sidebar_position: 1
 
 ## 五、ARM 安全架構
 
+> 深入說明見 [ARM Trusted Firmware (TF-A) 解析](../ARM_Trusted_Firmware_解析.md)；速查見 [ATF](../atf.md) 與 [ARM Trusted Firmware 元件](../arm_trust_firmware.md)。
+
 | 名詞 | 說明 |
 |---|---|
 | **Exception Level (EL)** | ARMv8+ CPU 權限分層：**EL0**=App、**EL1**=OS kernel、**EL2**=Hypervisor、**EL3**=Secure Monitor |
 | **TrustZone** | ARM 硬體級安全隔離，把系統切成 Secure World 與 Normal World。**是一種硬體層的 TEE 實作** |
 | **Secure World / Normal World** | TrustZone 的兩個世界。Secure World 有自己的 EL0~EL3 |
-| **Secure Monitor** | 執行在 EL3，負責世界切換（SMC handler） |
-| **SMC (Secure Monitor Call)** | 觸發世界切換的指令 |
-| **TZASC** | TrustZone Address Space Controller，記憶體區域隔離控制器 |
+| **NS bit** | AXI bus 上每筆 transaction 都帶的 Non-secure 標記。Secure RAM／secure peripheral（指紋 sensor SPI、crypto engine）在**硬體層**就拒絕 NS=1 的存取——TrustZone 的隔離不只是軟體概念 |
+| **Secure Monitor** | 執行在 EL3，負責世界切換（SMC handler）。EL3 是**唯一**能在兩個世界間切換的地方 |
+| **SMC (Secure Monitor Call)** | 觸發世界切換的指令。執行後 trap 進 EL3，由 Monitor 保存 context、翻轉 `SCR_EL3.NS`、跳進另一個世界 |
+| **`SCR_EL3.NS`** | Secure Configuration Register 的 NS bit，world switch 時由 BL31 翻轉 |
+| **TZASC / TZC-400** | TrustZone Address Space Controller，記憶體防火牆。由 TF-A 開機早期設定；**設錯一個 region，Normal World 就能直接讀到金鑰** |
 | **TEE (Trusted Execution Environment)** | 可信執行環境 |
-| **OP-TEE** | 開源 TEE 實作，由 Linaro 維護，跑在 Secure World（BL3-2 / Secure EL1） |
-| **TA (Trusted Application)** | 跑在 OP-TEE 上的可信應用（`.ta`） |
+| **OP-TEE** | 開源 TEE 實作，由 Linaro 維護，跑在 Secure World（BL32 / Secure EL1） |
+| **TA (Trusted Application)** | 跑在 Trusted OS 上的可信應用（`.ta`）。Android 上的 KeyMint/Keymaster、Gatekeeper、Widevine L1 DRM 本體都是 TA |
+| **QTEE / Kinibi / TEEGRIS** | 量產手機常見的閉源 Trusted OS：高通 QTEE、Trustonic Kinibi、三星 TEEGRIS。開源代表則是 OP-TEE |
 | **libteec** | Normal World 的 TEE Client API |
-| **Root of Trust (ROT)** | 啟動過程中最早被信任的元件，通常是 SoC 內建 BootROM |
-| **ATF / TF-A (ARM Trusted Firmware)** | ARM 官方 Secure World 執行環境實作。ARMv8 (2013-14) 首版，2015 成標準 |
-| **PSCI** | Power State Coordination Interface，TF-A 元件之一 |
-| **SMC Dispatcher / SiP service** | TF-A 元件 |
+| **Root of Trust (ROT)** | 啟動過程中最早被信任的元件，通常是 SoC 內建 BootROM。ROM 不可修改，是整條信任鏈的錨點 |
+| **ATF / TF-A (ARM Trusted Firmware)** | ARM 官方 Secure World 執行環境實作，正式名稱為 **Trusted Firmware-A**，BSD-3-Clause 開源，由 Linaro 主導的 trustedfirmware.org 維護。ARMv8 (2013-14) 首版，2015 成標準。是 TBBR/PSCI/SMCCC 等 ARM 規格的**參考實作**——各家量產韌體不是基於它，就是實作了相同介面 |
+| **TBBR** | Trusted Board Boot Requirements (Arm DEN0006)。定義 X.509 憑證鏈設計：每個 image 附 content certificate 與 key certificate，一路鏈回 ROTPK |
+| **PSCI** | Power State Coordination Interface (Arm DEN0022)。kernel 的 CPU hotplug、suspend-to-RAM、reboot 最後都是一個 SMC（`CPU_SUSPEND`、`SYSTEM_OFF`）進 BL31，由 platform code 操作電源控制器。device tree 的 `enable-method = "psci"` 就是它 |
+| **SMCCC** | SMC Calling Convention (Arm DEN0028)。定義 SMC function ID 的配置，含保留給廠商的 vendor 區段 |
+| **ROTPK** | Root of Trust Public Key。其 hash 燒在 eFuse 裡，BL1 用它驗證 BL2 簽章 |
+| **eFuse / anti-rollback counter** | 一次性燒錄的硬體熔絲，存放 ROTPK hash 與版本計數，防止刷回舊版有漏洞的韌體 |
+| **AP (Application Processor)** | 跑 Android/Linux 的主 CPU（Cortex-A），用來與 SoC 上其他處理器區分 |
+| **SCP (System Control Processor)** | 管電源時序的獨立處理器，通常是顆 Cortex-M。實務上很多 SoC 在 AP 上電前還有 PMIC/SCP 的 boot 流程 |
+| **SDEI** | Secure Delivery of Events Interface，BL31 提供的 runtime service 之一 |
+| **SMC Dispatcher / SiP service** | TF-A 元件。SiP (Silicon Provider) service 用 SMCCC 保留的 vendor function ID 區段實作廠商自訂功能 |
+| **`SMCCC_ARCH_WORKAROUND_*`** | BL31 提供的 Spectre/Meltdown 類漏洞 workaround 介面 |
+| **platform port** | TF-A 移植層（`plat/<vendor>/` 目錄）。新晶片 bring-up 第一步，需實作 `plat_get_my_entrypoint`、console driver、DDR 初始化、`plat_psci_ops`（每個 power domain 怎麼開關） |
 | **CCA (Confidential Compute Architecture)** | ARMv9 (2021) 引入，加入第三個 **Realm World**，對應 Intel TDX / AMD SEV |
 | **Confidential Computing** | 讓資料「使用中 (in use)」仍受保護的理念，比 TrustZone 更廣（含 SGX、SEV、CCA） |
+| **checkm8** | Apple BootROM 漏洞。經典案例：ROM 層的 bug 無法透過 OTA 修補、影響終生 |
 
 ### Boot Loader 階段對照
 
 | 階段 | 常見名稱 | 任務 | 層級 |
 |---|---|---|---|
-| **BL1** | ROM Code / BootROM | 硬體初始化、載入下一階 | EL3 |
-| **BL2** | Trusted Boot Loader | 設定安全屬性、載入 U-Boot/TF-A | EL3 |
-| **BL31** | ARM Trusted Firmware (ATF) | 實作 Secure Monitor | EL3 |
-| **BL32** | OP-TEE OS | Secure World 的 OS | Secure EL1 |
-| **BL33** | U-Boot / Linux Kernel | Normal World 的 OS | Non-secure EL1 |
+| **BL1** | AP Trusted ROM / BootROM | 燒在晶片裡不可改。初始化少量 SRAM、從 boot media 載入 BL2，用 eFuse 裡的 ROTPK hash 驗證其簽章 | EL3 |
+| **BL2** | Trusted Boot Firmware | 在 SRAM 執行。初始化 DDR、載入並驗證 BL31/BL32/BL33 與各家專屬韌體（DDR training、modem image） | EL3 |
+| **BL31** | EL3 Runtime Firmware (ATF) | **開機後常駐**於 secure memory。Secure Monitor（world switch）、PSCI、GIC 中斷路由、SDEI/SiP 等 runtime service | EL3 |
+| **BL32** | Trusted OS | Secure World 的 OS，提供 TA 執行環境。OP-TEE / QTEE / Kinibi / TEEGRIS | Secure EL1 |
+| **BL33** | Non-secure Firmware | 一般講的 bootloader：高通 ABL、聯發科 LK、開發板 U-Boot。負責 fastboot、A/B slot 選擇、載入 `boot.img`、執行 AVB | EL2 / Non-secure EL1 |
 
-順序：ROM → ATF (EL3) → OP-TEE (Secure EL1) → U-Boot (Non-secure EL1) → Linux
+順序：BL1 → BL2 → BL31 (EL3，常駐) → BL32 (Secure EL1) → BL33 (Non-secure) → Linux kernel → Android
+
+**信任鏈的銜接**：BL1→BL2→BL33 由 **TBBR 憑證鏈**保證，BL33→kernel 由 **AVB** 保證。兩段合起來才是完整的 Verified Boot。
+
+### 各家 SoC 的階段命名對照
+
+| TF-A | 高通 | 聯發科 |
+|---|---|---|
+| BL1 | PBL | BootROM |
+| BL2 | XBL / SBL | Preloader |
+| BL31 | TZ | ATF |
+| BL32 | TZ（QTEE） | — |
+| BL33 | ABL | LK |
+
+名字不同，角色對應得上。
 
 ---
 

@@ -29,6 +29,7 @@ sidebar_position: 0
 | [Bootloader](../bootloader.md) | Little Kernel (LK)、Aboot、PBL/SBL 兩階段 bootloader、SoC 廠商生態 |
 | [ARM Trusted Firmware (ATF)](../atf.md) | BL1~BL33 各階段、Exception Level (EL0~EL3)、TrustZone、OP-TEE、Secure/Normal World、CCA 演進時間軸 |
 | [ARM Trusted Firmware 元件](../arm_trust_firmware.md) | TF-A 主要元件：PSCI、SMC Dispatcher、SiP service、Root of Trust |
+| [ARM Trusted Firmware (TF-A) 解析](../ARM_Trusted_Firmware_解析.md) | **深入版**：BL1~BL33 各階段職責、TBBR 憑證鏈如何銜接 AVB、BL31 常駐的 Secure Monitor／PSCI／中斷路由、各家 SoC 階段命名對照（高通 PBL/XBL/TZ、MTK Preloader/ATF/LK）、platform port 與 QEMU 上手路徑 |
 
 ---
 
@@ -113,6 +114,7 @@ Android Build Number 解析
 Android 平台架構
    → Bootloader
    → ARM Trusted Firmware (ATF)
+   → ARM Trusted Firmware (TF-A) 解析   ← 深入 EL3 這一層
    → Android Boot Flow
    → Android SEPolicy
 ```
