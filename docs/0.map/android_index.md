@@ -25,6 +25,7 @@ sidebar_position: 0
 
 | 文章 | 內容 |
 |---|---|
+| [韌體安全全景](../firmware_security.md) | **總圖**：把韌體安全當領域組織的五道防線——供應鏈金鑰／開機信任鏈／執行期隔離／韌體更新／攻擊面。串起 [Secure Boot 解析](../Secure_Boot_解析.md)、[TF-A 解析](../ARM_Trusted_Firmware_解析.md)、[SELinux](../selinux.md) 三篇深入版，並補上執行期保護、攻擊面（含 MTK BROM exploit）、供應鏈等目前沒展開的塊 |
 | [Android Boot Flow](../android_boot_flow.md) | 完整開機流程：Boot ROM → Bootloader → Kernel → Init → Zygote → System Server → Launcher，含 partition 結構與除錯方法 |
 | [Bootloader](../bootloader.md) | Little Kernel (LK)、Aboot、PBL/SBL 兩階段 bootloader、SoC 廠商生態 |
 | [ARM Trusted Firmware (ATF)](../atf.md) | BL1~BL33 各階段、Exception Level (EL0~EL3)、TrustZone、OP-TEE、Secure/Normal World、CCA 演進時間軸 |
