@@ -73,6 +73,21 @@ sidebar_position: 6
 
 ---
 
+## 七、半導體量產測試
+
+> 一顆晶片從晶圓到客戶手上的測試流水線。從系統整合／韌體工程師視角看，這條線決定了拿到手的矽是什麼品質、怎麼分級，以及 MTBF 這類軟體穩定性度量為何落在整合團隊。
+
+| 文章 | 內容 |
+|---|---|
+| [半導體量產測試全景](../semiconductor-test-overview-cp-ft-slt-ate.md) | **系列總綱**：CP（晶圓）→ FT（封裝後）→ SLT（出貨前）三個 test insertion 加上 ATE（設備）的定位；結構性 vs 功能性兩種測試哲學、「缺陷越晚發現越貴」的十倍法則經濟學、四角色對照表，以及從 chip vendor 看品質過濾／良率歸因／產品分級／閉環回饋四件事 |
+| [ATE 是什麼](../what-is-ate.md) | 破除最常見的混淆——ATE 是 CP/FT **共用的設備**，不是一個測試階段。DFT／ATPG／scan chain 的結構性測試原理、fault model 與 coverage、市場格局，以及 ATE 覆蓋率的先天極限（為何仍需要 SLT） |
+| [CP 晶圓測試](../what-is-cp-wafer-test.md) | 封裝前用探針卡扎裸 die、產出 wafer map 篩壞品；探針卡的接觸電阻／寄生電感如何限制高頻與大電流測試、CP 能不能省（盲封），以及最容易混淆的 CP vs WAT（測產品 vs 測製程） |
+| [FT 最終測試](../what-is-ft-final-test.md) | 封裝後為何要再測一次（封裝製程也引入缺陷）、socket／load board 環境、以及 FT 不只判生死還做 speed binning（Fmax／Vmin 分級，直接決定 SKU 與 DVFS 設定） |
+| [SLT 系統級測試](../what-is-slt-and-why-chip-vendors-care.md) | 出貨前把晶片放進類產品板開機跑軟體，攔 ATE 抓不到的跨 IP／邊際／軟硬互動缺陷；為何對 chip vendor 重要（DPPM 合約承諾、缺陷逃逸的乘數成本、大客戶把系統品質推回 vendor、閉環回饋），以及 SLT 本質是平台軟體 |
+| [MTBF 與系統整合](../mtbf-and-why-si-owns-it.md) | **延伸篇**：前面講「矽」的品質，這篇講「軟體堆疊」的品質怎麼度量。為何 MTBF fail 天生沒 owner、是 build 層級度量、與 CI 同一套肌肉、直接面對客戶，因而落在系統整合（SI）的主場；附 MTBF triage 實務循環 |
+
+---
+
 ## 建議閱讀順序
 
 **想理解一塊板子怎麼從上電跑到 Linux：**
@@ -94,6 +109,17 @@ sidebar_position: 6
    → Yocto Project             ← 大而全
    → Das U-Boot                ← 把 image 開起來
    → Firmware Image 管理       ← 出貨前的通道與晉升機制
+```
+
+**想搞懂一顆晶片出廠前經過哪些測試：**
+
+```
+半導體量產測試全景          ← 先看四者定位與經濟學
+   → CP 晶圓測試             ← 封裝前
+   → FT 最終測試             ← 封裝後
+   → SLT 系統級測試          ← 出貨前，攔漏網
+   → ATE 是什麼              ← 前三站的共用設備
+   → MTBF 與系統整合         ← 延伸：軟體堆疊的品質度量
 ```
 
 ---
