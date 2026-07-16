@@ -18,7 +18,7 @@ sidebar_position: 0
 | **AI / Agent** | Claude Code / Skills、MCP、Gemini、本地推論（Ollama、Jan AI）、AI 應用與文章 | [AI.md](../AI.md) | [AI 系列索引](ai_index.md) | [AI 名詞表](ai_glossary.md) |
 | **BMC** | OpenBMC、CanopyBMC、IPMI / Redfish、sensor / thermal、Yocto | [BMC/openbmc_boot_flow.md](../BMC/openbmc_boot_flow.md) | [BMC 系列索引](bmc_index.md) | [BMC 名詞表](bmc_glossary.md) |
 | **Linux / 系統** | Kernel、device tree / driver、systemd、memory、Ubuntu 指令、GRUB、Docker | [Linux/Linux.md](../Linux/Linux.md) | 走 `Linux/` 資料夾側邊欄 | 待建 |
-| **Embedded / 韌體 / 硬體** | Bootloader、firmware testing / image management、Raspberry Pi、晶片與半導體 | [embedded.md](../embedded.md) | [Embedded 系列索引](embedded_index.md) | — |
+| **Embedded / 韌體 / 硬體** | Bootloader、firmware testing / image management、Raspberry Pi、晶片與半導體、半導體量產測試 | [embedded.md](../embedded.md) | [Embedded 系列索引](embedded_index.md) | [Embedded 名詞表](embedded_glossary.md) |
 | **效能 / Benchmark** | CPU DVFS、power / browser benchmark、codec 判讀 | [benchmark.md](../benchmark.md) | 待建 | — |
 | **投資 / 理財** | 投資計劃、個股風險、程式交易、酒田戰法、房、銀行操作 | [投資.md](../投資.md) | 待建 | — |
 | **職涯 / 生活 / 學習** | 面試、當責、說不、人際、健康、簡報、英文、書與電影 | [career.md](../career.md) | 待建 | — |
