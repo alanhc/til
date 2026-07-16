@@ -15,7 +15,7 @@ sidebar_position: 0
 | 分類 | 內容 | 起點 | 索引 | 名詞表 |
 |---|---|---|---|---|
 | **Android / Pixel** | AOSP 建置、boot flow、TF-A、Pixel 刷機、SELinux、Root | [android.md](../android.md) | [Android 系列索引](android_index.md) | [Android 名詞表](android_glossary.md) |
-| **AI / Agent** | Claude Code / Skills、MCP、Gemini、本地推論（Ollama、Jan AI）、AI 應用與文章 | [ai.md](../ai.md) | 待建 | 待建 |
+| **AI / Agent** | Claude Code / Skills、MCP、Gemini、本地推論（Ollama、Jan AI）、AI 應用與文章 | [AI.md](../AI.md) | 待建 | 待建 |
 | **BMC** | OpenBMC、CanopyBMC、IPMI / Redfish、sensor / thermal、Yocto | [BMC/openbmc.md](../BMC/openbmc.md) | 走 `BMC/` 資料夾側邊欄 | 待建 |
 | **Linux / 系統** | Kernel、device tree / driver、systemd、memory、Ubuntu 指令、GRUB、Docker | [Linux/Linux.md](../Linux/Linux.md) | 走 `Linux/` 資料夾側邊欄 | 待建 |
 | **Embedded / 韌體 / 硬體** | Bootloader、firmware testing / image management、Raspberry Pi、晶片與半導體 | [embedded.md](../embedded.md) | 待建 | — |
