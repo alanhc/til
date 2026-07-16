@@ -30,6 +30,7 @@ sidebar_position: 0
 | [ARM Trusted Firmware (ATF)](../atf.md) | BL1~BL33 各階段、Exception Level (EL0~EL3)、TrustZone、OP-TEE、Secure/Normal World、CCA 演進時間軸 |
 | [ARM Trusted Firmware 元件](../arm_trust_firmware.md) | TF-A 主要元件：PSCI、SMC Dispatcher、SiP service、Root of Trust |
 | [ARM Trusted Firmware (TF-A) 解析](../ARM_Trusted_Firmware_解析.md) | **深入版**：BL1~BL33 各階段職責、TBBR 憑證鏈如何銜接 AVB、BL31 常駐的 Secure Monitor／PSCI／中斷路由、各家 SoC 階段命名對照（高通 PBL/XBL/TZ、MTK Preloader/ATF/LK）、platform port 與 QEMU 上手路徑 |
+| [Secure Boot 解析](../Secure_Boot_解析.md) | **深入版**（上篇姊妹篇，講「憑什麼信任」）：簽章 vs 加密、Boot ROM 與 eFuse 兩個錨點、TBBR 的 X.509 憑證鏈與金鑰隔離、AVB 2.0 與 rollback index、boot state 四色、攻擊面（glitching／TOCTOU／EDL／checkm8）、導入 checklist |
 
 ---
 
@@ -114,7 +115,8 @@ Android Build Number 解析
 Android 平台架構
    → Bootloader
    → ARM Trusted Firmware (ATF)
-   → ARM Trusted Firmware (TF-A) 解析   ← 深入 EL3 這一層
+   → ARM Trusted Firmware (TF-A) 解析   ← 深入 EL3：誰在跑
+   → Secure Boot 解析                   ← 姊妹篇：憑什麼信任它
    → Android Boot Flow
    → Android SEPolicy
 ```

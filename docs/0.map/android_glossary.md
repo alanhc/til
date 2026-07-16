@@ -117,7 +117,7 @@ sidebar_position: 1
 
 ## 五、ARM 安全架構
 
-> 深入說明見 [ARM Trusted Firmware (TF-A) 解析](../ARM_Trusted_Firmware_解析.md)；速查見 [ATF](../atf.md) 與 [ARM Trusted Firmware 元件](../arm_trust_firmware.md)。
+> 深入說明見 [ARM Trusted Firmware (TF-A) 解析](../ARM_Trusted_Firmware_解析.md)（誰在跑）與 [Secure Boot 解析](../Secure_Boot_解析.md)（憑什麼信任它）；速查見 [ATF](../atf.md) 與 [ARM Trusted Firmware 元件](../arm_trust_firmware.md)。
 
 | 名詞 | 說明 |
 |---|---|
@@ -137,6 +137,13 @@ sidebar_position: 1
 | **Root of Trust (ROT)** | 啟動過程中最早被信任的元件，通常是 SoC 內建 BootROM。ROM 不可修改，是整條信任鏈的錨點 |
 | **ATF / TF-A (ARM Trusted Firmware)** | ARM 官方 Secure World 執行環境實作，正式名稱為 **Trusted Firmware-A**，BSD-3-Clause 開源，由 Linaro 主導的 trustedfirmware.org 維護。ARMv8 (2013-14) 首版，2015 成標準。是 TBBR/PSCI/SMCCC 等 ARM 規格的**參考實作**——各家量產韌體不是基於它，就是實作了相同介面 |
 | **TBBR** | Trusted Board Boot Requirements (Arm DEN0006)。定義 X.509 憑證鏈設計：每個 image 附 content certificate 與 key certificate，一路鏈回 ROTPK |
+| **key certificate / content certificate** | TBBR 中每個 image 配的兩張憑證：key cert 說「這 image 該用哪把公鑰驗」，content cert 說「這 image 的正確雜湊值」。**分層是為了金鑰隔離**——SoC 廠簽 BL2/BL31、手機廠簽 BL33，某層金鑰洩漏不必動到 ROTPK |
+| **FIP (Firmware Image Package)** | TF-A 把各 image 與憑證打包的格式。用 `fiptool` 操作、`cert_create` 產憑證鏈 |
+| **Secure Boot enable bit** | eFuse 裡的開關。未燒之前晶片什麼都肯跑（方便開發），燒下去後**不可逆**地強制驗證 |
+| **HSM** | 硬體安全模組，簽署伺服器用來持有私鑰。原則是「產出即簽章，人手不碰私鑰」 |
+| **glitching (fault injection)** | 在 ROM 執行「驗證是否通過」的分支瞬間，對電源／時脈打毛刺讓 CPU 跳錯分支。對策：冗餘比對、隨機延遲、把「驗證通過」編碼成非平凡常數而非 0/1 |
+| **TOCTOU** | Time-of-check to time-of-use。驗完雜湊後、跳轉執行前，image 若還在攻擊者可寫的記憶體就可能被掉包。原則：**先搬進受保護記憶體，再驗證，再執行** |
+| **kamakiri / mtkclient** | 聯發科 BROM 漏洞與其利用工具，與高通 EDL 同類：驗證邏輯還沒跑到，攻擊者已借下載模式取得執行權 |
 | **PSCI** | Power State Coordination Interface (Arm DEN0022)。kernel 的 CPU hotplug、suspend-to-RAM、reboot 最後都是一個 SMC（`CPU_SUSPEND`、`SYSTEM_OFF`）進 BL31，由 platform code 操作電源控制器。device tree 的 `enable-method = "psci"` 就是它 |
 | **SMCCC** | SMC Calling Convention (Arm DEN0028)。定義 SMC function ID 的配置，含保留給廠商的 vendor 區段 |
 | **ROTPK** | Root of Trust Public Key。其 hash 燒在 eFuse 裡，BL1 用它驗證 BL2 簽章 |
@@ -225,10 +232,18 @@ sidebar_position: 1
 
 ### Verified Boot
 
+> 深入說明見 [Secure Boot 解析](../Secure_Boot_解析.md)。TBBR 鏈驗到 BL33（bootloader）就結束，kernel 之後由 AVB 接手。
+
 | 名詞 | 說明 |
 |---|---|
-| **AVB (Android Verified Boot)** | 開機時驗證各 partition 簽章 |
-| **vbmeta** | AVB metadata，檔案開頭 magic 為 `AVB0` |
+| **AVB (Android Verified Boot)** | 開機時驗證各 partition 簽章。2.0 版以 vbmeta 為中樞 |
+| **vbmeta** | AVB metadata，檔案開頭 magic 為 `AVB0`。存各 partition 的雜湊或 hashtree descriptor，本身由 OEM 金鑰簽署、由 bootloader 內建的公鑰驗證 |
+| **hashtree descriptor** | 大 partition（system、vendor）用的 Merkle tree，執行期由 **dm-verity** 逐 block 驗證，避免開機時算整個 partition 的雜湊。小 partition（boot、dtbo）則用整體 hash |
+| **rollback index** | vbmeta 裡的版本號。裝置把見過的最大版本記在防竄改儲存（**RPMB** 或 eFuse）。刷回舊版簽章仍有效但版本號過不了，擋掉「降級到有漏洞舊版再攻擊」 |
+| **RPMB** | Replay Protected Memory Block，eMMC/UFS 上的防重放區塊，用來存 rollback index 等狀態 |
+| **boot state（四色）** | **green**=鏈完整；**yellow**=鎖著但用使用者自訂金鑰驗證；**orange**=bootloader 已解鎖、不驗證（開機警告畫面）；**red**=驗證失敗拒絕開機 |
+| **解鎖為何清 userdata** | 解鎖後 TEE 拒絕釋出綁在 verified 狀態上的金鑰，資料本來就再也解不開（同時是 Widevine 從 L1 掉到 L3 的原因），清除只是誠實面對 |
+| **`avbtool`** | AVB 工具。`add_hash_footer` 加簽章尾、`verify_image` 驗證，是理解 descriptor 結構最快的方式 |
 | **`Failed to find AVB_MAGIC at offset: 0`** | 對 `fastboot flashall` 加 `--disable-verity --disable-verification` 導致的錯誤。fastboot 試圖 patch 不存在的 `vbmeta_vendor_kernel_boot`。**userdebug build 的 `vbmeta.img` 已含正確 flags，不需要 patch** |
 | **`FLAGS_HASHTREE_DISABLED` / `FLAGS_VERIFICATION_DISABLED`** | `--disable-verity` / `--disable-verification` 寫入 vbmeta header 的 flag |
 
