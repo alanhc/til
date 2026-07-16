@@ -1,7 +1,7 @@
 ---
 title: BMC 名詞表
 sidebar_label: BMC 名詞表
-sidebar_position: 4
+sidebar_position: 5
 ---
 
 # BMC 名詞表

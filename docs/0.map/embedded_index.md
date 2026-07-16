@@ -1,7 +1,7 @@
 ---
 title: Embedded / 韌體 / 硬體 文章索引
 sidebar_label: Embedded 系列索引
-sidebar_position: 5
+sidebar_position: 6
 ---
 
 # Embedded / 韌體 / 硬體 文章索引
