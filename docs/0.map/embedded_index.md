@@ -95,3 +95,21 @@ sidebar_position: 5
    → Das U-Boot                ← 把 image 開起來
    → Firmware Image 管理       ← 出貨前的通道與晉升機制
 ```
+
+---
+
+## 待補主題
+
+用第一性原理拆嵌入式系統：**硬體 → boot → kernel／driver → userspace**，外加 **工具鏈、除錯、週邊通訊** 三條橫軸。目前筆記在 **boot flow 與建置系統**（U-Boot、Yocto、Buildroot、各架構開機）很完整，但 **driver、硬體介面、除錯**——嵌入式工程師每天在做的事——幾乎空白。下表依重要性排序。
+
+| 主題 | 為什麼重要 | 狀態 |
+|---|---|---|
+| **Device Tree 深入** | DTB 在 boot flow、Buildroot、U-Boot 幾乎每篇都被提到，但**它本身**——語法、binding、overlay、`&label`／phandle、常見 `status`／`reg` 錯誤——沒有專門文章。這是描述「板子上有什麼硬體」的核心 | 待補 |
+| **交叉編譯工具鏈** | [嵌入式背景](../embedded.md) 帶了 cross-compile 一詞就沒了。target triplet（`arm-linux-gnueabihf`）、sysroot、`CC`/`CROSS_COMPILE`、libc 選擇（glibc／musl／uClibc）是 bring-up 第一道關卡 | 待補 |
+| **Linux device driver 模型** | 從 char device、platform driver、`probe()`／device-tree match、到 `module_init`／sysfs。目前只有 BMC 分類零星碰到 driver，嵌入式視角的驅動撰寫沒有 | 待補 |
+| **I2C / SPI / UART / GPIO 週邊匯流排** | 板子上感測器、EEPROM、周邊晶片幾乎都掛在這幾條匯流排上。每個嵌入式工程師都要會用 `i2cdetect`／`spidev`／sysfs GPIO 與對應的 kernel 子系統，目前散在 BMC 而無嵌入式專篇 | 待補 |
+| **中斷、DMA 與 MMIO** | driver 與硬體對話的三種基本方式——記憶體映射暫存器、中斷（top/bottom half、threaded IRQ）、DMA。理解延遲與資料搬移瓶頸的基礎 | 待補 |
+| **JTAG / OpenOCD / gdb 硬體除錯** | [TF-A 解析](../ARM_Trusted_Firmware_解析.md) 提到「最難的 bug 靠 JTAG」，但沒有一篇講怎麼實際接 JTAG、用 OpenOCD + gdb 單步跟 bootloader／kernel。printk 救不了時的最後一哩 | 待補 |
+| **Flash 儲存（eMMC / UFS / SPI-NOR / MTD / UBIFS）** | image 最終要落到儲存裝置上。raw flash 與 managed flash 的差異、MTD 分割、UBI/UBIFS 對 NAND 的磨損平衡，是選型與開機失敗排查的常見來源 | 待補 |
+| **Clock / Regulator / Power management** | SoC 上每個 IP 都要供電與時脈才會動，bring-up 時「裝置沒反應」常常是 clock／regulator 沒開。runtime PM、suspend/resume 路徑也是耗電與喚不醒問題的核心 | 待補 |
+| **RTOS（FreeRTOS / Zephyr）** | 不是所有嵌入式都跑 Linux。MCU 等級的即時系統、task/scheduler/IPC 與 [State Machine](../Embedded/state_machine.md) 的 bare-metal 手法互補，目前完全沒有 RTOS 視角 | 待補 |

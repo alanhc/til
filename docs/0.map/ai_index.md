@@ -92,7 +92,7 @@ sidebar_position: 2
 | [Hermes Agent](../hermes.md) | 佔位頁：Nous Research 基於 Hermes 系列開源模型的 agent 系統，兩條連結（官方文件、Hermes vs OpenClaw 技術比較） |
 | [Hermes on Kubernetes](../hermes_kubernetes.md) | **實作版**：以 YAML 為主的安全架構。威脅模型六點、五個 namespace 分層、gateway 權限最小化的 ServiceAccount/Deployment 完整範例、`/opt/data` PVC 當機密資料保護、default-deny NetworkPolicy 三段範例、sandbox Job 範例、MCP 依權限拆（calendar／discord／github／k8s-readonly／k8s-admin）與 read-only RBAC Role、Dashboard 不公開（8642／9119 port）、Secrets 分級，最後是必做 10 項＋進階 10 項的 production 基線 |
 | [Kubernetes 作為 AI 代理系統之縱深防禦平台](../HERMES_AI_KUBERNETES_SECURITY_ARCHITECTURE.md) | **論文版**：上篇的學術化重寫。加入威脅模型分析（外部輸入／工具執行／憑證洩漏／記憶與 Skill 四類向量）、縱深防禦／最小權限／完整仲裁三原則、Tool Router + Policy Decision Point / Enforcement Point 的 runtime policy、「tool output is data, not instruction」原則、tool-call audit log 欄位設計、第三方 Skill 的分層掃描流程與長期記憶治理，並對應資安署五項防護建議。附引用文獻查核紀錄（含一筆被判定為幻覺引用而替換的紀錄） |
-| [Kubernetes as a Defense-in-Depth Platform for AI Agent Systems (EN)](../HERMES_AI_KUBERNETES_SECURITY_ARCHITECTURE_EN.md) | 上篇的英文版（參考文獻 [5] 尚為替換前的版本） |
+| [Kubernetes as a Defense-in-Depth Platform for AI Agent Systems (EN)](../HERMES_AI_KUBERNETES_SECURITY_ARCHITECTURE_EN.md) | 上篇的英文版（引用已與中文版同步，含引用查核附錄） |
 
 ---
 
@@ -145,3 +145,21 @@ Hermes Agent
    → Kubernetes 作為 AI 代理系統之縱深防禦平台    ← 再看為什麼要這樣寫
    → 為什麼公司推不動 Agentic AI                  ← 技術之外，組織的四道牆
 ```
+
+---
+
+## 待補主題
+
+用第一性原理拆 LLM 應用的骨架：**模型 → prompt → 檢索／context → 工具／agent → 評估 → 服務**。目前筆記在**工具與操作**（Claude Code、MCP、本機推論）很紮實，但**概念層**——為什麼這樣做、怎麼衡量好壞——有明顯缺口。下表依重要性排序，部分名詞散見於各篇但沒有專門文章。
+
+| 主題 | 為什麼重要 | 狀態 |
+|---|---|---|
+| **RAG（檢索增強生成）** | LLM 應用的第一號模式。[Firecrawl](../firecrawl.md) 提到「串進 RAG pipeline」，但 RAG 本身——chunking、檢索、reranking、把結果塞回 context——沒有任何一篇。要讓模型回答自己的資料，這是起點 | 待補 |
+| **Embedding / 向量資料庫 / 語意搜尋** | RAG 的檢索層底座，也能獨立用於語意搜尋、去重、分類。向量怎麼來、相似度怎麼算、向量庫（FAISS／pgvector 等）怎麼選，目前完全空白 | 待補 |
+| **模型評估（eval / LLM-as-judge）** | [AI 時代的基本功](../ai_basic_knowledge.md) 自己的結論是「驗證輸出對不對」最值錢，但整個知識庫沒有一篇講怎麼系統化衡量 LLM 輸出——測試集、rubric、LLM-as-judge、回歸。這是與自身論點最不一致的缺口 | 待補 |
+| **Agent 設計模式** | Hermes 系列講的是 agent 的**部署與安全**，但 agent 本身怎麼設計——ReAct、plan-execute、reflection、多 agent 分工——沒有文章。這決定 agent 到底能不能把事做對 | 待補 |
+| **Function calling / structured output 原理** | [MCP](../mcp.md) 講的是「工具怎麼接上」的協定，但底層 LLM 怎麼決定呼叫工具、`tool_use` 與 JSON schema 怎麼運作、structured output 怎麼強制格式，是另一層機制，沒有展開 | 待補 |
+| **Prompt engineering 系統化** | few-shot、chain-of-thought、role/context/format 結構、prompt 版本管理。目前散在各篇實作裡，沒有一篇把方法論收攏 | 待補 |
+| **量化與模型格式（GGUF / Q4 / GPTQ / AWQ）** | [本機推論](../ai_inference.md) 一直用到 GGUF 量化模型，但「量化是什麼、Q4 與 Q8 差在哪、GGUF vs GPTQ vs AWQ、掉多少精度換多少記憶體」從沒解釋。決定本機能不能跑得動的關鍵 | 待補 |
+| **Context 管理與 token 成本** | context window 限制、token 怎麼算、長對話的壓縮與截斷、成本估算。每個實際 LLM 應用都會撞到，但沒有專門筆記 | 待補 |
+| **推論最佳化（vLLM / KV cache / batching）** | [AI 生態總覽](../AI.md) 把 vLLM 列進 self-host 選型，但沒有文章講它為何比 ollama 適合多人服務——KV cache、continuous batching、throughput vs latency 的取捨 | 待補 |
