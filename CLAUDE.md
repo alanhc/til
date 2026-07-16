@@ -58,10 +58,17 @@ yarn clear           # Clear Docusaurus cache
 - **`sidebars.js`**: Sidebar auto-generated from docs folder structure
 
 ### Deployment
-- Hosted on GitHub Pages
+- Hosted on GitHub Pages at https://alanhc.github.io/til/
 - Organization: alanhc
 - Base URL: /til/
-- Deploy with: `yarn deploy` or `USE_SSH=true yarn deploy`
+- **Deploys automatically on push to `main`** via `.github/workflows/deploy.yml`,
+  which runs `yarn lint:md` → `yarn build` → `actions/deploy-pages`.
+  There is no manual deploy step — pushing to `main` publishes the site.
+- A `yarn deploy` script still exists in package.json but is legacy: it runs
+  `docusaurus deploy` (pushes to a `gh-pages` branch), which is not how the site
+  is served anymore. Don't use it.
+- `git push` is gated by a pre-push hook running `yarn preflight`
+  (`yarn lint:md && yarn build`). Bypass with `--no-verify` only if you mean it.
 
 ## Development Patterns
 
