@@ -99,6 +99,17 @@ sidebar_position: 0
 
 ---
 
+## 九、Android 供應鏈與長期維護
+
+> 一個系列，從 **Google／晶片商／系統廠**三方視角，看 Android 為什麼能承諾七年更新的制度地基：Treble 切開 system/vendor、GRF 凍結 vendor 要求、GKI 收編 kernel。（系列第一篇〈Android Migration〉尚**待補**，目前只在內文被引用。）
+
+| 文章 | 內容 |
+|---|---|
+| [Vendor Freeze](../vendor-freeze.md) | GRF／Longevity GRF 的凍結機制與三方賽局：`ro.board.first_api_level` 等 board property、VINTF／FCM 相容性合約、「3 年一次 kernel 大版本升級」條款、功能天花板如何在 SoC 選型那一刻就被決定 |
+| [Android Kernel](../android-kernel.md) | Android kernel = Linux + Android 補丁（Binder／wakelock／ION 的上游化史）、GKI 之前的四層 fork 碎片化、GKI／KMI 如何把 kernel 切成 Google 核心本體 + vendor module，以及三方各自的角色與工程實務 |
+
+---
+
 ## 建議閱讀順序
 
 **想從零 build 一個 Pixel ROM：**
@@ -132,12 +143,11 @@ Android 平台架構
 | 主題 | 為什麼重要 | 狀態 |
 |---|---|---|
 | **Binder / IPC 深入** | Android 一切跨程序溝通的底座——system service 呼叫、AIDL、app 生命週期、`dumpsys` 全都跑在 Binder 上。名詞表有列 Binder，但沒有一篇講它的 driver 機制、transaction、`ServiceManager` 註冊流程 | 待補 |
-| **HAL / Treble / VINTF** | vendor 與 framework 的介面切割，是系統整合的核心，也是「為什麼 Android 能單獨更新 framework 不動 vendor」的答案。名詞表有 VINTF／HIDL／AIDL，但沒有文章講這條 compatibility matrix 怎麼運作 | 待補 |
 | **A/B Seamless OTA 機制** | 刷機（fastboot）已有完整筆記，但**線上更新**怎麼送——`update_engine`、payload 結構、寫入備用 slot、開機失敗自動 rollback——完全沒有。這是出貨後維運的關鍵 | 待補 |
-| **GKI / KMI / vendor kernel module** | Generic Kernel Image 為何凍結 core kernel、KMI 介面穩定性、`vendor_dlkm` 的模組怎麼簽章與載入。學習路線與名詞表都提到 GKI，但沒有專門文章 | 待補 |
-| **SoC bring-up / BSP 對接** | 從一顆新晶片到能開機跑 Android 的完整路徑——這是韌體工程師的本職，學習路線提過 bring-up 但沒有落地文章（clock/pinctrl/DDR/console 順序、第一個 log 怎麼出來） | 待補 |
 | **init / property system 深入** | `init.rc` 語言、`.rc` trigger、property service 與 `ro.*`/`persist.*` 的儲存與 selabel。Boot flow 帶到 init，但沒有把 Android Init Language 與 property 機制單獨講清楚 | 待補 |
 | **HIDL / AIDL HAL 撰寫實作** | 不只是「知道有這個介面」，而是實際寫一支 HAL：`.aidl` 定義 → 產生 stub → binderized service 註冊 → framework 端呼叫。整合團隊天天碰 | 待補 |
 | **Perfetto / systrace / ANR 分析** | `adb` 筆記涵蓋基本指令，但系統化的 framework 除錯——用 Perfetto 抓 trace、判讀 ANR、看 scheduling／binder latency——是效能與卡頓問題的主戰場 | 待補 |
 | **CTS / VTS 實際跑法** | SELinux 那篇點出 CTS 是出貨硬條件，但沒有一篇講怎麼實際跑 `run cts`、判讀 fail、VTS 測 HAL 相容性。GMS 認證的實務缺口 | 待補 |
 | **FBE / dm-verity 執行期儲存保護** | Secure Boot 那篇講的是開機階段的 AVB，但**執行期**的 File-Based Encryption、metadata encryption、`/data` 如何綁定硬體金鑰是另一塊，解鎖清資料的根因也在這 | 待補 |
+
+> 已補上的缺口：**GKI／KMI** 見 [Android Kernel](../android-kernel.md)、**Treble／VINTF** 見 [Vendor Freeze](../vendor-freeze.md)（第九節）、**SoC bring-up** 見 [Bring-up](../bringup-article.md)（列於 [Embedded 系列索引](embedded_index.md)）。

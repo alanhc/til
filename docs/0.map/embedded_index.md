@@ -56,6 +56,7 @@ sidebar_position: 6
 
 | 文章 | 內容 |
 |---|---|
+| [Bring-up：新硬體從「不會動」到「能量產」](../bringup-article.md) | 從一顆回廠的工程樣品到能量產的完整戰役，拆成**晶片（silicon）／板級（board）／軟體韌體**三層 bring-up：上電前阻抗檢查、電源/時脈/reset sanity、建 JTAG 通道、逐一驗 IP（DDR training、SerDes 眼圖、PVT corner shmoo）、first UART print → DDR init → kernel to shell 的軟體推進、分層隔離的 debug 方法論、常見坑（strap pin、pinmux、clock gating、cache coherency）、re-spin 決策的經濟學，以及「好的 bring-up 從 tape-out 前就開始」 |
 | [Firmware Image 管理](../firmware_image_management.md) | 把「正式 vs 非正式 image」對應到五個軟體工程概念：Release Channels（Chrome 的 Canary/Dev/Beta/Stable）、Build Promotion（build once, promote many）、Nightly Build + Trunk-Based Development、Shift-Left Testing、Release Candidate 與 release branch 凍結 |
 | [Firmware Testing](../firmware_testing.md) | 目前僅是連結收藏：FOSDEM 2022 的 LAVA/openQA 議程、Linaro validation 平台，以及韌體團隊 CI/CD、OpenWrt CI/CD 兩篇文章 |
 
