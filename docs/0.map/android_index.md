@@ -32,6 +32,7 @@ sidebar_position: 0
 | [ARM Trusted Firmware 元件](../arm_trust_firmware.md) | TF-A 主要元件：PSCI、SMC Dispatcher、SiP service、Root of Trust |
 | [ARM Trusted Firmware (TF-A) 解析](../ARM_Trusted_Firmware_解析.md) | **深入版**：BL1~BL33 各階段職責、TBBR 憑證鏈如何銜接 AVB、BL31 常駐的 Secure Monitor／PSCI／中斷路由、各家 SoC 階段命名對照（高通 PBL/XBL/TZ、MTK Preloader/ATF/LK）、platform port 與 QEMU 上手路徑 |
 | [Secure Boot 解析](../Secure_Boot_解析.md) | **深入版**（上篇姊妹篇，講「憑什麼信任」）：簽章 vs 加密、Boot ROM 與 eFuse 兩個錨點、TBBR 的 X.509 憑證鏈與金鑰隔離、AVB 2.0 與 rollback index、boot state 四色、攻擊面（glitching／TOCTOU／EDL／checkm8）、導入 checklist |
+| [Android Verified Boot (AVB) 深入解析](../Android-Verified-Boot-AVB.md) | **深入版**（把上面 Secure Boot 提到的 AVB 展開）：硬體信任根 → `vbmeta` 樞紐（hash／hashtree／chain partition／kernel cmdline descriptor）→ dm-verity 區塊級執行期驗證 → rollback index 防降級 → GREEN／YELLOW／ORANGE／RED 四狀態與 Keystore attestation；含刷機實務（`--disable-verity`／`--disable-verification`、`avb_custom_key` 自簽走 YELLOW、`avbtool info_image`、重新上鎖變磚的坑） |
 | [MTK Preloader Combo Header 與 OTA](../mtk-preloader-combo-header-ota.md) | MTK boot chain（BROM → Preloader → LK）中 preloader 住在 eMMC boot0/UFS boot LU；device header 三型態（`EMMC_BOOT`／`UFS_BOOT`／`COMBO_BOOT`）與 device header → BRLYT → GFH 三層結構，以及怎麼接上 Google A/B OTA（`update_engine` byte-level 寫入故 image 需自帶 header、by-name symlink、header 型態不一致導致 source hash mismatch 的故障排查）。各節標註公開來源 vs 內部推論 |
 
 ---
@@ -148,6 +149,6 @@ Android 平台架構
 | **HIDL / AIDL HAL 撰寫實作** | 不只是「知道有這個介面」，而是實際寫一支 HAL：`.aidl` 定義 → 產生 stub → binderized service 註冊 → framework 端呼叫。整合團隊天天碰 | 待補 |
 | **Perfetto / systrace / ANR 分析** | `adb` 筆記涵蓋基本指令，但系統化的 framework 除錯——用 Perfetto 抓 trace、判讀 ANR、看 scheduling／binder latency——是效能與卡頓問題的主戰場 | 待補 |
 | **CTS / VTS 實際跑法** | SELinux 那篇點出 CTS 是出貨硬條件，但沒有一篇講怎麼實際跑 `run cts`、判讀 fail、VTS 測 HAL 相容性。GMS 認證的實務缺口 | 待補 |
-| **FBE / dm-verity 執行期儲存保護** | Secure Boot 那篇講的是開機階段的 AVB，但**執行期**的 File-Based Encryption、metadata encryption、`/data` 如何綁定硬體金鑰是另一塊，解鎖清資料的根因也在這 | 待補 |
+| **FBE 檔案系統加密** | dm-verity 與 AVB 已在 [AVB 深入解析](../Android-Verified-Boot-AVB.md) 涵蓋，但**檔案加密**這塊還沒有：File-Based Encryption、metadata encryption、`/data` 如何綁定硬體金鑰、解鎖為何一定清資料的根因 | 待補 |
 
 > 已補上的缺口：**GKI／KMI** 見 [Android Kernel](../android-kernel.md)、**Treble／VINTF** 見 [Vendor Freeze](../vendor-freeze.md)（第九節）、**SoC bring-up** 見 [Bring-up](../bringup-article.md)（列於 [Embedded 系列索引](embedded_index.md)）。
