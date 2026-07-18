@@ -1,12 +1,12 @@
 ---
 title: 工具 / 其他 文章索引
 sidebar_label: 工具與其他索引
-sidebar_position: 8
+sidebar_position: 9
 ---
 
 # 工具 / 其他 文章索引
 
-這是**雜項分類**：收的是不屬於 Android、Embedded、Linux、BMC 等其他八類的筆記——開發工具速查、雲端服務、自動化、資安、資料結構、side project 構想。性質偏向速查與隨手紀錄，篇幅落差很大，有幾篇目前仍是佔位頁（下表會逐一註明）。
+這是**雜項分類**：收的是不屬於其他大類的筆記——開發工具速查、雲端服務、自動化、資安、side project 構想。性質偏向速查與隨手紀錄，篇幅落差很大，有幾篇目前仍是佔位頁（下表會逐一註明）。
 
 ---
 
@@ -55,21 +55,7 @@ sidebar_position: 8
 
 ---
 
-## 五、資料結構與演算法（DSA）
-
-| 文章 | 內容 |
-|---|---|
-| [Single Linked List](../DSA/Linked_List/0.linked_list.md) | **本系列主線**：用 `main.c`／`list.h`／`list.c` 三檔從零實作，先解釋 dummy head node 為何能省掉空串列特判（附 ASCII 對照圖）；完整 C 實作涵蓋 insert_head／insert_tail、delete_node、fast-slow pointer 找中間節點、delete_dup、swap（含相鄰節點特例）、reverse、reverseK 分組反轉、帶 comparator function pointer 的 merge sort，末尾附 `gcc -Wall` 編譯與執行輸出 |
-| [Doubly Linked List](../DSA/Linked_List/1.double_linked_list.md) | prev／next 雙指標結構、已知節點指標時插入刪除為 O(1)（single list 得先找前驅）、哨兵節點簡化邊界；附與 array 的四項比較表（隨機存取／插入刪除／記憶體 cache friendly／動態成長），結論是適合 LRU cache、deque |
-| [LeetCode 題目清單](../DSA/Linked_List/2.leetcode.md) | **佔位頁**：只有六行題號（2095、82、24、25、2487、23），對應主線實作的各項操作，尚無任何解題內容或說明 |
-| [Linux Kernel Linked List](../DSA/Linked_List/3.linux_linked_list.md) | kernel 的 `list_head` 為何是 intrusive／doubly／circular：結構內嵌使用者 struct 因此同一結構可掛多個串列、環狀讓插刪不必特判 NULL、空串列即 `head->next == head`；`container_of` 如何由成員指標回推外層 struct，以及 `list_add`／`list_del`／`list_for_each_entry` 等巨集與「走訪中刪除要用 `_safe` 版本」的原因 |
-| [Binary Tree](../DSA/Tree/binary_tree.md) | 節點結構與四種走訪（preorder／inorder／postorder／level order，並點出 BST 中序走訪得遞增序列、前三者可遞迴或用 stack、層序用 queue），附 invert binary tree 的遞迴 C 實作與 O(n)／O(h) 複雜度 |
-| [Heap](../DSA/Tree/heap.md) | max／min heap 的 heap property、因為是完全二元樹所以用 array 實作及 parent／left／right 的索引公式、peek／push／pop／build heap 複雜度表、sift-up 與 sift-down 的動作、heapify 從 `n/2 - 1` 往前為何是 O(n)；並延伸到 priority queue 應用（Dijkstra、Prim、Huffman、top-k）與 heap sort |
-| [Boyer-Moore 投票法](../dsa_Boyer-Moore.md) | 找多數元素（出現 > n/2 次）的 O(n) 時間／O(1) 空間演算法：維護 `candidate` + `count` 兩兩對消、正確性直覺（多數元素抵消完必有剩）、需否二次遍歷驗證，附 Python 實作與逐步走表；經典題 LeetCode 169，進階 229（> n/3 維護兩個候選人） |
-
----
-
-## 六、Side Projects
+## 五、Side Projects
 
 | 文章 | 內容 |
 |---|---|
@@ -79,7 +65,7 @@ sidebar_position: 8
 
 ---
 
-## 七、其他
+## 六、其他
 
 | 文章 | 內容 |
 |---|---|
@@ -91,11 +77,4 @@ sidebar_position: 8
 
 ## 建議閱讀順序
 
-這一類多半是速查，可各取所需。唯一有明顯先後的是 DSA 的 linked list 主線：
-
-```
-Single Linked List          ← 主線，從零實作與各種操作
-   → Doubly Linked List     ← 多一個 prev 指標換來什麼
-   → Linux Kernel Linked List  ← 真實世界怎麼做：intrusive + circular
-   → LeetCode 題目清單      ← 拿題目對照練（目前僅題號）
-```
+這一類多半是速查與隨手紀錄，沒有固定順序，各取所需即可。（資料結構與演算法已獨立為 [DSA 系列索引](dsa_index.md)。）
