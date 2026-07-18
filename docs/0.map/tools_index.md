@@ -65,6 +65,7 @@ sidebar_position: 8
 | [Linux Kernel Linked List](../DSA/Linked_List/3.linux_linked_list.md) | kernel 的 `list_head` 為何是 intrusive／doubly／circular：結構內嵌使用者 struct 因此同一結構可掛多個串列、環狀讓插刪不必特判 NULL、空串列即 `head->next == head`；`container_of` 如何由成員指標回推外層 struct，以及 `list_add`／`list_del`／`list_for_each_entry` 等巨集與「走訪中刪除要用 `_safe` 版本」的原因 |
 | [Binary Tree](../DSA/Tree/binary_tree.md) | 節點結構與四種走訪（preorder／inorder／postorder／level order，並點出 BST 中序走訪得遞增序列、前三者可遞迴或用 stack、層序用 queue），附 invert binary tree 的遞迴 C 實作與 O(n)／O(h) 複雜度 |
 | [Heap](../DSA/Tree/heap.md) | max／min heap 的 heap property、因為是完全二元樹所以用 array 實作及 parent／left／right 的索引公式、peek／push／pop／build heap 複雜度表、sift-up 與 sift-down 的動作、heapify 從 `n/2 - 1` 往前為何是 O(n)；並延伸到 priority queue 應用（Dijkstra、Prim、Huffman、top-k）與 heap sort |
+| [Boyer-Moore 投票法](../dsa_Boyer-Moore.md) | 找多數元素（出現 > n/2 次）的 O(n) 時間／O(1) 空間演算法：維護 `candidate` + `count` 兩兩對消、正確性直覺（多數元素抵消完必有剩）、需否二次遍歷驗證，附 Python 實作與逐步走表；經典題 LeetCode 169，進階 229（> n/3 維護兩個候選人） |
 
 ---
 
