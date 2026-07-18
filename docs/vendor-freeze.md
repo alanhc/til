@@ -4,7 +4,7 @@ sidebar_label: Vendor Freeze
 
 # Vendor Freeze:一份 BSP 走七年——晶片商、Google 與系統廠的凍結賽局
 
-> 面向對象:Android 產業鏈的工程師與 PM。本文拆解 vendor freeze(以 Google 的 GRF/Longevity GRF 為核心)的技術機制與商業邏輯,並從 chip vendor、Google、系統廠(OEM/ODM)三個角度分析各自的得失與實務眉角。可視為前一篇〈Android Migration〉的深入篇。
+> 面向對象:Android 產業鏈的工程師與 PM。本文拆解 vendor freeze(以 Google 的 GRF/Longevity GRF 為核心)的技術機制與商業邏輯,並從 chip vendor、Google、系統廠(OEM/ODM)三個角度分析各自的得失與實務眉角。可視為前一篇〈[Android Migration](./android-migration.md)〉的深入篇。
 
 ---
 

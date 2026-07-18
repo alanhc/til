@@ -4,7 +4,7 @@ sidebar_label: Android Kernel
 
 # Android Kernel:從手工藝品到標準化零件——一顆核心的供應鏈故事
 
-> 面向對象:Android 產業鏈的工程師與 PM。本文介紹 Android kernel 的本質、它與 Linux 的關係、四層 fork 供應鏈的碎片化問題,以及 GKI 如何重構這一切;並延續系列前兩篇〈Android Migration〉與〈Vendor Freeze〉的視角,分析 Google、chip vendor、系統廠三方在 kernel 上各自的角色與工程實務。
+> 面向對象:Android 產業鏈的工程師與 PM。本文介紹 Android kernel 的本質、它與 Linux 的關係、四層 fork 供應鏈的碎片化問題,以及 GKI 如何重構這一切;並延續系列前兩篇〈[Android Migration](./android-migration.md)〉與〈[Vendor Freeze](./vendor-freeze.md)〉的視角,分析 Google、chip vendor、系統廠三方在 kernel 上各自的角色與工程實務。
 
 ---
 

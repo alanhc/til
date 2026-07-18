@@ -102,12 +102,13 @@ sidebar_position: 0
 
 ## 九、Android 供應鏈與長期維護
 
-> 一個系列，從 **Google／晶片商／系統廠**三方視角，看 Android 為什麼能承諾七年更新的制度地基：Treble 切開 system/vendor、GRF 凍結 vendor 要求、GKI 收編 kernel。（系列第一篇〈Android Migration〉尚**待補**，目前只在內文被引用。）
+> 一個系列，從 **Google／晶片商／系統廠**三方視角，看 Android 為什麼能承諾七年更新的制度地基：Treble 切開 system/vendor、GRF 凍結 vendor 要求、GKI 收編 kernel。建議依序讀。
 
 | 文章 | 內容 |
 |---|---|
-| [Vendor Freeze](../vendor-freeze.md) | GRF／Longevity GRF 的凍結機制與三方賽局：`ro.board.first_api_level` 等 board property、VINTF／FCM 相容性合約、「3 年一次 kernel 大版本升級」條款、功能天花板如何在 SoC 選型那一刻就被決定 |
-| [Android Kernel](../android-kernel.md) | Android kernel = Linux + Android 補丁（Binder／wakelock／ION 的上游化史）、GKI 之前的四層 fork 碎片化、GKI／KMI 如何把 kernel 切成 Google 核心本體 + vendor module，以及三方各自的角色與工程實務 |
+| [Android Migration](../android-migration.md) | **系列第一篇（總論）**：Android 大版本遷移為何是一條跨三家公司的串行供應鏈、一次升級的工作分解（晶片商 BSP → OEM framework rebase → CTS/VTS 認證 → OTA）、Project Treble 如何用 HIDL/AIDL + VINTF/FCM 切開 system/vendor，以及 Treble 沒解決的「要求年年追加」如何通往後兩篇 |
+| [Vendor Freeze](../vendor-freeze.md) | **系列第二篇**：GRF／Longevity GRF 的凍結機制與三方賽局——`ro.board.first_api_level` 等 board property、VINTF／FCM 相容性合約、「3 年一次 kernel 大版本升級」條款、功能天花板如何在 SoC 選型那一刻就被決定 |
+| [Android Kernel](../android-kernel.md) | **系列第三篇**：Android kernel = Linux + Android 補丁（Binder／wakelock／ION 的上游化史）、GKI 之前的四層 fork 碎片化、GKI／KMI 如何把 kernel 切成 Google 核心本體 + vendor module，以及三方各自的角色與工程實務 |
 
 ---
 
