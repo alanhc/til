@@ -72,6 +72,7 @@ sidebar_position: 9
 | [Data Viz](../data_viz.md) | 三種圖表的零散筆記：Sankey diagram 的節點／流結構與 plotly `go.Sankey` 能源流向範例（並提醒不適用於沒有「守恆」概念的資料）、Chord diagram 強調雙向關係與 Sankey 的差異、Treemap 僅一張截圖 |
 | [軟體工程隨筆](../software_engineering.md) | 隨手速記（原文有錯字未修）：sustainability 與 scale 是核心議題、海勒姆法則（被觀察到的行為終將被依賴成為系統的一部分）、「Because I said so」是萬惡之源、公車指數，以及 CI 的 Beyoncé rule |
 | [Preflight Check](../preflight.md) | **佔位頁**：同一段 preflight check 的定義被 LLM 以英文／簡體中文／繁體中文各寫一次（航空、軟體開發、韌體開發的類比），尚未整理成自己的筆記 |
+| [CUDA 入門第一步](../cuda-hello-world.md) | 新手向教學：在 Ubuntu／Debian 用 `apt` 裝 CUDA Toolkit（cuda-keyring→`cuda-toolkit-13-0`→設 `PATH`／`LD_LIBRARY_PATH`）、`nvcc --version` 驗裝好，再寫十幾行的 `hello.cu` 帶出 `__global__` kernel、`blockIdx.x`／`threadIdx.x`、`<<<2,4>>>` 執行組態與 `cudaDeviceSynchronize()`，最後 `nvcc -arch=native` 編譯執行；附 build pipeline／執行緒階層／CPU-GPU 流程三張 SVG 圖 |
 
 ---
 

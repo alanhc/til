@@ -1,0 +1,36 @@
+<svg viewBox="0 0 720 210" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',system-ui,sans-serif">
+  <rect width="720" height="210" fill="#ffffff"/>
+  <text x="360" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#1a1a2e">從原始碼到 GPU 上執行的過程</text>
+
+  <defs>
+    <marker id="a2" markerWidth="12" markerHeight="12" refX="8" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#7c83ff"/>
+    </marker>
+  </defs>
+
+  <rect x="26"  y="78" width="140" height="64" rx="10" fill="#eef1ff" stroke="#7c83ff" stroke-width="2"/>
+  <text x="96" y="106" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1a2e">hello.cu</text>
+  <text x="96" y="126" text-anchor="middle" font-size="11" fill="#6b7280">你寫的原始碼</text>
+
+  <rect x="216" y="78" width="150" height="64" rx="10" fill="#fff7e6" stroke="#e0a13a" stroke-width="2"/>
+  <text x="291" y="106" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1a2e">nvcc 編譯器</text>
+  <text x="291" y="126" text-anchor="middle" font-size="11" fill="#96690f">nvcc hello.cu -o hello</text>
+
+  <rect x="416" y="78" width="140" height="64" rx="10" fill="#eef1ff" stroke="#7c83ff" stroke-width="2"/>
+  <text x="486" y="106" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1a2e">hello</text>
+  <text x="486" y="126" text-anchor="middle" font-size="11" fill="#6b7280">可執行檔</text>
+
+  <rect x="606" y="78" width="90" height="64" rx="10" fill="#eef7f0" stroke="#5cb075" stroke-width="2"/>
+  <text x="651" y="102" text-anchor="middle" font-size="13" font-weight="700" fill="#3f8f57">GPU</text>
+  <text x="651" y="122" text-anchor="middle" font-size="11" fill="#6b7280">./hello</text>
+
+  <path d="M166,110 L214,110" fill="none" stroke="#7c83ff" stroke-width="2.5" marker-end="url(#a2)"/>
+  <path d="M366,110 L414,110" fill="none" stroke="#7c83ff" stroke-width="2.5" marker-end="url(#a2)"/>
+  <path d="M556,110 L604,110" fill="none" stroke="#7c83ff" stroke-width="2.5" marker-end="url(#a2)"/>
+
+  <text x="190" y="100" text-anchor="middle" font-size="10" fill="#9ca3af">編譯</text>
+  <text x="390" y="100" text-anchor="middle" font-size="10" fill="#9ca3af">產出</text>
+  <text x="580" y="100" text-anchor="middle" font-size="10" fill="#9ca3af">執行</text>
+
+  <text x="360" y="182" text-anchor="middle" font-size="12" fill="#9ca3af">nvcc 就像 CUDA 世界的 gcc：把 .cu 檔翻成能在 GPU 上跑的程式</text>
+</svg>

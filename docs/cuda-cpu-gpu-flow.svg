@@ -1,0 +1,47 @@
+<svg viewBox="0 0 720 430" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',system-ui,sans-serif">
+  <rect width="720" height="430" fill="#ffffff"/>
+  <text x="360" y="34" text-anchor="middle" font-size="22" font-weight="700" fill="#1a1a2e">CPU 與 GPU 各跑各的 ── 為什麼要 synchronize</text>
+
+  <!-- Lanes -->
+  <rect x="40"  y="64" width="300" height="330" rx="12" fill="#fdf1f1" stroke="#f0b7b7" stroke-width="2"/>
+  <rect x="380" y="64" width="300" height="330" rx="12" fill="#eef7f0" stroke="#a9d8b5" stroke-width="2"/>
+  <text x="190" y="90" text-anchor="middle" font-size="16" font-weight="700" fill="#b04a4a">CPU（主機端 host）</text>
+  <text x="530" y="90" text-anchor="middle" font-size="16" font-weight="700" fill="#3f8f57">GPU（裝置端 device）</text>
+
+  <!-- CPU steps -->
+  <rect x="70" y="112" width="240" height="46" rx="8" fill="#ffffff" stroke="#e08585"/>
+  <text x="190" y="140" text-anchor="middle" font-size="13" fill="#1a1a2e">main() 開始執行</text>
+
+  <rect x="70" y="176" width="240" height="52" rx="8" fill="#ffffff" stroke="#e08585"/>
+  <text x="190" y="200" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a2e">hello&lt;&lt;&lt;2,4&gt;&gt;&gt;()</text>
+  <text x="190" y="218" text-anchor="middle" font-size="11" fill="#6b7280">把工作丟給 GPU，不等它做完</text>
+
+  <rect x="70" y="246" width="240" height="52" rx="8" fill="#fff7e6" stroke="#e0a13a"/>
+  <text x="190" y="270" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a2e">cudaDeviceSynchronize()</text>
+  <text x="190" y="288" text-anchor="middle" font-size="11" fill="#96690f">CPU 在這裡停下來，等 GPU 全部完成</text>
+
+  <rect x="70" y="330" width="240" height="46" rx="8" fill="#ffffff" stroke="#e08585"/>
+  <text x="190" y="358" text-anchor="middle" font-size="13" fill="#1a1a2e">return 0  程式結束</text>
+
+  <!-- GPU work -->
+  <rect x="410" y="176" width="240" height="122" rx="8" fill="#ffffff" stroke="#5cb075"/>
+  <text x="530" y="204" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a2e">8 條 thread 同時執行</text>
+  <text x="530" y="228" text-anchor="middle" font-size="12" fill="#3f8f57">printf(...) 印出各自的編號</text>
+  <text x="530" y="258" text-anchor="middle" font-size="11" fill="#6b7280">誰先印出來不固定</text>
+  <text x="530" y="276" text-anchor="middle" font-size="11" fill="#6b7280">（平行運算沒有保證順序）</text>
+
+  <!-- Arrows -->
+  <defs>
+    <marker id="ah" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#7c83ff"/>
+    </marker>
+  </defs>
+  <!-- launch arrow CPU->GPU -->
+  <path d="M310,202 C350,202 360,237 408,237" fill="none" stroke="#7c83ff" stroke-width="2.5" marker-end="url(#ah)"/>
+  <text x="360" y="196" text-anchor="middle" font-size="11" fill="#4b4fce">啟動 kernel</text>
+  <!-- done arrow GPU->CPU sync -->
+  <path d="M408,285 C360,296 350,272 312,272" fill="none" stroke="#5cb075" stroke-width="2.5" stroke-dasharray="5 4" marker-end="url(#ah)"/>
+  <text x="360" y="316" text-anchor="middle" font-size="11" fill="#3f8f57">做完後通知</text>
+
+  <text x="360" y="416" text-anchor="middle" font-size="12" fill="#9ca3af">少了 synchronize，CPU 可能在 GPU 印出東西前就跑到 return，畫面什麼都沒有</text>
+</svg>
