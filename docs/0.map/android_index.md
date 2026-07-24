@@ -37,7 +37,7 @@ sidebar_position: 0
 
 ---
 
-## 三、AOSP 建置
+## 三、建置：AOSP 平台與 App
 
 | 文章 | 內容 |
 |---|---|
@@ -46,6 +46,8 @@ sidebar_position: 0
 | [Android Build Project](../android_build_project.md) | 環境套件安裝、repo init/sync、Cuttlefish 虛擬機建置、詞彙表（ACK、GKI、VNDK） |
 | [AOSP Codebase](../aosp_codebase.md) | `.repo/manifests/default.xml` 查目前 branch revision |
 | [Android Build Number 解析](../Android_build_number.md) | `BP4A.251205.006` 各欄位含義（代號／分支／日期／patch） |
+| [搞懂三種 Build Variant：user／userdebug／eng](../android-build-variants.md) | 三者的定位與底層差異：`ro.secure`／`ro.debuggable` 兩個屬性怎麼決定能不能 `adb root`、模組安裝範圍（eng 全裝 vs user 只裝 product 要求）、dexpreopt 最佳化開關與效能落差；附完整對照表與「重現使用者問題／量效能／QA 一律用 `userdebug` 而非 `eng`」的實務原則 |
+| [Android Product Flavor 完整教學](../android-product-flavor-完整教學.md) | **App 層（Gradle）**：一份程式碼產出多個 App——build type／product flavor／build variant 三者關係、Groovy 與 Kotlin DSL 兩種寫法、flavor 能客製什麼（`applicationId`／`BuildConfig`／manifest placeholder／source set 資源與程式碼覆寫）、flavor dimensions 多維度組合、免費版 vs 付費版實戰、依 flavor 加依賴，以及常見陷阱 |
 
 ---
 
@@ -79,6 +81,7 @@ sidebar_position: 0
 | [adb（Android Debug Bridge）](../android_adb.md) | 常用指令速查、多裝置 `-s`、`adb root`/`remount`、無線除錯 |
 | [Android SEPolicy / SELinux](../android_sepolicy.md) | 速查：Security context、`.te` 檔、`allow`/`neverallow`、AVC denied 判讀、`audit2allow` |
 | [SELinux 是什麼？為什麼 Android 韌體工程師必須懂它](../selinux.md) | **深入版**：MAC vs DAC、LSM hooks / AVC / selinuxfs 元件、Treble 後的 sepolicy 四層架構、從 denial 反推 owner 的四種方法、為何是 CTS/GMS 出貨硬條件 |
+| [adb logcat 與 UART：Android 除錯的兩把刀](../adb-logcat-vs-uart.md) | 兩者為何不能互相取代：logcat 走 Android log buffer（tag／優先級／`--pid`／crash buffer 過濾），UART 是硬體直連的序列 console，看得到 bootloader／`printk`／panic 死前最後幾行。附開機七階段（Boot ROM → SPL/BL1·BL2 → U-Boot/ABL → Kernel → init → Zygote → Boot completed）與 JTAG／UART／adb 的可用性對照表與圖，以及 watchdog／ANR／tombstone／bootloop 等相關名詞速查 |
 | [效能實驗：Codec 判讀](../performance_experient.md) | YouTube debug overlay 判讀硬解／軟解、`[exo2]` vs `[plat]`、VP9 Profile 2 HDR fallback、掉幀分析 |
 
 ---
@@ -92,10 +95,11 @@ sidebar_position: 0
 
 ---
 
-## 八、周邊
+## 八、周邊與延伸平台
 
 | 文章 | 內容 |
 |---|---|
+| [Android Automotive OS（AAOS）開發者入門](../AAOS-開發者入門.md) | 先把 Android Auto（手機投影）／AAOS（跑在車機上的 OS）／AAOS + GAS 三者分清楚；為何值得投入（生態複用、量產車廠、SDV 趨勢）、車用專屬的六塊核心元件（VHAL 把車速／空調／檔位抽象成 property、`android.car` 的 `CarPropertyManager`、`car-ui-lib` 與 System UI、多 display／多 user、template 化的車用 app 範式、Car Audio 分區與開機效能），以及開發者入門路徑與常見坑 |
 | [工程機](../工程機.md) | 高通工程機相關影片筆記 |
 
 ---

@@ -58,7 +58,10 @@ sidebar_position: 1
 | **`source build/envsetup.sh`** | 載入 AOSP build 環境函式（lunch、m、get_build_var 等） |
 | **`lunch`** | 選擇編譯目標。Android 14+ 為三段式：`aosp_shiba-bp1a-userdebug`（product-release-variant） |
 | **`m`** | 編譯全部（等同 `make`）。Pixel 8 首次編譯約 1~3 小時 |
-| **build variant** | `user`（正式）/ `userdebug`（可 adb root，效能測試用）/ `eng`（build 最快） |
+| **build variant** | `user`（正式）/ `userdebug`（可 adb root，效能測試用）/ `eng`（build 最快）。三者差異詳見 [搞懂三種 Build Variant](../android-build-variants.md) |
+| **`ro.secure`** | 決定 adbd 是否以受限身分執行：`eng` 為 0（開機即 root），`userdebug`／`user` 為 1 |
+| **`ro.debuggable`** | 決定系統是否可被除錯（`adb root` 提權、`jdwp` 附加、部分 log 行為）：`eng`／`userdebug` 為 1，`user` 為 0 |
+| **dexpreopt** | 建置時預先 AOT 編譯 dex；`eng` 關閉（改 code 快但執行慢）、`userdebug`／`user` 啟用 |
 | **`TARGET_PRODUCT`** | 編譯目標產品，如 `aosp_shiba` |
 | **`TARGET_BUILD_VARIANT`** | 編譯變體，如 `userdebug` |
 | **`PRODUCT_OUT`** | 產物目錄，如 `out/target/product/shiba`。用 `get_build_var PRODUCT_OUT` 取得 |
@@ -74,6 +77,21 @@ sidebar_position: 1
 | **VNDK** | Vendor Native Development Kit，vendor 可用的原生介面集合 |
 | **VINTF** | Vendor Interface，透過 manifest 與 compatibility matrix 檢查 framework/vendor 相容性 |
 | **HIDL / AIDL** | HAL 介面定義語言（AIDL 為現代作法） |
+
+### App 端（Gradle）
+
+> 注意：AOSP 平台建置與 App 建置是兩套系統，「build variant」在兩邊意思不同。以下出自 [Android Product Flavor 完整教學](../android-product-flavor-完整教學.md)。
+
+| 名詞 | 說明 |
+|---|---|
+| **build type（建置類型）** | Gradle 的「怎麼建」：`debug`／`release`，管簽章、`minifyEnabled`、可除錯與否 |
+| **product flavor（產品風味）** | Gradle 的「建給誰」：免費／付費、白牌客戶 A／B、dev／staging／prod，共用同一份程式碼庫 |
+| **build variant（建置變體，Gradle）** | build type × product flavor 的組合，如 `freeDebug`／`paidRelease`；與 AOSP 的 `user`/`userdebug`/`eng` 無關 |
+| **flavor dimension** | flavor 的分類軸；多維度時各軸各取一個 flavor 再組合（如 `version × environment`） |
+| **source set** | `src/free/`、`src/paid/` 等目錄，同名資源／程式碼會覆寫 `src/main/`，是 flavor 客製的主要機制 |
+| **`applicationId` / `applicationIdSuffix`** | App 的唯一識別碼；不同 flavor 給不同 id 才能同機並存安裝 |
+| **`BuildConfig`** | Gradle 產生的常數類別（需開 `buildFeatures { buildConfig = true }`），用 `buildConfigField` 把 flavor 差異帶進程式碼 |
+| **manifest placeholder** | 用 `manifestPlaceholders` 把值注入 `AndroidManifest.xml`（如各 flavor 不同的 App 名稱、API key） |
 
 ---
 
@@ -292,6 +310,23 @@ sidebar_position: 1
 | **Factory Image** | developers.google.com/android/images，救磚用 |
 | **USB debugging / OEM unlocking** | 開發人員選項中的兩個開關（設定 → 關於手機 → 連點版本號 7 下） |
 
+### Log 與低階除錯
+
+> 出自 [adb logcat 與 UART：Android 除錯的兩把刀](../adb-logcat-vs-uart.md)。
+
+| 名詞 | 說明 |
+|---|---|
+| **logd / logcat buffer** | logcat 背後的 daemon 與環形緩衝區；buffer 分 `main`／`system`／`crash`／`events`／`radio`，用 `-b` 指定 |
+| **log 等級** | `V`／`D`／`I`／`W`／`E`／`F`，另有 `S`(Silent)；`MyTag:E *:S` 表示只看該 tag 的 Error 以上、其餘靜音 |
+| **UART / serial console** | 硬體序列埠 console，用 USB-to-TTL 接出，看得到 bootloader、`printk`、driver 初始化與 panic 死前訊息；是唯一橫跨開機全程的觀察窗口 |
+| **`earlycon`** | kernel cmdline 參數，讓 console 在正式 serial driver 起來前就能輸出，追早期開機問題用 |
+| **JTAG / SWD** | 比 UART 更底層的硬體除錯介面，可下中斷點、讀暫存器；Boot ROM 階段幾乎只剩它可用 |
+| **ramdump / coredump** | panic 或死當時把記憶體傾印出來事後分析 |
+| **tombstone** | native crash 留在 `/data/tombstones/` 的墓碑檔（含 backtrace） |
+| **watchdog / 餵狗** | 計時器，系統需定期重置它，卡死沒餵到就強制重啟；分硬體／軟體 watchdog，framework 另有監控 `system_server` 的 Watchdog |
+| **ANR（Application Not Responding）** | App 主執行緒卡住超過門檻的無回應狀態 |
+| **bootloop** | 開機無限重啟；依卡住階段決定該看 UART 還是 logcat |
+
 ---
 
 ## 九、Root
@@ -421,3 +456,23 @@ sidebar_position: 1
 | `Setting current slot to 'b'` | A/B slot rotation，每次 flash 交替 |
 | `Invalid sparse file format at header magic` | sparse image 分批傳送的正常現象 |
 | `archive does not contain 'recovery.img'` | Pixel 8 無獨立 recovery 分區 |
+
+---
+
+## 十三、車用（AAOS）
+
+> 出自 [Android Automotive OS（AAOS）開發者入門](../AAOS-開發者入門.md)。
+
+| 名詞 | 說明 |
+|---|---|
+| **Android Auto** | 手機投影協定，運算在手機上，車機只是外接螢幕——與 AAOS 是兩回事 |
+| **AAOS（Android Automotive OS）** | 直接跑在車機硬體上的完整作業系統，AOSP 的一支，開源可由車廠客製 |
+| **GAS（Google Automotive Services）** | Google 另外授權的服務包（Play 商店、Google 地圖、Assistant）；有無 GAS 是兩種 AAOS 車的分界 |
+| **VHAL（Vehicle HAL）** | OS 與車輛硬體的邊界，把車速／電量／空調／車門／檔位抽象成帶存取權限與訂閱通知的 **property**，上層不必管 CAN bus 或哪家 ECU |
+| **vehicle property** | VHAL 的基本單位；分 AOSP 標準 property（`VehiclePropertyIds`）與車廠自訂的 vendor property |
+| **`android.car` / Car API** | App 端入口，透過 `Car` 取得各種 manager，最常用 `CarPropertyManager` 讀寫／訂閱 property |
+| **`CarUxRestrictionsManager`** | 行車中的 UI 限制管理（限制文字量、互動複雜度等） |
+| **`car-ui-lib`** | Car UI Library，車廠客製狀態列／通知／清單等系統外觀，維持一致互動邏輯 |
+| **Car Audio Zones** | 分區音訊，讓車內不同區域播放不同來源 |
+| **IVI（In-Vehicle Infotainment）** | 車載資訊娛樂系統，AAOS 所競爭的類別 |
+| **SDV（Software-Defined Vehicle）** | 軟體定義車輛：車輛功能由軟體決定並可 OTA 演進，是 AAOS 的產業背景 |

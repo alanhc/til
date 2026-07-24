@@ -17,15 +17,15 @@ sidebar_position: 0
 | **Android / Pixel** | AOSP 建置、boot flow、TF-A、Pixel 刷機、SELinux、Root | [android.md](../android.md) | [Android 系列索引](android_index.md) | [Android 名詞表](android_glossary.md) |
 | **AI / Agent** | Claude Code / Skills、MCP、Gemini、本地推論（Ollama、Jan AI）、AI 應用與文章 | [AI.md](../AI.md) | [AI 系列索引](ai_index.md) | [AI 名詞表](ai_glossary.md) |
 | **BMC** | OpenBMC、CanopyBMC、IPMI / Redfish、sensor / thermal、Yocto | [BMC/openbmc_boot_flow.md](../BMC/openbmc_boot_flow.md) | [BMC 系列索引](bmc_index.md) | [BMC 名詞表](bmc_glossary.md) |
-| **Linux / 系統** | Kernel、device tree / driver、systemd、memory、Ubuntu 指令、GRUB、Docker | [Linux/Linux.md](../Linux/Linux.md) | 走 `Linux/` 資料夾側邊欄 | 待建 |
+| **Linux / 系統** | Kernel、kernel 除錯（Oops／crash dump）、device tree / driver、systemd、memory、Ubuntu 指令、GRUB、Docker | [Linux/Linux.md](../Linux/Linux.md) | 走 `Linux/` 資料夾側邊欄 | 待建 |
 | **Embedded / 韌體 / 硬體** | Bootloader、firmware testing / image management、Raspberry Pi、晶片與半導體、半導體量產測試 | [embedded.md](../embedded.md) | [Embedded 系列索引](embedded_index.md) | [Embedded 名詞表](embedded_glossary.md) |
-| **DSA / 演算法** | Linked List（single／doubly／kernel `list_head`）、Tree（binary tree／heap）、Boyer-Moore 投票法 | [DSA/Linked_List/0.linked_list.md](../DSA/Linked_List/0.linked_list.md) | [DSA 系列索引](dsa_index.md) | — |
+| **DSA / 演算法** | Linked List、hash / LRU、樹與堆積、圖與 BFS/DFS、二分與排序、DP／回溯、雙指標／單調堆疊、位元與環形緩衝 | [DSA/Linked_List/0.linked_list.md](../DSA/Linked_List/0.linked_list.md) | [DSA 系列索引](dsa_index.md) | — |
 | **效能 / Benchmark** | CPU DVFS、power / browser benchmark、codec 判讀 | [benchmark.md](../benchmark.md) | 待建 | — |
 | **投資 / 理財** | 投資計劃、個股風險、程式交易、酒田戰法、房、銀行操作 | [投資.md](../投資.md) | 待建 | — |
 | **職涯 / 生活 / 學習** | 面試、當責、說不、人際、健康、簡報、英文、書與電影 | [career.md](../career.md) | 待建 | — |
 | **工具 / 其他** | Obsidian、Supabase、Cloudflare、n8n、爬蟲、資安、side projects | [tools.md](../tools.md) | [工具與其他索引](tools_index.md) | — |
 
-篇數量級：BMC ≈ 40、AI ≈ 35、Android ≈ 25、職涯生活 ≈ 19、工具其他 ≈ 18、Embedded ≈ 15、Linux ≈ 12、投資 ≈ 9、DSA ≈ 7、效能 ≈ 7。
+篇數量級：BMC ≈ 40、AI ≈ 35、Android ≈ 27、DSA ≈ 16、職涯生活 ≈ 19、工具其他 ≈ 18、Embedded ≈ 17、Linux ≈ 13、投資 ≈ 9、效能 ≈ 7。
 
 ## 索引與名詞表的分工
 

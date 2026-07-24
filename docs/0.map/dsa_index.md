@@ -52,6 +52,7 @@ sidebar_position: 8
 | 文章 | 內容 |
 |---|---|
 | [二分搜尋 Binary Search](../DSA/Binary-Search.md) | 基本二分 + lower_bound／upper_bound 邊界（只差一個 `<` vs `<=`）、`mid = lo + (hi-lo)//2` 防溢位（2006 著名 bug）、閉區間 vs 半開區間模板；**答案空間二分**（最佳化轉可行性判定，Google 高頻）、旋轉排序陣列。LeetCode 704、34、33、875、410 |
+| [潛伏九年的 binarySearch bug](../binary-search-bug.md) | **故事版**：Joshua Bloch 2006 年那篇〈Nearly All Binary Searches and Mergesorts are Broken〉——`(low + high) / 2` 在 Java 有號 int 溢位變負數、為何要陣列長度逼近 2³⁰ 才會爆所以九年沒人發現、三種修法（先取差再加回、無號右移 `>>> 1`、改用更大型別）與它們的適用語言，以及「測試涵蓋不到的邊界」與型別溢位的一般教訓 |
 | [排序演算法總覽](../DSA/Sorting.md) | quick／merge／heap／counting／radix 全景比較表（平均/最壞/空間/穩定/in-place）、`Ω(n log n)` 下界；partition 手寫、mergesort 穩定性與外部排序、heapsort in-place；**何時用哪個**（firmware 記憶體受限、為何標準庫用 introsort/Timsort）。LeetCode 912、215（quickselect） |
 
 ---

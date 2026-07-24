@@ -201,7 +201,27 @@ sidebar_position: 7
 | **MBIST（Memory Built-In Self-Test）** | 記憶體區塊內建自我測試電路，機台下指令收結果即可 | [ATE 是什麼](../what-is-ate.md) |
 | **fault model（故障模型）** | 讓覆蓋率可精確計算的模型：stuck-at、transition、bridging 等 | [ATE 是什麼](../what-is-ate.md)、[半導體量產測試全景](../semiconductor-test-overview-cp-ft-slt-ate.md) |
 | **stuck-at fault** | 最常見的故障模型（節點卡在固定 0 或 1），可計算「pattern 覆蓋了 98.5% stuck-at fault」這類工程陳述 | [ATE 是什麼](../what-is-ate.md) |
-| **fault coverage** | 一組 pattern 對某 fault model 的覆蓋率，可量化 | [ATE 是什麼](../what-is-ate.md) |
+| **fault coverage** | 一組 pattern 對某 fault model 的覆蓋率，可量化 | [ATE 是什麼](../what-is-ate.md)、[DFT 工程實務](../DFT_Design_for_Test_工程實務.md) |
+| **transition / at-speed fault** | 節點會翻轉但翻得太慢的延遲型故障，需在功能頻率下用兩個 pattern（launch → capture）測 | [DFT 工程實務](../DFT_Design_for_Test_工程實務.md) |
+| **shift / capture** | scan test 的兩個階段：shift 把測試向量沿 scan chain 移入移出（慢速時脈），capture 讓組合邏輯在一個時脈內把結果打進 FF | [DFT 工程實務](../DFT_Design_for_Test_工程實務.md) |
+| **scan FF（scan flip-flop）** | 多一個 scan input 與 scan enable 的 FF，測試模式下串成 scan chain，是 scan design 的基本單元 | [DFT 工程實務](../DFT_Design_for_Test_工程實務.md) |
+| **test compression** | 用解壓縮器／壓縮器把少量外部 channel 展開成大量內部 scan chain，壓 pattern 資料量與測試時間 | [DFT 工程實務](../DFT_Design_for_Test_工程實務.md) |
+| **LBIST（Logic BIST）** | 邏輯自測：LFSR 產生偽隨機 pattern、MISR 把回應壓成 signature 比對，車用／安全等級晶片常要求開機自測 | [DFT 工程實務](../DFT_Design_for_Test_工程實務.md) |
+| **LFSR / MISR** | 線性回授移位暫存器（產生偽隨機測試向量）與多輸入簽章暫存器（把大量回應壓成一個 signature），LBIST 的兩端 | [DFT 工程實務](../DFT_Design_for_Test_工程實務.md) |
+| **Boundary Scan（IEEE 1149.1 / JTAG）** | 在 IO pad 旁串一圈 boundary scan cell，用 TAP（TCK/TMS/TDI/TDO）測板級焊接與晶片間連線，也是進 scan/BIST 的入口 | [DFT 工程實務](../DFT_Design_for_Test_工程實務.md) |
+| **TAP controller** | JTAG 的 16 狀態機，由 TMS 驅動在 instruction／data register 之間切換；bringup 時讀得到 IDCODE 是第一個里程碑 | [DFT 工程實務](../DFT_Design_for_Test_工程實務.md)、[DFT Verification 面試準備](../DFT_Verification_面試準備.md) |
+| **OCC（On-Chip Clock Controller）** | at-speed test 時在晶片內部切換 shift 慢速時脈與 capture 功能時脈的控制電路 | [DFT Verification 面試準備](../DFT_Verification_面試準備.md) |
+
+### DFT 驗證（simulation 端）
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **VCS / Verdi** | Synopsys 的模擬器與 debug／波形工具；DFT verification 的日常組合——VCS 跑 RTL/gate sim，Verdi 做 signal tracing 與 FSDB 波形 debug | [DFT Verification 面試準備](../DFT_Verification_面試準備.md) |
+| **gate-level simulation** | 在合成後 netlist 上跑模擬，用來驗 ATPG 產出的 pattern 與 ATE 預期一致 | [DFT Verification 面試準備](../DFT_Verification_面試準備.md) |
+| **SDF back-annotation** | 把 Standard Delay Format 的實際延遲反標進 gate-level sim，才驗得到 setup/hold 相關問題 | [DFT Verification 面試準備](../DFT_Verification_面試準備.md) |
+| **X-propagation** | 未初始化 FF／時脈 reset 問題導致的未知值在 netlist 上擴散，是 gate sim 最常見的殺手，debug 靠 driver trace 往回追 | [DFT Verification 面試準備](../DFT_Verification_面試準備.md) |
+| **hierarchical verification（IP／cluster／full chip）** | 三層驗證策略：單一 macro 獨立驗 → 數個 IP 整合驗介面 → 整顆晶片驗 top 連線與 DFT mode 切換 | [DFT Verification 面試準備](../DFT_Verification_面試準備.md) |
+| **chip bringup** | 矽從 fab 回來後第一次點亮：scan chain 通不通、JTAG IDCODE 讀不讀得到是早期關鍵里程碑 | [DFT Verification 面試準備](../DFT_Verification_面試準備.md)、[Bring-up 全紀錄](../bringup-article.md) |
 
 ### 分級、良率與品質度量
 

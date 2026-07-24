@@ -85,6 +85,8 @@ sidebar_position: 6
 | [CP 晶圓測試](../what-is-cp-wafer-test.md) | 封裝前用探針卡扎裸 die、產出 wafer map 篩壞品；探針卡的接觸電阻／寄生電感如何限制高頻與大電流測試、CP 能不能省（盲封），以及最容易混淆的 CP vs WAT（測產品 vs 測製程） |
 | [FT 最終測試](../what-is-ft-final-test.md) | 封裝後為何要再測一次（封裝製程也引入缺陷）、socket／load board 環境、以及 FT 不只判生死還做 speed binning（Fmax／Vmin 分級，直接決定 SKU 與 DVFS 設定） |
 | [SLT 系統級測試](../what-is-slt-and-why-chip-vendors-care.md) | 出貨前把晶片放進類產品板開機跑軟體，攔 ATE 抓不到的跨 IP／邊際／軟硬互動缺陷；為何對 chip vendor 重要（DPPM 合約承諾、缺陷逃逸的乘數成本、大客戶把系統品質推回 vendor、閉環回饋），以及 SLT 本質是平台軟體 |
+| [DFT（Design for Test）工程實務](../DFT_Design_for_Test_工程實務.md) | **設計端**：把上面「ATE 靠 DFT 才測得到內部」展開成設計方法——為何幾億電晶體只能靠幾百支 pin 觀測、fault model（stuck-at／transition／bridging）、Scan Design 的 shift-in→capture→shift-out 與實務重點、ATPG 覆蓋率指標與 test compression、MBIST／LBIST（LFSR + MISR）、Boundary Scan（JTAG／IEEE 1149.1）TAP 狀態機，以及 DFT 在設計鏈與 chip vendor 組織裡的位置 |
+| [DFT Verification 學習與面試準備](../DFT_Verification_面試準備.md) | **驗證端**：照一份 DFT Verification Engineer JD 反推的準備筆記——VCS/Verdi 的 RTL/gate-level tracing 與 X-propagation debug、IP／cluster／full chip 三層驗證與收斂指標、SDF back-annotation、把 ATPG pattern 拉回 gate sim 驗證、SoC 基本盤（clock/reset/power rail/IO pad/package）與 DFT 的關係、Tcl/Python 自動化，附面試自我檢查清單與名詞速查 |
 | [MTBF 與系統整合](../mtbf-and-why-si-owns-it.md) | **延伸篇**：前面講「矽」的品質，這篇講「軟體堆疊」的品質怎麼度量。為何 MTBF fail 天生沒 owner、是 build 層級度量、與 CI 同一套肌肉、直接面對客戶，因而落在系統整合（SI）的主場；附 MTBF triage 實務循環 |
 
 ---
