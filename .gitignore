@@ -22,3 +22,7 @@ yarn-error.log*
 .env
 
 /docs/.obsidian
+
+# Personal (not for publishing)
+interview-prep-plan.md
+coscup*.md
