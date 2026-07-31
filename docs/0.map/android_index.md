@@ -33,6 +33,7 @@ sidebar_position: 0
 | [ARM Trusted Firmware (TF-A) 解析](../ARM_Trusted_Firmware_解析.md) | **深入版**：BL1~BL33 各階段職責、TBBR 憑證鏈如何銜接 AVB、BL31 常駐的 Secure Monitor／PSCI／中斷路由、各家 SoC 階段命名對照（高通 PBL/XBL/TZ、MTK Preloader/ATF/LK）、platform port 與 QEMU 上手路徑 |
 | [Secure Boot 解析](../Secure_Boot_解析.md) | **深入版**（上篇姊妹篇，講「憑什麼信任」）：簽章 vs 加密、Boot ROM 與 eFuse 兩個錨點、TBBR 的 X.509 憑證鏈與金鑰隔離、AVB 2.0 與 rollback index、boot state 四色、攻擊面（glitching／TOCTOU／EDL／checkm8）、導入 checklist |
 | [Android Verified Boot (AVB) 深入解析](../Android-Verified-Boot-AVB.md) | **深入版**（把上面 Secure Boot 提到的 AVB 展開）：硬體信任根 → `vbmeta` 樞紐（hash／hashtree／chain partition／kernel cmdline descriptor）→ dm-verity 區塊級執行期驗證 → rollback index 防降級 → GREEN／YELLOW／ORANGE／RED 四狀態與 Keystore attestation；含刷機實務（`--disable-verity`／`--disable-verification`、`avb_custom_key` 自簽走 YELLOW、`avbtool info_image`、重新上鎖變磚的坑） |
+| [把 ABL 拆開看：AVB 驗證在真機上到底怎麼跑](../abl-avb-reversing.md) | **上篇的實作對照版**：把 Qualcomm 手機的 ABL（UEFI application）從 `abl.img` 剝殼成 PE32+ 丟進 Ghidra，用字串（`androidboot.verifiedbootstate=`、`AVB0` magic、`avb_slot_verify.c`）當錨點定位 AVB；再逐步走 `avb_slot_verify()` → vbmeta header 解析 → SHA + RSA 驗簽 → descriptor（hash／hashtree／chain／cmdline）→ rollback index → 綠黃橙紅四色 → 組 kernel cmdline。核心結論：libavb 是通用密碼學骨架，**真正決定安不安全的是廠商在 `AvbOps` 回呼裡有沒有偷工**（金鑰比對、rollback 接 RPMB、鎖狀態）。附逆向常踩的坑 |
 | [MTK Preloader Combo Header 與 OTA](../mtk-preloader-combo-header-ota.md) | MTK boot chain（BROM → Preloader → LK）中 preloader 住在 eMMC boot0/UFS boot LU；device header 三型態（`EMMC_BOOT`／`UFS_BOOT`／`COMBO_BOOT`）與 device header → BRLYT → GFH 三層結構，以及怎麼接上 Google A/B OTA（`update_engine` byte-level 寫入故 image 需自帶 header、by-name symlink、header 型態不一致導致 source hash mismatch 的故障排查）。各節標註公開來源 vs 內部推論 |
 
 ---
@@ -82,6 +83,7 @@ sidebar_position: 0
 | [Android SEPolicy / SELinux](../android_sepolicy.md) | 速查：Security context、`.te` 檔、`allow`/`neverallow`、AVC denied 判讀、`audit2allow` |
 | [SELinux 是什麼？為什麼 Android 韌體工程師必須懂它](../selinux.md) | **深入版**：MAC vs DAC、LSM hooks / AVC / selinuxfs 元件、Treble 後的 sepolicy 四層架構、從 denial 反推 owner 的四種方法、為何是 CTS/GMS 出貨硬條件 |
 | [adb logcat 與 UART：Android 除錯的兩把刀](../adb-logcat-vs-uart.md) | 兩者為何不能互相取代：logcat 走 Android log buffer（tag／優先級／`--pid`／crash buffer 過濾），UART 是硬體直連的序列 console，看得到 bootloader／`printk`／panic 死前最後幾行。附開機七階段（Boot ROM → SPL/BL1·BL2 → U-Boot/ABL → Kernel → init → Zygote → Boot completed）與 JTAG／UART／adb 的可用性對照表與圖，以及 watchdog／ANR／tombstone／bootloop 等相關名詞速查 |
+| [從 `mount -o remount` 到 OverlayFS：Driver 開發者必須弄懂的 remount 機制](../android-remount-deep-dive.md) | **深入版**：為何現代 Android 分區改不動——dm-verity／AVB、dynamic partition right-sizing 沒有剩餘空間、EROFS 根本不可寫三道約束；AOSP 的解法是把 `adb remount` 重新實作成 **overlayfs**（lower = 唯讀原分區，upper = `/cache/overlay` 或 `super` 裡的 `scratch` 邏輯分區），所以你看到的是「出廠 image + 你的 diff」的合成視圖。含標準流程、對 driver／HAL／firmware／`init.*.rc`／vendor sepolicy 的迭代價值，以及九條踩坑（first stage init 與 ramdisk 蓋不到、空間會爆、remount 過的機器不能吃 OTA、bootloader fastboot 刷機不會被偵測到） |
 | [效能實驗：Codec 判讀](../performance_experient.md) | YouTube debug overlay 判讀硬解／軟解、`[exo2]` vs `[plat]`、VP9 Profile 2 HDR fallback、掉幀分析 |
 
 ---
@@ -113,6 +115,17 @@ sidebar_position: 0
 | [Android Migration](../android-migration.md) | **系列第一篇（總論）**：Android 大版本遷移為何是一條跨三家公司的串行供應鏈、一次升級的工作分解（晶片商 BSP → OEM framework rebase → CTS/VTS 認證 → OTA）、Project Treble 如何用 HIDL/AIDL + VINTF/FCM 切開 system/vendor，以及 Treble 沒解決的「要求年年追加」如何通往後兩篇 |
 | [Vendor Freeze](../vendor-freeze.md) | **系列第二篇**：GRF／Longevity GRF 的凍結機制與三方賽局——`ro.board.first_api_level` 等 board property、VINTF／FCM 相容性合約、「3 年一次 kernel 大版本升級」條款、功能天花板如何在 SoC 選型那一刻就被決定 |
 | [Android Kernel](../android-kernel.md) | **系列第三篇**：Android kernel = Linux + Android 補丁（Binder／wakelock／ION 的上游化史）、GKI 之前的四層 fork 碎片化、GKI／KMI 如何把 kernel 切成 Google 核心本體 + vendor module，以及三方各自的角色與工程實務 |
+
+---
+
+## 十、虛擬化、隔離與安全研究
+
+> 當 UID sandbox + SELinux 的前提「kernel 是可信的」不再成立時，Android 往兩個方向走：**把機密計算搬進 kernel 讀不到的 VM**（AVF / Microdroid），以及**持續被攻破的實證**（協同處理器 driver）。兩篇對照著讀最有感。
+
+| 文章 | 內容 |
+|---|---|
+| [Microdroid：Android 為什麼要在手機裡再開一台 Android](../Microdroid.md) | AVF / pKVM / crosvm / pVM / Microdroid 五個名詞的層次拆解；pKVM 把 **host kernel 降權到 EL1、hypervisor 留在 EL2**，用記憶體捐贈 + stage 2 讓 Android kernel 讀不到 guest 記憶體（配套：MMIO guard、IOMMU/SMMU、FF-A proxy）。Microdroid 有什麼沒什麼（無 Zygote／SystemServer／`android.*`／HAL，payload 是 native `.so`）、磁碟分割表為何長得像一台手機、開機鏈七步（pvmfw → bootloader → kernel/init → `microdroid_manager` → apexd → zipfuse → payload）、sealing key／attestation key 從量測值推導、`instance` 分割區與 rollback counter，以及 debuggable vs non-debuggable 的安全意義 |
+| [當防護開滿反而露出破口：Pixel 8 GXP DSP 漏洞與 MTE 繞過](../pixel8-gxp-dsp.md) | HITCON 2025（STAR LABS SG）議程整理：攻擊面選擇邏輯（越邊緣防護越薄）→ SELinux policy 反推出「有 server 代開 `/dev/gxp` 再傳 FD」→ 漏洞本體是 `gxp_mapping_create()` **直接信任 user 傳入的 DMA direction**，不與 VMA 屬性比對 → 取得 **write read-only memory primitive**（MTE 完全看不到，因為它保護的是 CPU 端存取）→ Frida replay attack 取代硬啃 firmware → camera provider library hijacking → modprobe → 關 SELinux → root。含修補方向與防禦視角 |
 
 ---
 

@@ -91,6 +91,17 @@ sidebar_position: 6
 
 ---
 
+## 八、Driver 與效能觀測
+
+> 前面幾節講的是「板子怎麼開起來」；這一節講開起來之後——資料怎麼在硬體與 kernel 之間搬，以及效能出問題時該從哪一層看。
+
+| 文章 | 內容 |
+|---|---|
+| [MediaTek UART APDMA：從 Virtual FIFO 硬體模型讀懂 `mtk-uart-apdma.c`](../mtk-uart-apdma.md) | 對照 upstream `drivers/dma/mediatek/mtk-uart-apdma.c` 與 `8250_mtk.c` 逐段讀：為何高速 UART（BT/GNSS/modem）需要 DMA、**VFF（Virtual FIFO）** 的 ring buffer + 硬體讀寫指標模型、用額外一個 wrap bit 解 full/empty 歧義、TX/RX 中斷門檻為何刻意不對稱、完整 register map、建立在 virt-dma 之上的三層結構、TX/RX/terminate 三條路徑，以及 DT 綁定與 32→35 bit 定址演進。附八點除錯清單，重點是**兩種無聲降級**（port 是 console 就強制關 DMA、`dma-names` 數量不對就靜默退回 PIO）。文末區分公開來源與作者推論 |
+| [PMU、Ftrace、EMI：SoC 效能問題的三個觀測層次](../pmu-ftrace-emi.md) | 三個常被混在一起的縮寫，其實是 **CPU 微架構層 / 作業系統層 / 記憶體子系統層** 三個互補視角。先拆一詞多義（PMU = Performance Monitoring Unit 或 Power Management Unit；EMI = External Memory Interface 或電磁干擾），再講各自怎麼用：`perf` 與 counter multiplexing、big.LITTLE 的 event 編碼陷阱；Ftrace 的 tracer 種類、filter 為何不能省、Android 上 atrace/Perfetto 的資料來源就是它；EMI MPU violation log 與頻寬計數器。最後用「畫面偶爾卡頓」示範三層怎麼串著看 |
+
+---
+
 ## 建議閱讀順序
 
 **想理解一塊板子怎麼從上電跑到 Linux：**

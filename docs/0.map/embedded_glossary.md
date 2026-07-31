@@ -249,3 +249,38 @@ sidebar_position: 7
 | **Monkey** | Android 內建壓測工具，注入偽隨機（seed 可重現）使用者事件流對整個軟體堆疊施壓，是 MTBF 壓測核心 | [MTBF 與系統整合](../mtbf-and-why-si-owns-it.md) |
 | **MTBF triage** | 把壓測收集的 crash 去重、初判、跨 stack log 分析後分派給 owner 團隊的循環；本質是「以統計形式呈現的跨團隊 log 分析」，落在系統整合（SI）團隊 | [MTBF 與系統整合](../mtbf-and-why-si-owns-it.md) |
 | **系統整合（SI）** | 模組團隊對零件負責、SI 對「組起來撐不撐得住」負責；MTBF 與 SLT 都是其主場，需跨層 debug 能力歸因失效 | [MTBF 與系統整合](../mtbf-and-why-si-owns-it.md) |
+
+---
+
+## 七、Driver 與效能觀測
+
+### MediaTek UART APDMA
+
+> 出自 [MediaTek UART APDMA](../mtk-uart-apdma.md)。
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **APDMA（Application Processor DMA）** | MediaTek 掛在 peripheral bus 上、服務 UART/I2C/SPI 等低速周邊的 DMA controller。upstream 只有 UART 那支被 mainline 化（`CONFIG_MTK_UART_APDMA`） | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+| **VFF（Virtual FIFO）** | 把 DRAM 的一塊 ring buffer 當成「虛擬的大 FIFO」，由硬體讀寫指標 `VFF_RPT`／`VFF_WPT` 推進。不是常見的 one-shot「搬完通知你」模型 | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+| **`VFF_VALID_SIZE` / `VFF_LEFT_SIZE`** | 永遠是「可被消費的量」與「還有空間可生產的量」；消費者／生產者身分依 TX/RX 方向鏡像對調 | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+| **wrap bit（`VFF_RING_WRAP`）** | 低 16 bits 是 offset、bit 16 是繞圈標記。經典的「多一個 bit 解 full/empty 歧義」手法——只看 offset 時 `RPT == WPT` 無法分辨空或滿 | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+| **TX/RX threshold 不對稱** | TX 門檻 = 整個 ring（等全空才中斷），RX 門檻 = 3/4 ring（留 1/4 給中斷後 SW 還沒處理完的期間繼續寫，防 overrun）。反映兩方向風險不同：TX 慢只是延遲，RX 慢會掉資料 | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+| **`VFF_DEBUG_STATUS`** | driver 在 `stop: fail` / `flush: fail` 時主動印出的暫存器值，是硬體卡在哪的直接證據 | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+| **virt-dma** | kernel 的 virtual DMA channel 框架（`drivers/dma/virt-dma.h`），driver 不自己管 descriptor queue | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+| **residue** | dmaengine 回報的「還沒完成的量」；RX 端用 `rx_size - residue` 反推實際收到多少，是整條 RX 路徑的資料量真相來源 | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+| **無聲降級（silent fallback）** | 本篇最重要的除錯觀念：port 是 console 就被強制關 DMA、`dma-names` 數量不對就靜默退回 PIO——兩者都不留任何 log。遇到「功能正常但效能不對」優先懷疑這類失敗模式 | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+
+### 效能觀測三層
+
+> 出自 [PMU、Ftrace、EMI](../pmu-ftrace-emi.md)。
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **PMU（Performance Monitoring Unit）** | ARM 核心內建的硬體事件計數器（ARMv8 對應 PMUv3），計 cycle／retired instruction／cache refill／TLB miss／branch misprediction 等；Linux 的 `perf` 是它的軟體介面 | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
+| **PMU（Power Management Unit）** | 同一縮寫的另一義：電源管理單元／PMIC。看上下文分辨——出現 counter/IPC/cache miss 是前者，出現 regulator/rail/suspend 是後者 | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
+| **counter multiplexing** | 要求的 event 數超過實體 counter（ARM 約 6 + 1 cycle counter）時，kernel 分時輪流計數再按比例推估；`perf stat` 的百分比欄位低於 100% 時結果只能當趨勢參考 | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
+| **Ftrace** | kernel 內建追蹤框架，介面在 `/sys/kernel/tracing`。tracer 有 `function`／`function_graph`／`irqsoff`／`preemptoff`／`wakeup`；也是 tracepoint 與 kprobe 的輸出通道 | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
+| **filter 一定要設** | 全開 `function` tracer 會在幾秒內塞滿 ring buffer，且 tracing 本身的 overhead 會讓 timing 相關的 bug 消失 | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
+| **EMI（External Memory Interface）** | SoC 語境下 EMI 多半指外部 DRAM 的控制器子系統，是全晶片所有 master 搶頻寬的匯流點；不是電磁干擾 | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
+| **EMI MPU（Memory Protection Unit）** | 把實體記憶體切 region 並限定哪些 master domain 可讀寫；violation log 會印出違規位址與**來源 master**，直接指出「是誰」踩到記憶體 | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
+| **三層觀測法** | Ftrace 答「時間花在哪」→ PMU 答「這些 cycle 是有效工作還是 stall」→ EMI 答「這是我的問題還是鄰居的問題」。避免拿著 `perf` 死盯 CPU 而瓶頸在別的 master | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |

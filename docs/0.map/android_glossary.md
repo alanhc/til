@@ -476,3 +476,85 @@ sidebar_position: 1
 | **Car Audio Zones** | 分區音訊，讓車內不同區域播放不同來源 |
 | **IVI（In-Vehicle Infotainment）** | 車載資訊娛樂系統，AAOS 所競爭的類別 |
 | **SDV（Software-Defined Vehicle）** | 軟體定義車輛：車輛功能由軟體決定並可 OTA 演進，是 AAOS 的產業背景 |
+
+---
+
+## 十四、AVB 真機逆向（ABL）
+
+> 出自 [把 ABL 拆開看：AVB 驗證在真機上到底怎麼跑](../abl-avb-reversing.md)。規格層的定義見第五、七節。
+
+| 名詞 | 說明 |
+|---|---|
+| **ABL（Android Boot Loader）** | Qualcomm 開機鏈 PBL → XBL → **ABL** → kernel 裡的最後一棒，本身是建構在 edk2 上的 **UEFI application**。信任鏈裡第一個改用 AVB 驗 Android 分區的階段（前面用的是 Qualcomm 自家 ELF 簽章格式） |
+| **`QcomModulePkg`** | Qualcomm 在 edk2 下的模組包，`VerifiedBoot.c`／`BootLinux.c` 等廠商包裝層住在這；逆向時 `avb_*` 開頭的才是 Google 的 libavb 本體 |
+| **`libavb`** | Google 的 AVB 參考實作，純 C、幾乎無混淆且滿是描述性字串，是逆向時的黃金錨點 |
+| **`AvbOps`** | libavb 與廠商實作的分界線——一張函式指標表，把「怎麼讀分區／讀 rollback／裝置有沒有解鎖／公鑰對不對」等平台細節交給廠商。**AVB 的實際強度取決於這裡有沒有偷工** |
+| **`validate_vbmeta_public_key`** | `AvbOps` 回呼，決定「簽 vbmeta 的這把公鑰是不是我認可的 OEM 金鑰」。libavb 只驗「有被某把私鑰簽過」，這一刀由廠商補上 |
+| **`read_rollback_index` / `write_rollback_index`** | `AvbOps` 回呼，接到 **RPMB** 才有防回滾效果；被 stub 成永遠回 0 是常見的安全弱化 |
+| **`read_is_device_unlocked`** | `AvbOps` 回呼，回報 bootloader 鎖定狀態，決定驗證失敗要不要擋開機 |
+| **`avb_slot_verify()`** | libavb 總入口，吃 `requested_partitions`（`boot`／`init_boot`／`vendor_boot`／`dtbo`）、`ab_suffix`（`_a`／`_b`）等參數 |
+| **`AVB0`** | vbmeta header 開頭 4 bytes 的 magic（小端讀成 `0x30425641`），逆向時用來定位 header 解析點。**header 所有多位元組欄位都是 big-endian** |
+| **CHAIN_PARTITION descriptor** | 把某分區的驗證「轉交」給它自己的 vbmeta + 指定公鑰，是 `vbmeta_system` 等多份 vbmeta 存在的原因；逆向時漏追會少掉半條驗證鏈 |
+| **`AVB_SLOT_VERIFY_FLAGS_ALLOW_VERIFICATION_ERROR`** | 解鎖裝置會帶的旗標，讓「驗證失敗」不等於「停止開機」；看漏它會誤以為某台機器根本沒在驗 |
+| **`androidboot.verifiedbootstate=`** | 驗證結果（`green`／`yellow`／`orange`／`red`）透過 kernel cmdline 傳給 Android，後續影響 KeyMaster attestation。搜這個字串的 xref 是定位整段 AVB 流程最快的路 |
+
+---
+
+## 十五、remount 與 OverlayFS
+
+> 出自 [從 `mount -o remount` 到 OverlayFS](../android-remount-deep-dive.md)。
+
+| 名詞 | 說明 |
+|---|---|
+| **remount** | VFS 層語意是「不卸載、不重建 mount point，只改既有 superblock 的 mount flags」。因為 `/system`／`/vendor` 永遠有開啟中的 fd，`umount` + `mount` 不可行，remount 是唯一路徑 |
+| **EROFS** | Enhanced Read-Only File System，壓縮唯讀檔案系統，並在 block 層做去重（shared blocks）。**設計上就沒有寫入路徑**，`remount,rw` 對它不是被禁止而是語意不存在 |
+| **right-sizing** | build 系統把每個 logical partition 縮到剛好裝得下內容，好把空間還給 `super` 的動態配置池；結果是唯讀分區幾乎沒有 free space |
+| **overlayfs（Android 用法）** | `adb remount` 從 Android 10 起的實作：lower = 唯讀原分區、upper = 可寫 backing storage，疊起來掛在原掛載點。**你看到的是「出廠 image + 你的 diff」的合成視圖，不是出廠 image** |
+| **`scratch`** | A/B 裝置上 fs_mgr 在 `super` 裡動態建立、掛在 `/mnt/scratch/overlay` 的 backing storage 邏輯分區。**是保留名稱**，BSP 不能拿去命名別的分區 |
+| **copy-up** | overlayfs 的語意：改動一個檔案會把**整個檔案**複製到 upper layer。改一行的 40 MB `.so` 就佔掉 40 MB，是 scratch 爆掉的主因 |
+| **`adb remount -R`** | 需要時自動關 verity 並重開機；已在 remount 狀態則不多此一舉重開 |
+| **`adb enable-verity`** | 解除 overlay、還原到修改前狀態；也是清掉 scratch、排除「行為與檔案內容對不上」這個變因的手段 |
+| **`override_creds`** | android-common 為 overlayfs 加的 mount option，用來調和 Android 嚴格的 SELinux least-privilege 模型與 overlayfs 預設行為；主線 kernel 自組的板子容易在這裡出問題 |
+
+---
+
+## 十六、虛擬化與隔離（AVF / Microdroid）
+
+> 出自 [Microdroid：Android 為什麼要在手機裡再開一台 Android](../Microdroid.md)。
+
+| 名詞 | 說明 |
+|---|---|
+| **AVF（Android Virtualization Framework）** | 整套虛擬化框架的統稱，不是某個程式 |
+| **pKVM（protected KVM）** | 做隔離的 hypervisor 本體，跑在 **EL2**；把 Android 的 Linux kernel 留在 EL1 並**降權**，使 host kernel 不再是 guest 的 TCB 的一部分 |
+| **pVM（protected VM）** | 被 pKVM 保護的 guest，是容器概念；裡面裝 Microdroid 或別的 OS 都可以 |
+| **Microdroid** | 裝進 pVM 的**極簡 Android based guest OS**。有 Bionic／Verified Boot／SELinux／APEX／Binder RPC；**沒有** `android.*` Java API、SystemServer、Zygote、UI、HAL |
+| **crosvm** | Rust 寫的 VMM，模擬 virtio 裝置、組裝 composite disk image |
+| **VirtualizationService / `virtmgr`** | Android 主機側的管理服務，配 CID、生成磁碟、以引用計數管理 VM 生命週期（client 放掉 `IVirtualMachine` 就關 VM） |
+| **記憶體捐贈（memory donation）** | 建 pVM 時 host 把頁面捐給 guest，hypervisor 轉移所有權並從 host 的 **stage 2** 頁表拿掉；host 拿著實體位址也解不開。要通訊得由 guest 主動 hypercall 分享回去 |
+| **MMIO guard** | guest 對 MMIO 的存取被 trap 給 hypervisor，而非任意穿透 |
+| **FF-A（Firmware Framework for Arm）** | pKVM proxy SMC 到 TrustZone 時用的框架，防 confused deputy——host 不能叫 TrustZone 去讀它自己讀不到的 buffer |
+| **`pvmfw`（protected VM firmware）** | guest 裡執行的第一段程式，角色等同實體裝置的 Boot ROM：驗下一階段 bootloader，並用 `instance` 映像維持這台 VM 的身分一致性 |
+| **`microdroid_manager`** | VM 內部的驗證決策者：解密 instance 映像、讀公鑰與 rollback counter、用 Binder RPC 與 host 的 VirtualizationService 通訊、從 APK config 讀出 main binary 並執行 |
+| **`zipfuse`** | Microdroid 的 FUSE 檔案系統，把 client APK（本質是 Zip）**不解壓縮**直接掛成檔案系統——省資源，也讓逐塊驗證能一路帶到讀取那一刻 |
+| **`instance` 分割區** | 加密分割區，持久保存 per-instance 的 verified boot 資料（公鑰、rollback counter）。撐起「這台 VM 是同一台」這個概念 |
+| **sealing key** | 從開機鏈量測值推導出的**穩定**封存金鑰。程式碼改了 → 量測值變了 → 金鑰變了 → 舊資料自動解不開，不需要額外的防竄改檢查 |
+| **attestation key** | 簽章用，向外證明「我是誰、我跑的是什麼」 |
+| **vsock** | pVM 唯一的通訊管道（沒有網路概念），用 32-bit **CID** 定位，類比 IP 位址 |
+| **Binder RPC** | 把 Binder 從 kernel driver 上的 IPC 擴展成 socket 上的 RPC（client 用 `RpcSession`、server 用 `RpcServer`），使同一套 AIDL 介面可以跨 VM 邊界 |
+| **AuthFS** | 跨 pVM 邊界、雙方互不信任時的檔案交換；在**每一次存取操作**做透明完整性檢查（類比 `fs-verity`），才擋得住 TOCTOU |
+| **debug level（FULL / NONE）** | FULL 開放 adb／logcat／tombstone／gdb，NONE 全關。**差別是安全等級不是方便程度**——debuggable 的 pVM 等於把 guest 攤開給 host 看，production 應用 NONE |
+
+---
+
+## 十七、協同處理器攻擊面（GXP 案例）
+
+> 出自 [Pixel 8 GXP DSP 漏洞與 MTE 繞過](../pixel8-gxp-dsp.md)。
+
+| 名詞 | 說明 |
+|---|---|
+| **GXP（Google eXtended Processing）** | Google 自研的影像處理 DSP，2022 年隨 Pixel 7 引入；零公開文件、零 toolchain，Google Camera 等系統 App 依賴它 |
+| **攻擊面分層** | Universal（unix socket／binder／pipe）→ Chipset-specific（Mali／Qualcomm GPU/DSP）→ Vendor-specific（Samsung NPU／KNOX）→ Model/Module-specific。**越往下防護越薄、影響範圍也越窄** |
+| **DMA direction 信任錯誤** | `gxp_mapping_create()` 正確地從 VMA 取得 CPU 端屬性，卻直接採用 user 傳入的 `mapping_dir` 去設 DSP MMU，兩者未比對。傳 `DMA_BIDIRECTIONAL` 即可讓 DSP 認為唯讀頁面可寫 |
+| **write read-only memory primitive** | CPU 端視為唯讀的實體頁面可透過 DSP 任意寫入。**MTE 對此完全無感**——它保護的是 CPU 端存取的合法性，不涉及 DMA 路徑 |
+| **Replay attack（研究方法）** | 不硬啃閉源 firmware，改用「SELinux policy 找出誰在正常使用這個 device → Frida 錄下 production App 的實際 call flow → 把真實行為當非官方 SDK 重放」 |
+| **Library hijacking + PID 遍歷** | 覆寫 camera provider 的 library 後，利用「開機早期 daemon 的 PID 落在小而穩定的範圍」逐一 kill，靠 init 自動拉起以觸發重載 |
