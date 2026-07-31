@@ -98,6 +98,7 @@ sidebar_position: 6
 | 文章 | 內容 |
 |---|---|
 | [MediaTek UART APDMA：從 Virtual FIFO 硬體模型讀懂 `mtk-uart-apdma.c`](../mtk-uart-apdma.md) | 對照 upstream `drivers/dma/mediatek/mtk-uart-apdma.c` 與 `8250_mtk.c` 逐段讀：為何高速 UART（BT/GNSS/modem）需要 DMA、**VFF（Virtual FIFO）** 的 ring buffer + 硬體讀寫指標模型、用額外一個 wrap bit 解 full/empty 歧義、TX/RX 中斷門檻為何刻意不對稱、完整 register map、建立在 virt-dma 之上的三層結構、TX/RX/terminate 三條路徑，以及 DT 綁定與 32→35 bit 定址演進。附八點除錯清單，重點是**兩種無聲降級**（port 是 console 就強制關 DMA、`dma-names` 數量不對就靜默退回 PIO）。文末區分公開來源與作者推論 |
+| [Hibernation：一份可以寫回 kernel 記憶體的快照](../hibernation.md) | 換一個角度看 S4——重點不是省電，而是「**hibernation image 是一份可以被完整寫回 kernel 記憶體的資料**」。先建立 ACPI 電源狀態座標，再講 swsusp 怎麼做出 snapshot、image 在 swap 裡的長相；最反直覺的是**過程中存在兩個 kernel**（做 snapshot 的與 resume 時載入的）。`dev_pm_ops` 四組 callback（suspend/freeze/poweroff/restore）的語意差異與最常見的 bug 模式、freezer 為何是協作式而非搶佔式、**信任鏈在這裡斷開**的安全問題，以及分階段隔離／`pm_trace`／image 太大等除錯手法。最後解釋 ARM/Android 為何幾乎不用 S4，並區分同名不同物的 Android App Hibernation |
 | [PMU、Ftrace、EMI：SoC 效能問題的三個觀測層次](../pmu-ftrace-emi.md) | 三個常被混在一起的縮寫，其實是 **CPU 微架構層 / 作業系統層 / 記憶體子系統層** 三個互補視角。先拆一詞多義（PMU = Performance Monitoring Unit 或 Power Management Unit；EMI = External Memory Interface 或電磁干擾），再講各自怎麼用：`perf` 與 counter multiplexing、big.LITTLE 的 event 編碼陷阱；Ftrace 的 tracer 種類、filter 為何不能省、Android 上 atrace/Perfetto 的資料來源就是它；EMI MPU violation log 與頻寬計數器。最後用「畫面偶爾卡頓」示範三層怎麼串著看 |
 
 ---

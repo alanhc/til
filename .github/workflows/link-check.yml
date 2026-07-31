@@ -36,14 +36,25 @@ jobs:
           #   --accept 403: academic/publisher sites (doi.org, medium, ACM,
           #     researchgate, arm developer...) return 403 to bots, not real 404s
           #   --accept 429: rate limited, treated as alive
+          #   --accept 202: IEEE Xplore answers bot requests with 202 + a JS
+          #     challenge; verified alive in a normal browser
+          #   exclude gitbooks.io: serves 401 to non-browser UAs (0xax
+          #     linux-insides is alive; confirmed 200 with a browser UA)
+          #   exclude edn.com: refuses connections from CI runners entirely
+          #     (HTTP/2 protocol error), not a dead page
+          #   exclude gemini.google.com: private chat links kept as source
+          #     provenance; only openable by the author, never by a reader
           args: >-
             --base https://alanhc.github.io
             --exclude "alanhc\.github\.io"
+            --exclude "gitbooks\.io"
+            --exclude "edn\.com"
+            --exclude "gemini\.google\.com"
             --exclude-all-private
             --no-progress
             --max-concurrency 8
             --max-retries 2
             --timeout 30
-            --accept 200,206,403,429
+            --accept 200,202,206,403,429
             "build/**/*.html"
           fail: true

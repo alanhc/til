@@ -84,6 +84,7 @@ sidebar_position: 0
 | [SELinux 是什麼？為什麼 Android 韌體工程師必須懂它](../selinux.md) | **深入版**：MAC vs DAC、LSM hooks / AVC / selinuxfs 元件、Treble 後的 sepolicy 四層架構、從 denial 反推 owner 的四種方法、為何是 CTS/GMS 出貨硬條件 |
 | [adb logcat 與 UART：Android 除錯的兩把刀](../adb-logcat-vs-uart.md) | 兩者為何不能互相取代：logcat 走 Android log buffer（tag／優先級／`--pid`／crash buffer 過濾），UART 是硬體直連的序列 console，看得到 bootloader／`printk`／panic 死前最後幾行。附開機七階段（Boot ROM → SPL/BL1·BL2 → U-Boot/ABL → Kernel → init → Zygote → Boot completed）與 JTAG／UART／adb 的可用性對照表與圖，以及 watchdog／ANR／tombstone／bootloop 等相關名詞速查 |
 | [從 `mount -o remount` 到 OverlayFS：Driver 開發者必須弄懂的 remount 機制](../android-remount-deep-dive.md) | **深入版**：為何現代 Android 分區改不動——dm-verity／AVB、dynamic partition right-sizing 沒有剩餘空間、EROFS 根本不可寫三道約束；AOSP 的解法是把 `adb remount` 重新實作成 **overlayfs**（lower = 唯讀原分區，upper = `/cache/overlay` 或 `super` 裡的 `scratch` 邏輯分區），所以你看到的是「出廠 image + 你的 diff」的合成視圖。含標準流程、對 driver／HAL／firmware／`init.*.rc`／vendor sepolicy 的迭代價值，以及九條踩坑（first stage init 與 ramdisk 蓋不到、空間會爆、remount 過的機器不能吃 OTA、bootloader fastboot 刷機不會被偵測到） |
+| [SurfaceFlinger：Android 畫面是怎麼被「合成」出來的](../surfaceflinger-composition-and-debugging.md) | 從「開分割畫面就耗電、滑動掉幀但 App profiler 正常」這類 bug 出發：SurfaceFlinger 的定位、BufferQueue → **BLAST**（Android 12+）的資料流變化、VSYNC 與 Choreographer 的節奏。核心是**Device Composition（HWC 硬體合成）vs Client Composition（GPU 合成）這個分歧點**——fallback 到 GPU 為何直接反映在功耗與溫度上、哪些情況會 fallback（層數超過、格式/縮放不支援、有 blur/圓角）、平板多視窗場景為何特別容易踩到。除錯五件套：`dumpsys SurfaceFlinger`、TimeStats、Perfetto、Winscope/Layer Trace 與建議的檢查順序 |
 | [效能實驗：Codec 判讀](../performance_experient.md) | YouTube debug overlay 判讀硬解／軟解、`[exo2]` vs `[plat]`、VP9 Profile 2 HDR fallback、掉幀分析 |
 
 ---
@@ -129,6 +130,33 @@ sidebar_position: 0
 
 ---
 
+## 十一、Chip Vendor 視角系列（16 篇）
+
+> 一個完整系列，從 **SoC 廠（chip vendor）維護 BSP** 的角度重走 Android 平台工程：你的地盤在哪、Google 劃了哪些邊界、交付什麼給客戶、出貨前要過哪些關。與第九節（供應鏈三篇）互補——那邊講制度，這邊講日常操作。
+>
+> 建議照編號順序讀；01 是總覽，16 附系列全目錄。
+
+| 文章 | 內容 |
+|---|---|
+| [01 Android Build System：Chip Vendor 視角](../01-android-build-system-chip-vendor.md) | **系列總覽**：repo + manifest 如何把 AOSP／SoC BSP／客戶專案三種來源組起來、`envsetup` → `lunch` → Soong/Kati → Ninja 的引擎鏈、product 層 vs board 層兩條設定軸線與繼承鏈（SoC 公版 → 客戶專案）、Treble／GKI／sepolicy 三道邊界，以及最終產出的 partition 與 image |
+| [02 GKI 與 Kleaf Kernel Build](../02-gki-kleaf-kernel-build.md) | kernel 碎片化的四層蛋糕（上游 LTS + Google patch + SoC patch + ODM patch）如何逼出 GKI；從 `build.sh` 到 **Kleaf**（Bazel-based）的實際操作、vendor 自己的 `BUILD.bazel`、接回 platform build；**KMI** 的工程紀律：symbol list 要先登記、ABI 檢查、boot image 重組，附常見坑 |
+| [03 Soong 與 Android.bp：vendor variant 與 VNDK](../03-soong-android-bp-vendor-vndk.md) | Soong 的宣告式哲學、`cc_defaults` 與 `soong_config` 條件式設定；重點是 **`vendor: true` 到底做了什麼**——image variant 概念、vendor module 能 link 誰、VNDK 的歷史與現況、runtime 第二道牆 linker namespace。含交付 prebuilt blob、stable AIDL HAL、`.mk` → `.bp` 遷移三個典型場景 |
+| [04 SELinux Sepolicy 除錯實戰](../04-selinux-sepolicy-debugging.md) | Treble 後 policy 的目錄結構，以及一套系統化流程：Step 0 先確認真的是 SELinux → 抓 denial → `audit2allow` 產候選規則 → **放進正確的 `.te` 檔** → 確認 label 本身是對的 → 重 build 驗證。關鍵在「`audit2allow` 之外：判斷該不該 allow」與 neverallow／chip vendor 特有的坑 |
+| [05 OTA 與簽章流程](../05-ota-signing-flow.md) | 金鑰體系（APK 四把 platform key、AVB 金鑰、其他）、**target-files 是簽章與 OTA 的中樞**、`sign_target_files_apks` 換 key、`ota_from_target_files` 產包；A/B seamless update 機制與 full/incremental 包差異、量產前檢查清單，以及「開發期正常、換 release key 後開不了機」這類常見事故現場 |
+| [06 xTS 認證測試：CTS/VTS/GTS/STS](../06-xts-compliance-testing.md) | **過不了 xTS，客戶拿不到 GMS 授權就不能出貨**。四套測試的分工與誰最痛、與 chip vendor 最相關的 VTS（Treble 合約的執法者）／CTS-V／STS（security patch 查核）、Tradefed 工作流與分析 fail 的標準流程，以及把 xTS 工程化的做法 |
+| [07 開機流程與 Bootloader](../07-boot-flow-bootloader.md) | 完整開機鏈 BootROM/PBL → SBL/preloader → ABL/LK/U-Boot → kernel → first/second stage init → Zygote → 桌面，重點是**各階段能用什麼手段除錯**的對照表（卡在哪一階段決定你該抓什麼 log） |
+| [08 HAL 開發實戰：AIDL 介面到開機起服務](../08-hal-development-aidl.md) | **把 03（Android.bp）／04（sepolicy）／01（VINTF）串成一條線**：以一支 thermal 擴充 HAL 為例，從 HIDL → stable AIDL 的背景，走完定義 `aidl_interface` → 實作 service → `init.rc` + VINTF 讓它開機起來且被找到 → sepolicy 讓它活下來 → 掛進 product 驗證 → 版本演進與多實例 |
+| [09 Android 年度版本升級方法論](../09-annual-android-upgrade.md) | chip vendor 最大的例行專案：時間軸與策略、Phase 0 評估（寫 code 之前）、Merge 策略與 conflict 分類、公版 bringup、認證 release；含「vendor 與 system 同時升級」的完全體情境（開發期需要一個不動的錨、版本對齊機制、OTA 原子性、測試矩陣變化）與降低明年痛苦的結構性投資 |
+| [10 效能與功耗調校](../10-performance-power-tuning.md) | 控制點地圖（kernel 層／HAL-framework 邊界／framework 之上各自誰在決定快慢耗電）、量測工具鏈以 **Perfetto** 為主力加功耗量測與基準場景庫；調校方法論分 jank 與功耗兩條標準流程，並把 thermal 定位成「效能與功耗的仲裁者」 |
+| [11 Camera 與多媒體 Pipeline](../11-camera-multimedia-pipeline.md) | 三條 pipeline（相機／Codec2 編解碼／顯示）與它們共用的地基 **graphics buffer 的一生**；各自的架構、chip vendor 的責任區與踩坑，附除錯工具速查。這是 BSP 中最複雜、xTS fail 最集中的領域 |
+| [12 Ramdump 與穩定性除錯](../12-ramdump-stability-debugging.md) | 症狀分類（kernel panic／watchdog／native crash／ANR／低機率當機）先分流；kernel 層取證用 **pstore/ramoops**（最便宜的黑盒子）與 ramdump 全記憶體解剖，userspace 用 tombstone／ANR trace／bugreport；低機率問題的攻堅方法，以及「穩定性是指標不是事件」的組織面 |
+| [13 工廠與量產流程](../13-factory-production-flow.md) | 網路上資料最少但每家都要做的一塊：量產軟體的組成、典型產線流程，以及燒錄、**校準（calibration）**、序號化與金鑰灌注、出貨態 final fusing 四個關鍵技術點，加上返修售後路徑與交付形式 |
+| [14 Android 上的 Rust](../14-rust-on-android.md) | 動機很直接——歷年 Android 安全漏洞約七成是記憶體安全問題。Rust 目前已進入系統的哪些位置、Soong 的原生支援（`rust_binary`／`rust_library`）、chip vendor 的採用策略（先吃甜區、kernel driver 該不該上、組織準備） |
+| [15 Project Mainline 與 APEX](../15-mainline-apex-vendor-impact.md) | Treble 拆開 vendor/system，Mainline 更進一步把 system 的一部分交給 Google 從 Play 直接更新——代表**你以為凍結的 framework 其實每月都在變**。APEX 容器與模組群、「配置漂移」對驗證組合的衝擊、MTS 與認證，以及反過來把 vendor APEX 為己所用 |
+| [16 多專案 BSP 的 Branch 與 Manifest 管理](../16-bsp-branch-manifest-management.md) | **系列完結**：面對「5 顆 SoC × 3 個 Android 版本 × 上百個客戶專案 × 每月 security patch」，repo/manifest 的管理模式、三層分支模型與版本維度、與客戶的邊界、CI 與工程紀律，以及常見反模式。文末附系列全目錄 |
+
+---
+
 ## 建議閱讀順序
 
 **想從零 build 一個 Pixel ROM：**
@@ -162,11 +190,11 @@ Android 平台架構
 | 主題 | 為什麼重要 | 狀態 |
 |---|---|---|
 | **Binder / IPC 深入** | Android 一切跨程序溝通的底座——system service 呼叫、AIDL、app 生命週期、`dumpsys` 全都跑在 Binder 上。名詞表有列 Binder，但沒有一篇講它的 driver 機制、transaction、`ServiceManager` 註冊流程 | 待補 |
-| **A/B Seamless OTA 機制** | 刷機（fastboot）已有完整筆記，但**線上更新**怎麼送——`update_engine`、payload 結構、寫入備用 slot、開機失敗自動 rollback——完全沒有。這是出貨後維運的關鍵 | 待補 |
+| **A/B Seamless OTA 機制** | 刷機（fastboot）已有完整筆記，但**線上更新**怎麼送——`update_engine`、payload 結構、寫入備用 slot、開機失敗自動 rollback——完全沒有。這是出貨後維運的關鍵 | ✅ 已補：[05 OTA 與簽章流程](../05-ota-signing-flow.md) |
 | **init / property system 深入** | `init.rc` 語言、`.rc` trigger、property service 與 `ro.*`/`persist.*` 的儲存與 selabel。Boot flow 帶到 init，但沒有把 Android Init Language 與 property 機制單獨講清楚 | 待補 |
-| **HIDL / AIDL HAL 撰寫實作** | 不只是「知道有這個介面」，而是實際寫一支 HAL：`.aidl` 定義 → 產生 stub → binderized service 註冊 → framework 端呼叫。整合團隊天天碰 | 待補 |
-| **Perfetto / systrace / ANR 分析** | `adb` 筆記涵蓋基本指令，但系統化的 framework 除錯——用 Perfetto 抓 trace、判讀 ANR、看 scheduling／binder latency——是效能與卡頓問題的主戰場 | 待補 |
-| **CTS / VTS 實際跑法** | SELinux 那篇點出 CTS 是出貨硬條件，但沒有一篇講怎麼實際跑 `run cts`、判讀 fail、VTS 測 HAL 相容性。GMS 認證的實務缺口 | 待補 |
+| **HIDL / AIDL HAL 撰寫實作** | 不只是「知道有這個介面」，而是實際寫一支 HAL：`.aidl` 定義 → 產生 stub → binderized service 註冊 → framework 端呼叫。整合團隊天天碰 | ✅ 已補：[08 HAL 開發實戰](../08-hal-development-aidl.md) |
+| **Perfetto / systrace / ANR 分析** | `adb` 筆記涵蓋基本指令，但系統化的 framework 除錯——用 Perfetto 抓 trace、判讀 ANR、看 scheduling／binder latency——是效能與卡頓問題的主戰場 | ✅ 已補：[10 效能與功耗調校](../10-performance-power-tuning.md)、[12 Ramdump 與穩定性除錯](../12-ramdump-stability-debugging.md)、[SurfaceFlinger](../surfaceflinger-composition-and-debugging.md) |
+| **CTS / VTS 實際跑法** | SELinux 那篇點出 CTS 是出貨硬條件，但沒有一篇講怎麼實際跑 `run cts`、判讀 fail、VTS 測 HAL 相容性。GMS 認證的實務缺口 | ✅ 已補：[06 xTS 認證測試](../06-xts-compliance-testing.md) |
 | **FBE 檔案系統加密** | dm-verity 與 AVB 已在 [AVB 深入解析](../Android-Verified-Boot-AVB.md) 涵蓋，但**檔案加密**這塊還沒有：File-Based Encryption、metadata encryption、`/data` 如何綁定硬體金鑰、解鎖為何一定清資料的根因 | 待補 |
 
 > 已補上的缺口：**GKI／KMI** 見 [Android Kernel](../android-kernel.md)、**Treble／VINTF** 見 [Vendor Freeze](../vendor-freeze.md)（第九節）、**SoC bring-up** 見 [Bring-up](../bringup-article.md)（列於 [Embedded 系列索引](embedded_index.md)）。

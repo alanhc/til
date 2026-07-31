@@ -26,3 +26,6 @@ yarn-error.log*
 # Personal (not for publishing)
 interview-prep-plan.md
 coscup*.md
+
+# Claude Code local worktrees (accidentally committed as a gitlink before)
+.claude/worktrees/

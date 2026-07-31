@@ -1,4 +1,4 @@
-https://gemini.google.com/app/342fdad855ec58d8?hl=zh-TW
+> 來源：作者的 Gemini 對話 `gemini.google.com/app/342fdad855ec58d8`（私人連結，僅作者本人可開啟）
 
 adb reboot bootloader
 

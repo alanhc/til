@@ -558,3 +558,76 @@ sidebar_position: 1
 | **write read-only memory primitive** | CPU 端視為唯讀的實體頁面可透過 DSP 任意寫入。**MTE 對此完全無感**——它保護的是 CPU 端存取的合法性，不涉及 DMA 路徑 |
 | **Replay attack（研究方法）** | 不硬啃閉源 firmware，改用「SELinux policy 找出誰在正常使用這個 device → Frida 錄下 production App 的實際 call flow → 把真實行為當非官方 SDK 重放」 |
 | **Library hijacking + PID 遍歷** | 覆寫 camera provider 的 library 後，利用「開機早期 daemon 的 PID 落在小而穩定的範圍」逐一 kill，靠 init 自動拉起以觸發重載 |
+
+---
+
+## 十八、Chip Vendor BSP 與交付
+
+> 出自 [Chip Vendor 視角系列](android_index.md) 01／03／16。既有的 Soong／`Android.bp`／VNDK／Treble／VINTF 定義見第三節。
+
+| 名詞 | 說明 |
+|---|---|
+| **BSP（Board Support Package）** | Chip vendor 交付給 OEM/ODM 的整包東西：device tree、kernel、HAL、prebuilt blob、工具鏈。「維護一份 BSP 讓客戶能 build 出整台裝置的所有 image」就是 chip vendor 的工作定義 |
+| **manifest server** | Chip vendor 自建的 manifest 服務，把 AOSP 上游、自家 SoC BSP、客戶專案三種來源組成一份可 `repo sync` 的 XML |
+| **local manifest** | `.repo/local_manifests/` 底下的補充 XML，用來在不改主 manifest 的前提下增刪 project——客戶專案客製的常見手法 |
+| **product 層 vs board 層** | 兩條互相獨立的設定軸線：product（`AndroidProducts.mk`／`device-vendor.mk`，決定「裝什麼軟體」）與 board（`BoardConfig.mk`，決定「硬體長什麼樣」）。分不清這兩條是新手改錯地方的主因 |
+| **繼承鏈（product inheritance）** | SoC 公版 → 客戶專案層層 `$(call inherit-product,...)`；愈上層愈通用，客戶只覆寫差異部分 |
+| **image variant** | 同一份原始碼因 `vendor: true` / `product: true` 等屬性被編成多份 variant，各自連結不同的 library 集合。這是 Treble 在 build 層的落實 |
+| **`vendor: true`** | 把 module 標為 vendor variant，直接決定它裝到哪個 partition、能 link 誰。牽動 Treble 分離與 VNDK 連結規則 |
+| **`cc_defaults`** | Soong 的設定範本，讓公版與多個客戶專案共用同一組編譯選項，是公版工程的必備 |
+| **`soong_config`** | Soong 的條件式設定機制，用來在不 fork 原始碼的前提下依產品開關功能 |
+| **linker namespace** | Runtime 的第二道牆：即使 build 期連結過關，執行期 linker 仍依 namespace 規則決定 vendor 程序能載入哪些 `.so` |
+| **prebuilt blob 交付** | 以 prebuilt module 或 `PRODUCT_COPY_FILES` 形式把編好的二進位給客戶，原始碼不出門——chip vendor 保護 IP 的標準做法 |
+| **三層分支模型** | 應對「SoC × Android 版本 × 客戶專案 × 每月 security patch」的組合爆炸：公版主線 → 版本分支 → 客戶專案分支，搭配明確的 cherry-pick 方向規範 |
+
+---
+
+## 十九、Kernel 交付：Kleaf 與 KMI
+
+> 出自 [02 GKI 與 Kleaf Kernel Build](../02-gki-kleaf-kernel-build.md)。GKI 本身的定義見第三節。
+
+| 名詞 | 說明 |
+|---|---|
+| **四層蛋糕** | GKI 之前每家 vendor 的 kernel ＝ 上游 LTS + Google patch + SoC patch + ODM patch，四層各自魔改導致無法共用更新，是 GKI 要終結的碎片化 |
+| **Kleaf** | Bazel-based 的 kernel build 系統，取代舊的 `build.sh`。Vendor 用自己的 `BUILD.bazel` 定義 kernel build，再接回 platform build |
+| **KMI（Kernel Module Interface）** | GKI 核心與 vendor module 之間的穩定 ABI；有了它 Google 才能單獨更新 kernel 而不重編 vendor module |
+| **symbol list** | Vendor 要用的 kernel symbol 必須先登記進 symbol list，才會被納入 KMI 保護範圍。沒登記的 symbol 隨時可能消失 |
+| **ABI 檢查** | build 時比對目前 kernel 的 ABI 與凍結的基準，任何破壞 KMI 的改動會直接擋下來——把「相容性」從人工紀律變成 CI 檢查 |
+
+---
+
+## 二十、量產、簽章與認證
+
+> 出自 [05 OTA 與簽章](../05-ota-signing-flow.md)、[06 xTS 認證測試](../06-xts-compliance-testing.md)、[13 工廠與量產流程](../13-factory-production-flow.md)。
+
+| 名詞 | 說明 |
+|---|---|
+| **target-files** | 簽章與 OTA 的中樞產物：一包含有所有 image 素材與 metadata 的 zip，換 key 與產 OTA 包都從它出發，而不是從已簽好的 image |
+| **`sign_target_files_apks`** | 把 dev key 簽的 target-files 換成 release key 的工具。**「開發期正常、換 release key 後開不了機」的事故就發生在這一步的前後** |
+| **`ota_from_target_files`** | 從 target-files 產出 OTA 包（full 或 incremental）的工具 |
+| **release key vs test key** | AOSP 預設用公開的 test key（`releasekey`／`platform`／`shared`／`media` 四把的測試版）；量產必須換成自家保管的 release key，否則任何人都能簽出你的系統更新 |
+| **Tradefed（Trade Federation）** | Google 的測試框架，xTS 全家都跑在上面；`run cts`／`run vts` 這類指令與結果報告都由它產生 |
+| **MTS（Mainline Test Suite）** | 針對 Mainline 模組的測試套件，因 APEX 每月更新而存在 |
+| **calibration（校準）** | 產線關鍵工序：RF 功率、sensor 零點、camera 色彩／對焦、螢幕白平衡等逐台量測並把參數寫進裝置。校準資料遺失＝機器功能不正常但外觀正常，返修最難查 |
+| **序號化與金鑰灌注** | 產線寫入 IMEI／SN 與各種裝置專屬金鑰的步驟，通常在安全環境下進行且不可逆 |
+| **final fusing（出貨態）** | 產線最後把 eFuse 燒成出貨狀態（鎖 bootloader、關 debug 通道、啟用 secure boot）。**燒完不可逆**，燒早了機器就無法再進產測 |
+| **pstore / ramoops** | 保留一塊記憶體跨重開機存活，把 panic 前的 kernel log 留下來——「最便宜的黑盒子」，量產機上最常靠它取證 |
+| **Perfetto** | Android 現行的主力 trace 工具（取代 systrace），同時涵蓋 kernel ftrace 與 userspace atrace，是 jank／功耗／binder latency 分析的主戰場 |
+
+---
+
+## 二十一、圖形合成（SurfaceFlinger）
+
+> 出自 [SurfaceFlinger：Android 畫面是怎麼被「合成」出來的](../surfaceflinger-composition-and-debugging.md)。
+
+| 名詞 | 說明 |
+|---|---|
+| **SurfaceFlinger** | 系統的合成器：把所有 App 與系統 UI 的 layer 合成為一張最終畫面送給顯示硬體 |
+| **BufferQueue** | 傳統的 producer/consumer buffer 傳遞模型，App 是 producer、SurfaceFlinger 是 consumer |
+| **BLAST（Buffer as LayerState）** | Android 12 之後的新模型，把 buffer 提交與 layer 狀態變更合併成一次 transaction，減少同步往返 |
+| **VSYNC** | 顯示硬體的垂直同步訊號，是整個繪製與合成節奏的時基；SurfaceFlinger 依它排程 |
+| **Choreographer** | App 端對應 VSYNC 的節拍器，決定 UI thread 何時執行 input／animation／draw |
+| **HWC（Hardware Composer HAL）** | 決定每個 layer 由顯示硬體直接合成（**Device Composition**）還是丟回 GPU 畫（**Client Composition**）的仲裁者 |
+| **Device vs Client Composition** | 本篇的核心分歧點：走 HWC 幾乎不耗 GPU，**fallback 到 GPU 合成則直接反映在功耗與溫度上**。層數超過硬體上限、格式／縮放不支援、有 blur/圓角等效果都可能觸發 fallback；平板多視窗場景特別容易踩到 |
+| **TimeStats** | SurfaceFlinger 內建的統計式 jank 資料來源，適合回答「掉幀有多頻繁」而非「這一幀為什麼掉」 |
+| **Winscope / Layer Trace** | 錄下 layer 樹與 transaction 變化並可逐幀回放的工具，用來查「畫面上為什麼多/少了一層」 |

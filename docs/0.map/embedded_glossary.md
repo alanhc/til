@@ -284,3 +284,19 @@ sidebar_position: 7
 | **EMI（External Memory Interface）** | SoC 語境下 EMI 多半指外部 DRAM 的控制器子系統，是全晶片所有 master 搶頻寬的匯流點；不是電磁干擾 | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
 | **EMI MPU（Memory Protection Unit）** | 把實體記憶體切 region 並限定哪些 master domain 可讀寫；violation log 會印出違規位址與**來源 master**，直接指出「是誰」踩到記憶體 | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
 | **三層觀測法** | Ftrace 答「時間花在哪」→ PMU 答「這些 cycle 是有效工作還是 stall」→ EMI 答「這是我的問題還是鄰居的問題」。避免拿著 `perf` 死盯 CPU 而瓶頸在別的 master | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
+
+### Hibernation 與電源管理
+
+> 出自 [Hibernation：一份可以寫回 kernel 記憶體的快照](../hibernation.md)。
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **S3 / S4** | S3 = suspend to RAM（記憶體持續供電）；S4 = suspend to disk / hibernation（記憶體內容寫到儲存裝置後完全斷電） | [hibernation](../hibernation.md) |
+| **swsusp** | Linux 的 hibernation 實作，負責凍結系統、做出記憶體 snapshot 並寫進 swap | [hibernation](../hibernation.md) |
+| **hibernation image** | 寫進 swap 的記憶體快照。本篇的核心視角：**它是一份可以被完整寫回 kernel 記憶體的資料**——所以它同時是一個攻擊面，而不只是省電機制 | [hibernation](../hibernation.md) |
+| **兩個 kernel** | Hibernation 最反直覺之處：做 snapshot 的 kernel 與 resume 時被載入的 kernel 是不同的執行實例，中間隔著一次完整開機 | [hibernation](../hibernation.md) |
+| **`dev_pm_ops`** | Driver 的電源管理 callback 表；`suspend`／`freeze`／`poweroff`／`restore` 四組語意不同，混用是最常見的 bug 模式 | [hibernation](../hibernation.md) |
+| **freezer** | 凍結行程的機制，是**協作式而非搶佔式**——需要各方配合到達可凍結點，不配合的行程會讓 hibernation 卡住 | [hibernation](../hibernation.md) |
+| **信任鏈斷開** | Secure boot 驗的是開機映像，但 resume 是把一份存在 swap 的 image 寫回記憶體；若這份 image 未經驗證，等於繞過整條開機信任鏈 | [hibernation](../hibernation.md) |
+| **`pm_trace`** | 完全沒有輸出時的除錯手段，把 suspend/resume 進度寫進 RTC，重開機後讀回來定位卡在哪個 device | [hibernation](../hibernation.md) |
+| **Android App Hibernation** | 同名不同物：Android 的 App Hibernation 是「長期未使用的 App 撤銷權限並釋放空間」的框架功能，與 kernel 的 S4 無關 | [hibernation](../hibernation.md) |

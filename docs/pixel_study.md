@@ -85,7 +85,7 @@ fastboot --version
 
 
 https://chatgpt.com/c/697478a8-8b74-8321-8275-d3f49352e5be
-https://gemini.google.com/app/046a11a4616f5e9a?hl=zh-TW
+> 來源：作者的 Gemini 對話 `gemini.google.com/app/046a11a4616f5e9a`（私人連結，僅作者本人可開啟）
 
 
 https://wiki.lineageos.org/devices/shiba/build/

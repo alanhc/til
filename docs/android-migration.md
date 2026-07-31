@@ -95,4 +95,4 @@ Android 大版本遷移的本質,是一條跨三家公司的串行供應鏈。�
 - [Project Treble — Android Developers Blog](https://android-developers.googleblog.com/2017/05/here-comes-treble-modular-base-for.html)
 - [Vendor Interface (VINTF) — AOSP](https://source.android.com/docs/core/architecture/vintf)
 - [Generic System Image (GSI) — AOSP](https://source.android.com/docs/core/tests/vts/gsi)
-- [Vendor Software Requirements (VSR) — AOSP](https://source.android.com/docs/compatibility/vsr)
+- [Android 相容性計畫（CDD／VSR 的入口） — AOSP](https://source.android.com/docs/compatibility)（原本的 `/docs/compatibility/vsr` 已 404，AOSP 站改版後 VSR 條目散在相容性計畫與 VTS 文件下）

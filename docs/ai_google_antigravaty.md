@@ -1,4 +1,4 @@
-https://antigravity.google/docs/get-started
+https://antigravity.google/docs
 
 ## Mode
 Fast: 直接執行
