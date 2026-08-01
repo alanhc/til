@@ -120,9 +120,21 @@
               "icon": "lucide-file",
               "title": "claude_ui"
             }
+          },
+          {
+            "id": "39bec9475fc11de4",
+            "type": "leaf",
+            "state": {
+              "type": "release-notes",
+              "state": {
+                "currentVersion": "1.13.4"
+              },
+              "icon": "lucide-book-up",
+              "title": "發行記錄 1.13.4"
+            }
           }
         ],
-        "currentTab": 7
+        "currentTab": 8
       }
     ],
     "direction": "vertical"
@@ -142,7 +154,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "檔案瀏覽器"
@@ -257,13 +271,12 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "claude_ui.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "claude_ui 的大綱"
+              "title": "大綱"
             }
           },
           {
@@ -324,8 +337,10 @@
       "bases:建立新的 base": false
     }
   },
-  "active": "0a6191b900ccd0f2",
+  "active": "39bec9475fc11de4",
   "lastOpenFiles": [
+    "mobile-trust-boundaries.md",
+    "dirty-sepolicy-detection.md",
     "pixel8-gxp-dsp-exploit.md",
     "assets/claude_ui/file-20260510192046695.png",
     "assets/claude_ui/file-20260507230810819.png",
@@ -356,8 +371,6 @@
     "claude_channel.md",
     "投資.md",
     "skills.md",
-    "deeplearning_ai_aisuite.md",
-    "分析/android-summary.md",
     "assets/vercel_skills/file-20260406151002920.png",
     "assets/vercel_skills",
     "ai-articles",

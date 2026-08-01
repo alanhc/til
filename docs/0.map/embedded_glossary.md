@@ -128,6 +128,10 @@ sidebar_position: 7
 | **LAVA** | Linaro 的自動化韌體/OS 測試框架，把 build flash 到實體板開機測試 | [Firmware Testing](../firmware_testing.md) |
 | **openQA** | 開源自動化 OS 測試工具，常與 LAVA 一同出現在韌體 CI 議程 | [Firmware Testing](../firmware_testing.md) |
 | **Linaro validation** | Linaro 的 validation 平台（validation.linaro.org），韌體驗證的參考基礎設施 | [Firmware Testing](../firmware_testing.md) |
+| **「有支援」≠「有生效」** | BSP 支援某安全機制 ＝ 程式碼寫好了，不等於出貨裝置上它正在運作；中間隔著 efuse 有沒有真的燒、燒的是量產還是開發金鑰、生命週期狀態有沒有推進、量產 build 有沒有真的關掉除錯 | [信任邊界](../mobile-trust-boundaries.md) |
+| **驗證「攻擊失敗」而非「機制存在」** | 弱驗證查設定檔（secure boot enabled、JTAG disabled）；強驗證做實測（刷未簽章映像確認拒絕開機、實接除錯器確認連不上、刷舊版確認被 anti-rollback 擋下）。**設定檔會說謊，實測不會** | [信任邊界](../mobile-trust-boundaries.md) |
+| **量產殘留** | 測試憑證、內部特權介面、產線快速刷機路徑——當初都有正當理由，然後沒人負責移除，因為**沒有人會因為多留一個 debug hook 而測試失敗**。要靠流程關卡攔截而非測試 | [信任邊界](../mobile-trust-boundaries.md) |
+| **PSA 生命週期狀態 / ADAC** | Arm PSA Security Model 的 Blank／Development／Production／RMA 四階段記在 efuse、由硬體強制；PSA ADAC 定義受控的除錯重開授權（用晶片唯一 ID 挑戰值回原廠簽章，只解鎖那一顆） | [信任邊界](../mobile-trust-boundaries.md) |
 
 ---
 

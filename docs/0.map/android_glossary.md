@@ -342,7 +342,7 @@ sidebar_position: 1
 
 ## 十、SELinux / SEPolicy
 
-> 深入說明見 [SELinux 是什麼？為什麼 Android 韌體工程師必須懂它](../selinux.md)；規則語法速查見 [Android SEPolicy](../android_sepolicy.md)。
+> 深入說明見 [SELinux 是什麼？為什麼 Android 韌體工程師必須懂它](../selinux.md)；規則語法速查見 [Android SEPolicy](../android_sepolicy.md)。App 如何靠讀取核心中生效的 policy 反推裝置已被 root，見第二十二節。
 
 ### 基本概念
 
@@ -631,3 +631,47 @@ sidebar_position: 1
 | **Device vs Client Composition** | 本篇的核心分歧點：走 HWC 幾乎不耗 GPU，**fallback 到 GPU 合成則直接反映在功耗與溫度上**。層數超過硬體上限、格式／縮放不支援、有 blur/圓角等效果都可能觸發 fallback；平板多視窗場景特別容易踩到 |
 | **TimeStats** | SurfaceFlinger 內建的統計式 jank 資料來源，適合回答「掉幀有多頻繁」而非「這一幀為什麼掉」 |
 | **Winscope / Layer Trace** | 錄下 layer 樹與 transaction 變化並可逐幀回放的工具，用來查「畫面上為什麼多/少了一層」 |
+
+---
+
+## 二十二、Dirty SEPolicy 偵測與隱藏
+
+> 出自 [Dirty SEPolicy 偵測：一種讓所有 Root 方案都現形的新向量](../dirty-sepolicy-detection.md)。SELinux 本身的定義見第十節、Root 工具見第九節。
+
+| 名詞 | 說明 |
+|---|---|
+| **binary policy** | `checkpolicy` / `secilc` 編譯出、開機由 init 載入核心的二進位規則檔，之後存在記憶體的 `selinux_state` 裡。**同機型同版本的原廠 policy 位元級一致**，所以它有指紋，任何偏離都是異常 |
+| **dirty sepolicy** | Root 方案為了運作而注入額外規則（開放 su domain、允許 App 與 root 服務通訊、把 domain 設 permissive、模組的 `sepolicy.rule`）後，核心中生效的 policy 偏離原廠的狀態 |
+| **`/sys/fs/selinux/policy`** | selinuxfs 節點，**任何 App 都能讀**，讀到的正是當下記憶體裡完整生效的 binary policy。這是偵測方直接檢查核心狀態的窗口 |
+| **偵測判準** | App 的 native SDK 自行解析 policy 後找：可疑自訂 type／domain（含 `magisk`／`su`／`ksu` 字樣）、**任何 permissive domain**、`untrusted_app` 被授予異常權限、規則總數或雜湊對不上該機型原廠 |
+| **為何全覆蓋** | 傳統隱藏術（Magisk Hide／Shamiko／改包名）騙的是「App 能觀察到的周邊資訊」；但 **root 要能運作就必須真的改核心 policy，這是功能性的、不可迴避的**。Magisk／KernelSU 全分支／APatch 實作路徑各異，最終都會在這份 policy 上留痕 |
+| **`security_read_policy`** | 核心中回應 policy 讀取請求的函式，是隱藏方的 hook 攔截點 |
+| **Hide SELinux modifications / `selinux_hook`** | 分別是 KernelSU 的設定與 APatch 的 KPM：在核心讀取路徑上判斷呼叫者是否為非特權 App UID，是則回傳一份「原廠未修改」的 policy 副本，否則回傳真實（髒的）policy 讓 root 照常運作。因 hook 位於核心層，App 無法繞過 |
+| **自行驗證方法** | 對目標行程 `strace`（或 frida 掛 libc），看功能被擋前是否出現 `openat(..., "/sys/fs/selinux/policy", O_RDONLY)` + `read`。隱藏生效時 `openat` 依然會發生，差別在讀回的內容已被換掉 |
+
+---
+
+## 二十三、裝置信任邊界與 Baseband
+
+> 出自 [一支手機從開機到連上網，中間跨過了幾道信任邊界](../mobile-trust-boundaries.md)（純公開規格整理）。BL1~BL33／TrustZone 見第五節，AVB／dm-verity 見第七節。
+
+| 名詞 | 說明 |
+|---|---|
+| **信任邊界（trust boundary）** | 「這邊的東西不能無條件相信那邊」的界線。一支手機裡有五到十幾顆各跑自己韌體的處理器，**失誤幾乎都發生在邊界上，而不是單一模組內部** |
+| **BootROM / mask ROM** | 晶片製造時寫死在矽上的第一段程式碼，出廠後改不了——這個「不可變」就是**信任根（Root of Trust）**。代價是 bug 幾乎無法修補（checkm8、fusée gelée 都是此層漏洞），所以刻意寫得極簡 |
+| **efuse / OTP** | 晶片上只能寫一次的記憶體。實務上放**公鑰的雜湊值**而非完整公鑰（公鑰跟映像檔一起放 flash，開機時算雜湊比對）。單向不可逆——既是安全價值也是報廢風險 |
+| **簽章 ≠ 加密** | Secure boot 要的是**簽章驗證（完整性／來源）**，不是加密（機密性）。沒加密但簽章正確足夠安全；加密但不驗簽可能等於零安全。**把機密性當成安全機制，是一種會過期的保護** |
+| **anti-rollback** | 映像檔帶單調遞增版本號，efuse 保留一組 bit 記錄「目前可接受的最低版本」。危險在 efuse bit 有限、推進後無法降版——所以推進時機通常非常保守 |
+| **串聯電路模型** | 信任鏈不是「多一層多一分安全」的疊加，而是串聯：**九級做對、一級做錯等於零級**。要問的是「最弱的一級在哪」而不是「我們有幾層防護」 |
+| **modem（數據機）子系統** | 不是加速器而是**真正獨立的子系統**：跑自己的 RTOS、有自己的記憶體與生命週期，**輸入不來自 AP 而來自空氣** |
+| **協定處理器 vs 基頻 DSP** | 前者跑 3GPP 上層（RRC／NAS／PDCP/RLC/MAC），狀態機龐大，跑在即時導向核心 + RTOS；後者跑實體層（調變解調、Turbo/卷積/LDPC/Polar 編解碼、FFT、通道估測），用帶向量／SIMD 的專用 DSP |
+| **1 ms subframe / HARQ 預算** | FDD LTE 下行 HARQ 回饋固定落在 subframe n+4，扣掉傳輸與上行準備，終端解調＋解碼＋CRC 的處理預算約 3 ms，且必須以每 1 ms 一次的節奏持續 pipeline。5G NR 在較高 subcarrier spacing 下 slot 更短（1 ms / 2^μ）。**這種硬性即時要求就是 modem 必須獨立於跑 Linux 的 AP 的原因** |
+| **modem 三性質疊加** | (1) 輸入本質不可信——初始接取階段尚未雙向認證，SDR 成本已降到數百美金；(2) 攻擊面極大——數千頁規格、為向後相容保留的老機制、多套變長編碼（RRC 用 ASN.1 unaligned PER、NAS 用 IEI/TLV），解析器多半是 C 寫在無現代記憶體保護的 RTOS 上；(3) 傳統上權限高。合起來＝**不需使用者互動、只要在無線電範圍內即可觸發的遠端攻擊路徑** |
+| **IOMMU / SMMU** | 放在 modem 與記憶體控制器之間的位址轉譯與權限檢查單元，由 AP 側安全軟體設定。把「modem 淪陷 = 全機淪陷」降級成「modem 淪陷 = modem 淪陷」——**不需要 modem 韌體完美就能限制爆炸半徑，投報率最高的單一措施** |
+| **subsystem restart 的驗證缺口** | modem 崩潰重啟是常見復原機制，但**重啟路徑必須跟冷開機一樣做完整驗證**；為省時間跳過驗證等於在信任鏈上開後門 |
+| **PSA 生命週期狀態** | Arm PSA Security Model 定義的裝置階段：Blank／Development（開發金鑰、除錯全開）／Production（量產金鑰、除錯關閉、secure boot 生效）／RMA。狀態記在 efuse，由硬體強制而非靠人記得改設定 |
+| **PSA ADAC** | Authenticated Debug Access Control：受控的除錯授權機制。RMA 重開除錯的常見做法是用晶片唯一 ID 產生挑戰值、回原廠簽章後只解鎖那一顆晶片 |
+| **「有支援」≠「有生效」** | BSP 支援 ＝ 程式碼寫好了；不等於這台出貨裝置上它正在運作。中間隔著 efuse 有沒有真的燒、燒的是量產還是開發金鑰、生命週期有沒有推進、量產 build 有沒有真的關掉除錯、anti-rollback 有沒有啟用 |
+| **驗證「攻擊失敗」而非「機制存在」** | 弱驗證是查設定檔（secure boot enabled、console disabled、JTAG disabled、anti-rollback 已設定）；強驗證是實測（刷未簽章映像確認拒絕開機、實接 UART 確認無輸出、實接除錯器確認連不上、刷舊版本確認被拒）。**設定檔會說謊，實測不會** |
+| **量產殘留** | 測試憑證、內部工具的特權介面、產線快速刷機路徑——共通點是「當初有正當理由」，然後沒人負責移除，因為**沒有人會因為多留了一個 debug hook 而測試失敗**。要靠流程關卡攔截而非測試 |
+| **五類典型實作缺陷** | (1) 驗證失敗但只 log 一行就繼續執行；(2) 簽章只涵蓋 header，內容可替換；(3) 先載入到最終位址再原地驗證（其他 DMA 主控可改 → TOCTOU）；(4) 信任鏈斷點（信任鏈是樹不是線，漏掉一根枝條不易察覺）；(5) 回退／recovery／子系統重啟路徑不驗證。**共同點：都不是密碼學問題，破的是「什麼時候驗、驗多少、驗完怎麼辦」的工程決定** |

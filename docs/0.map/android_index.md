@@ -34,6 +34,7 @@ sidebar_position: 0
 | [Secure Boot 解析](../Secure_Boot_解析.md) | **深入版**（上篇姊妹篇，講「憑什麼信任」）：簽章 vs 加密、Boot ROM 與 eFuse 兩個錨點、TBBR 的 X.509 憑證鏈與金鑰隔離、AVB 2.0 與 rollback index、boot state 四色、攻擊面（glitching／TOCTOU／EDL／checkm8）、導入 checklist |
 | [Android Verified Boot (AVB) 深入解析](../Android-Verified-Boot-AVB.md) | **深入版**（把上面 Secure Boot 提到的 AVB 展開）：硬體信任根 → `vbmeta` 樞紐（hash／hashtree／chain partition／kernel cmdline descriptor）→ dm-verity 區塊級執行期驗證 → rollback index 防降級 → GREEN／YELLOW／ORANGE／RED 四狀態與 Keystore attestation；含刷機實務（`--disable-verity`／`--disable-verification`、`avb_custom_key` 自簽走 YELLOW、`avbtool info_image`、重新上鎖變磚的坑） |
 | [把 ABL 拆開看：AVB 驗證在真機上到底怎麼跑](../abl-avb-reversing.md) | **上篇的實作對照版**：把 Qualcomm 手機的 ABL（UEFI application）從 `abl.img` 剝殼成 PE32+ 丟進 Ghidra，用字串（`androidboot.verifiedbootstate=`、`AVB0` magic、`avb_slot_verify.c`）當錨點定位 AVB；再逐步走 `avb_slot_verify()` → vbmeta header 解析 → SHA + RSA 驗簽 → descriptor（hash／hashtree／chain／cmdline）→ rollback index → 綠黃橙紅四色 → 組 kernel cmdline。核心結論：libavb 是通用密碼學骨架，**真正決定安不安全的是廠商在 `AvbOps` 回呼裡有沒有偷工**（金鑰比對、rollback 接 RPMB、鎖狀態）。附逆向常踩的坑 |
+| [一支手機從開機到連上網，中間跨過了幾道信任邊界](../mobile-trust-boundaries.md) | **橫向總覽**（純公開規格：TF-A／AVB／GlobalPlatform／PSA／3GPP）：把整支手機當成一堆彼此不完全信任的處理器來看。三部分——(1) 開機信任鏈：BootROM 為何不可變、efuse 存公鑰雜湊、簽章 ≠ 加密、anti-rollback 的 efuse 代價、AVB/dm-verity 與四色 boot state；(2) **AP 之外的 modem**：協定處理器／基頻 DSP／RF 三塊分工，為何被 LTE 的 1 ms subframe 與約 3 ms HARQ 處理預算逼成硬性即時的獨立子系統，以及它「輸入來自空氣、攻擊面是數千頁 3GPP 規格、傳統上權限很高」三性質疊加後為何需要 IOMMU/SMMU 把爆炸半徑限制住；(3) 從開發到量產：PSA 生命週期狀態、「有支援 ≠ 有生效」、**驗證「攻擊失敗」而不是「機制存在」**的強／弱驗證對照表，與五類跨廠商反覆出現的實作缺陷（驗證失敗仍繼續、只驗 header、先載入再驗證的 TOCTOU、信任鏈斷點、回退路徑不驗證） |
 | [MTK Preloader Combo Header 與 OTA](../mtk-preloader-combo-header-ota.md) | MTK boot chain（BROM → Preloader → LK）中 preloader 住在 eMMC boot0/UFS boot LU；device header 三型態（`EMMC_BOOT`／`UFS_BOOT`／`COMBO_BOOT`）與 device header → BRLYT → GFH 三層結構，以及怎麼接上 Google A/B OTA（`update_engine` byte-level 寫入故 image 需自帶 header、by-name symlink、header 型態不一致導致 source hash mismatch 的故障排查）。各節標註公開來源 vs 內部推論 |
 
 ---
@@ -72,6 +73,7 @@ sidebar_position: 0
 |---|---|
 | [Pixel Root](../pixel_root.md) | Magisk（user-space，patch `init_boot.img`）vs KernelSU（kernel-space，改 `boot.img`）比較 |
 | [Pixel 無法 adb root](../pixel_can_not_run_as_root.md) | `adbd cannot run as root in production builds` 的解法：Magisk patch init_boot，含 `/sys/class/` 節點列表 |
+| [Dirty SEPolicy 偵測：一種讓所有 Root 方案都現形的新向量](../dirty-sepolicy-detection.md) | 2026 年起銀行／金流 App（Shopee、BRImo、Birbank 等）採用的偵測手法：直接讀任何 App 都能開的 `/sys/fs/selinux/policy`，解析核心中**正在生效**的 binary policy，比對原廠指紋找污染痕跡（可疑 type／permissive domain／`untrusted_app` 異常權限）。之所以打擊面全覆蓋（Magisk／KernelSU 全分支／APatch），是因為**注入 sepolicy 規則是 root 的功能性必要條件，無法迴避**，傳統藏檔案／改包名的表層隱藏完全失效。反制思路是在核心 `security_read_policy` 路徑上 hook，對非特權 App 回傳乾淨副本（KernelSU 的 Hide SELinux modifications／APatch `selinux_hook` KPM）；附用 `strace` 自行驗證某 App 是否使用此向量的方法 |
 
 ---
 

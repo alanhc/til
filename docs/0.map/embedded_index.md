@@ -39,6 +39,7 @@ sidebar_position: 6
 |---|---|
 | [ARM Trusted Firmware (ATF)](../atf.md) | **名詞與對照表為主**：BL1~BL3-3 階段對應表（含 EL 層級）、EL0~EL3 權限分層表、TrustZone 的 Secure/Normal World 與 OP-TEE 元件樹、TrustZone vs 機密運算比較、ARMv7-A/v8-A/v9-A 安全模型演進表，以及 TrustZone → CCA 的 mermaid 時間軸 |
 | [ARM Trusted Firmware（TF-A）](../booting/atf.md) | **散文式說明為主**（與上篇不同檔案）：逐段講 BL1（AP Trusted ROM）、BL2（Trusted Boot Firmware）、BL31（EL3 Runtime Firmware 常駐 Secure Monitor 並實作 PSCI）、BL32（OP-TEE）、BL33（U-Boot/UEFI）各自職責，附 Arm Juno 官方文件等參考連結 |
+| [一支手機從開機到連上網，中間跨過了幾道信任邊界](../mobile-trust-boundaries.md) | 把 TF-A 的分階段模型放回一整支裝置的脈絡：BootROM 為何是不可變的信任根、efuse 存的是公鑰雜湊而非公鑰、簽章 ≠ 加密、anti-rollback 的單向代價；接著跨出 AP 談 **modem 這個獨立信任域**（協定處理器／基頻 DSP／RF 的分工、1 ms subframe 的硬性即時要求、IOMMU/SMMU 為何是 CP 值最高的緩解措施）；最後談整合階段：PSA 生命週期狀態、「有支援 ≠ 有生效」、**驗證「攻擊失敗」而非「機制存在」**，以及五類典型實作缺陷 |
 | [ARM Trusted Firmware 元件](../arm_trust_firmware.md) | 速記卡：What／Why／When（ARMv8 引入 TrustZone + EL3、2013-14 首版、2015 成標準）、主要元件列表（BL 各階段、TF-A、PSCI、SMC Dispatcher、SiP service、憑證鏈／RoT）與待補的名詞清單 |
 
 ---
