@@ -5,7 +5,8 @@ sidebar_label: MTK Preloader Combo Header
 # MTK Preloader Combo Header 與 Google OTA 流程整理
 
 > 整理日期:2026-07-16
-> 資料來源標註:[公開] = 可從公開 code/文件驗證(mtkclient、u-boot、XDA dump);[推論/內部] = 邏輯推論或需 MTK 內部 source 確認。
+> 資料來源標註:[公開] = 可從公開 code/文件驗證(mtkclient、u-boot、公開 device tree、XDA dump);[推論] = 我依公開資訊與通用工程原理推論,未經任何官方文件核對。
+> 本文不含任何非公開的原始碼、struct 定義或內部工具細節。
 
 ---
 
@@ -49,17 +50,17 @@ GFH+0x20  u32 → preloader 長度
 
 補充 [公開]:u-boot `tools/mtk_image.h` 有舊平台(MT76xx 路由器線)的 struct 定義——`gen_boot_header`(name[12] + version + size,padding 到 0x200)、`brom_layout_header`(BRLYT magic `0x42424242`、type enum:EMMC=0x10005、SDMMC=0x10008 等)。但 u-boot **沒有 COMBO_BOOT**,combo 是手機線(MT67xx/MT68xx)的東西。
 
-## 4. Combo header 是什麼 [公開 magic + 推論/內部 struct]
+## 4. Combo header 是什麼 [magic 公開,struct 無公開來源]
 
 - 概念:把最外層 device header 換成一個**容器**,裡面放多組 entry,每組對應一種 storage type/設定,各自指向對應的 BRLYT/GFH。eMMC BROM 和 UFS BROM 各認各的 entry。
 - 動機:量產機種常有 **second source 料件**(同專案出 eMMC 版 + UFS 版,或不同顆粒)。Combo header 讓工廠和 OTA 只需維護**一份 preloader image**,不用按料件分兩份。
-- ⚠️ 精確的 struct 欄位**不在公開 code**:mtkclient 只認 magic 沒展開欄位;u-boot 沒有。最準的來源是 MTK 內部 DA source 或 preloader build 產 header 的 pack 工具(`pl` 的 mkimage 那段)。
+- ⚠️ 精確的 struct 欄位**沒有公開來源**:mtkclient 只認 magic、沒有展開欄位,u-boot 那份又只涵蓋舊的路由器平台。所以本文只寫到「它是個容器、裡面是多組 entry」這個層次;想再往下走,只能自己 dump 幾支不同料件的機器互相 diff。
 
 ## 5. 跟 Google A/B OTA(update_engine)的接法
 
-1. **Build 端** [推論/內部可驗]:`AB_OTA_PARTITIONS += preloader`;target_files 裡放的是**含 device header 的 raw image**,不是純 preloader binary。
+1. **Build 端** [推論]:`AB_OTA_PARTITIONS += preloader`(這個變數本身是 AOSP 公開的 build 機制,把 preloader 掛進去則是推論);target_files 裡放的是**含 device header 的 raw image**,不是純 preloader binary。
    - 對比:SP Flash Tool 燒錄路徑是由工具/DA 負責 header;OTA 路徑 update_engine 只會 byte-level 寫入,所以 image 必須自帶 header。
-2. **Device 端** [推論/內部可驗]:init 階段由 MTK plpath utils 建 by-name symlink:
+2. **Device 端** [公開]:init 階段由 `mtk_plpath_utils` 建 by-name symlink——這支工具與它在 `init.*.rc` 裡的呼叫點,在公開的 MTK device/hardware tree 就看得到(見參考來源):
    - eMMC:`preloader_a → mmcblk0boot0`、`preloader_b → mmcblk0boot1`,且需清 `/sys/block/mmcblk0bootX/force_ro`
    - UFS:指到 boot LU(sda/sdb)
 3. **update_engine 視角**:它不知道這是特殊區域,就是照 payload 做 byte-level 讀寫 + hash 驗證。因此:
@@ -92,4 +93,6 @@ xxd preloader_xxx.img | head
 - mtkclient(bkerler/mtkclient):`Tools/preloader_emu_mmc.py`、`mtkclient/Library/partition.py` — header parsing 邏輯
 - u-boot `tools/mtk_image.h` / `mtk_image.c` — 舊平台 device header/BRLYT struct 定義
 - XDA: "Fixing Bricked Preloader on Mediatek MTK Devices" — EMMC_BOOT/UFS_BOOT/COMBO_BOOT magic 與 FILE_INFO offset 的實機 dump 觀察
+- 公開 MTK device/hardware tree — [`android_hardware_mediatek/mtk_plpath_utils`](https://github.com/huawei-mediatek-devs/android_hardware_mediatek/tree/lineage-20/mtk_plpath_utils)(LineageOS 20 分支)與各 device tree 的 [`init.mt6755.rc`](https://github.com/Vgdn1942/android_device_mediatek_mt6755/blob/master/init.mt6755.rc) 之類檔案,可看到 preloader by-name symlink 的建立方式
+- [MediaTek details: Partitions and Preloader — LIEBERBIBER](https://www.lieberbiber.de/2015/07/04/mediatek-details-partitions-and-preloader/) — 較早期但仍是公開世界裡對 MTK 分區與 preloader 講得最清楚的一篇
 - MediaTek IoT Yocto 文件 — BROM 僅支援 eMMC/UFS boot、boot partition fallback 行為
