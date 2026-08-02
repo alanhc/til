@@ -200,7 +200,7 @@ sidebar_position: 1
 | BL32 | TZ（QTEE） | — |
 | BL33 | ABL | LK |
 
-名字不同，角色對應得上。
+名字不同，角色對應得上。更完整的版本（含 Hypervisor 層與 GBL）見下方第二十五節與 [高通與聯發科開機流程深度解析](../qualcomm-vs-mediatek-android-boot-flow.md)。
 
 ---
 
@@ -697,3 +697,34 @@ sidebar_position: 1
 | **AVB 與 A/B 正交** | 每個 slot 有自己的 vbmeta，各驗各的——兩套機制彼此獨立，不要混在一起想 |
 | **`get_unlock_ability`** | 開發者選項的「OEM unlocking」寫下的 bit，存在防竄改區。`fastboot flashing unlock` 前 LK 會檢查它，並在解鎖時**強制 wipe userdata**——就是為了防止「撿到別人手機直接 unlock 拿資料」 |
 | **只刷 boot 沒刷 vbmeta** | `vbmeta verification failed` 最常見的成因。開發時用 `fastboot --disable-verity --disable-verification flash vbmeta vbmeta.img` |
+
+---
+
+## 二十五、高通 vs 聯發科開機鏈對照
+
+> 出自 [高通與聯發科 Android 開機流程深度解析](../qualcomm-vs-mediatek-android-boot-flow.md)。上方第五節有簡版對照表，這裡是加上 Hypervisor 層與各家專有元件的完整版。
+
+| 通用階段 | 高通 | 聯發科 |
+|---|---|---|
+| BL1（晶片內 ROM，信任根） | PBL | BootROM |
+| BL2（DRAM init、載入並驗簽後續 image） | XBL_Loader | Preloader |
+| BL31（Secure Monitor / PSCI / SMC） | TZ、XBL_SEC | ATF BL31（直接用上游 TF-A） |
+| BL32（Trusted OS） | QTEE | OP-TEE 或專案指定 TEE |
+| Hypervisor（EL2） | Gunyah（前身 QHEE） | GenieZone |
+| BL33（fastboot、AVB、載入 kernel） | ABL（+ GBL） | LK / LK2 |
+
+| 名詞 | 說明 |
+|---|---|
+| **XBL 三塊分工** | **XBL_SEC** 跑 EL3、是 TrustZone image 的信任根並提供驗簽服務；**XBL_Loader** 做粗活（DDR training、PMIC/clock、讀 CDT、載入 `tz`/`hyp`/`aop` 等）；**XBL_Core** 是 UEFI 的 DXE 環境，供 ABL 這個 UEFI application 使用 |
+| **AOP（Always-On Processor）** | 高通的常駐小核（取代舊平台的 `rpm`），管電源域、時脈投票與低功耗狀態機，在 XBL 階段就被載入。**AOP 沒起來的症狀是 kernel log 裡一堆莫名其妙的 device probe timeout——根因卻在 XBL 階段**，是跨階段追根因的經典案例 |
+| **Gunyah** | 高通已開源的 hypervisor（前身 QHEE），跑 EL2 做 Stage-2 記憶體隔離，例如把某段記憶體從 Non-secure kernel 視野中移除交給安全服務獨占 |
+| **GBL（Generic Bootloader）** | Google 主導、跨廠商通用的 UEFI application，把「載入 kernel + 驗證 + 傳參數」從各家 vendor bootloader 抽出來標準化。使高通 BL33 變成**兩段式**：ABL（vendor 專屬）→ GBL（通用）。通用啟示：**每多一個 bootloader 交接點，就多一個必須在設計階段講清楚「誰負責驗誰」的介面合約** |
+| **UEFI vs LK 的取捨** | 高通自 SDM845 起 XBL_Core 與 ABL 全面 UEFI 化，換得 DXE driver model、UEFI protocol/variable 與成熟工具生態，代價是體積與開機時間；MTK 維持 LK，換得開機快、程式碼直觀，代價是缺少標準介面。**是「標準化 vs 輕量化」的取捨，沒有絕對優劣** |
+| **DDR training vs EMI calibration** | 同一件事在兩家的不同名字與不同落點：高通在 **XBL_Loader**、MTK 在 **Preloader**。「螢幕不亮、無限重開」時該挖哪份 UART log 完全取決於平台，**是跨平台 debug 最需要換腦袋的一點** |
+| **DTBO 匹配鍵** | 高通用 `qcom,msm-id`（SoC ID + revision）配 `qcom,board-id`（platform ID + subtype），ABL runtime 掃整個 `dtbo` 分割區挑匹配度最高的；MTK 用 `mediatek,mtXXXX` compatible 加專案 board 資訊。**新板 board-id 沒填對會直接卡在 bootloader 找不到 DTB**，是 bring-up 初期高頻踩雷 |
+| **PIL / remoteproc vs 分散載入** | 高通用統一框架在 kernel 起來後載入 modem/DSP，好處是支援 **SSR（subsystem restart）**——子系統掛掉可單獨重啟不用重開機；MTK 較分散，部分協處理器韌體在更早階段載入。兩者在啟動時序與失效隔離上各有取捨 |
+| **ramdump vs AEE** | 除錯基礎設施不通用：高通有 `ramdump` 導出 DRAM 內容配合 Trace32 分析；MTK 有 **AEE（Android Exception Engine）** 產生含 kernel log、backtrace 與記憶體快照的除錯檔。**跨平台工程師要同時熟兩套，是專案排程常漏算的隱性成本** |
+| **韌體套件必須整組匹配** | 兩家共通：`tz`/`cmnlib`、`lk`/`tee` 這些 image 之間有 ABI 依賴，**混版是最常見的開機失敗原因**。更新要以原廠釋出的完整韌體套件為單位，不要單檔抽換 |
+| **每台機器獨一無二的校準資料區** | 射頻校準值、廠測參數在產線寫入並與該台硬體綁定，**整區被覆蓋後無法用另一台機器的備份還原**。兩家都有性質相同的區域，任何刷機流程都要先確認它是否落在覆蓋範圍內 |
+| **anti-rollback 不可逆** | 兩家都用熔絲裡的版本計數器防止刷回舊版韌體。**一旦升版觸發計數器遞增就降不回去**——送測樣機、開發板重複燒錄前要先規劃，否則測試機會被鎖死在某個版本 |
+| **移植成本的真正大頭** | 幾乎不用改：平台無關的 kernel driver、HAL 之上、framework 修改、多數 SELinux policy。要重寫：bootloader 客製、DTS 的 SoC 部分、電源策略、camera/display vendor HAL。**最容易被低估的是產線流程**——燒錄工具、治具、產測與校準寫入方式完全不同，工廠端切換成本經常高於軟體端 |

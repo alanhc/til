@@ -339,6 +339,9 @@
   },
   "active": "39bec9475fc11de4",
   "lastOpenFiles": [
+    "0.map/android_glossary.md.tmp.19753.8d5d33ad80ee",
+    "qualcomm-vs-mediatek-android-boot-flow.md.tmp.19753.a2ca38d38c59",
+    "qualcomm-vs-mediatek-android-boot-flow.md",
     "dma-heap-guide.md",
     "mtk-boot-deep-dive.md",
     "assets/image-3.png",
@@ -370,8 +373,6 @@
     "pixel_study.md",
     "pixel_root.md",
     "claude_use_ollama.md",
-    "gpts.md",
-    "claude_channel.md",
     "assets/vercel_skills/file-20260406151002920.png",
     "assets/vercel_skills",
     "ai-articles",
@@ -383,7 +384,6 @@
     "assets/openclaw",
     "assets/pixel_flash_another_version/file-20260307152717311.png",
     "assets/pixel_flash_another_version/file-20260307152715776.png",
-    "assets/pixel_flash_another_version",
     "assets/pixel_study/file-20260208182535001.png",
     "Untitled.canvas"
   ]
