@@ -339,6 +339,9 @@
   },
   "active": "39bec9475fc11de4",
   "lastOpenFiles": [
+    "dma-heap-guide.md",
+    "mtk-boot-deep-dive.md",
+    "assets/image-3.png",
     "mobile-trust-boundaries.md",
     "dirty-sepolicy-detection.md",
     "pixel8-gxp-dsp-exploit.md",
@@ -369,8 +372,6 @@
     "claude_use_ollama.md",
     "gpts.md",
     "claude_channel.md",
-    "投資.md",
-    "skills.md",
     "assets/vercel_skills/file-20260406151002920.png",
     "assets/vercel_skills",
     "ai-articles",
@@ -384,7 +385,6 @@
     "assets/pixel_flash_another_version/file-20260307152715776.png",
     "assets/pixel_flash_another_version",
     "assets/pixel_study/file-20260208182535001.png",
-    "assets/pixel_study/IMG_7834.jpeg",
     "Untitled.canvas"
   ]
 }

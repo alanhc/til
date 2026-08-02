@@ -3,6 +3,8 @@ title: Android Boot Flow
 sidebar_position: 2
 ---
 
+![Android Boot Flow 概觀](assets/image-3.png)
+
 # Android Boot Flow（Android 開機流程）
 
 Android 裝置從按下電源鍵到看見 Launcher 桌面，背後經歷了一連串複雜的啟動流程。本文整理完整的 Android Boot Flow，從最底層的硬體到最上層的應用框架。

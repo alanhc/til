@@ -304,3 +304,46 @@ sidebar_position: 7
 | **信任鏈斷開** | Secure boot 驗的是開機映像，但 resume 是把一份存在 swap 的 image 寫回記憶體；若這份 image 未經驗證，等於繞過整條開機信任鏈 | [hibernation](../hibernation.md) |
 | **`pm_trace`** | 完全沒有輸出時的除錯手段，把 suspend/resume 進度寫進 RTC，重開機後讀回來定位卡在哪個 device | [hibernation](../hibernation.md) |
 | **Android App Hibernation** | 同名不同物：Android 的 App Hibernation 是「長期未使用的 App 撤銷權限並釋放空間」的框架功能，與 kernel 的 S4 無關 | [hibernation](../hibernation.md) |
+
+---
+
+## 八、DMA-BUF Heaps
+
+> 出自 [DMA-BUF Heaps 完整導覽](../dma-heap-guide.md)。
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **dma-buf** | Linux 3.3 引入的**跨 driver buffer 共享框架**。它只定義「怎麼共享」，不定義「從哪裡配置」——配置那一半是後來 ION／dma-heap 在補 | [dma-heap 導覽](../dma-heap-guide.md) |
+| **Exporter / Importer** | 擁有並管理記憶體、實作 `struct dma_buf_ops` 的一方是 exporter；透過 fd 拿到 buffer 再 attach/map 進自己位址空間的是 importer | [dma-heap 導覽](../dma-heap-guide.md) |
+| **PMEM** | ION 之前各家自幹的 physical memory allocator，每家介面都不同，是「群雄割據時期」的代表 | [dma-heap 導覽](../dma-heap-guide.md) |
+| **ION** | Android 從 2011 用到 2021 的統一配置器。致命設計是**所有 heap 共用同一個 `/dev/ion` node**，無法用檔案權限或 SELinux 區分誰能配置一般記憶體、誰能配置 secure 記憶體 | [dma-heap 導覽](../dma-heap-guide.md) |
+| **dma-heap** | Linux 5.6 上游接班 ION 的機制。關鍵改進：**每個 heap 各自一個 `/dev/dma_heap/<name>` node**，權限與 SELinux label 可以逐 heap 分開設 | [dma-heap 導覽](../dma-heap-guide.md) |
+| **System heap / CMA heap** | 兩個上游內建 heap。System heap 從一般 page allocator 拿（可不連續，需 IOMMU）；CMA heap 從 CMA 保留區拿實體連續記憶體，供沒有 IOMMU 的 IP 使用 | [dma-heap 導覽](../dma-heap-guide.md) |
+| **`dma_heap_add()`** | Heap 向框架註冊自己的入口，註冊後產生對應的 `/dev/dma_heap/<name>` 字元裝置 | [dma-heap 導覽](../dma-heap-guide.md) |
+| **`dma_resv` / `dma_fence` / `sync_file`** | 同步三件套：`dma_resv` 是掛在 dmabuf 上的 fence 容器（管讀寫依賴），`dma_fence` 是跨 driver 的非同步完成通知，`sync_file` 把 fence 包成 fd 給 userspace（即 Android 的 acquire/release fence） | [dma-heap 導覽](../dma-heap-guide.md) |
+| **Page pool / deferred free** | 效能最佳化：釋放的 page 不立刻還給系統而是留在 pool 裡重用，避免高頻配置釋放時反覆做 zeroing 與 cache 維護 | [dma-heap 導覽](../dma-heap-guide.md) |
+| **`dmabuf_dump`** | Android 的 dma-buf 觀測工具（`system/memory/libmeminfo` 下的 libdmabufinfo），列出誰持有哪些 buffer | [dma-heap 導覽](../dma-heap-guide.md) |
+| **dma-buf 洩漏「隱形」** | dma-buf 佔的記憶體不計入一般 process RSS 統計，洩漏時 `dumpsys meminfo` 看起來很正常，記憶體卻一直少——要靠 `dmabuf_dump` 或 debugfs 才抓得到 | [dma-heap 導覽](../dma-heap-guide.md) |
+| **heap 名稱不可攜** | heap 名稱是各平台自訂字串（`system`、`system-uncached`、`vendor-secure`…），寫死在 userspace 會綁死平台 | [dma-heap 導覽](../dma-heap-guide.md) |
+
+---
+
+## 九、MTK Preloader 與 DRAM Init
+
+> 出自 [MTK Boot 深入筆記](../mtk-boot-deep-dive.md)。該文以 [規範]／[社群]／[推論] 標記各段依據強度，Preloader 部分多為社群逆向與工程推論。
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **Preloader** | MTK 特有的 BL2，由 BootROM 從 eMMC `boot0`／UFS boot LU 載入並驗簽。**跑在只有幾百 KB 的 SRAM**（DRAM 還沒起來），所以幾乎不用 malloc 與大型 library；任務是把 DRAM 弄起來後載入並驗證 `lk`／`tee`／`gz` | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **PMIC 上電 / DRAM init** | BL2 階段最容易出事的兩步（PMIC 上電順序與各 rail 電壓、DRAM calibration），bring-up 階段絕大多數問題來自這裡 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **DRAM discovery（MR5／MR6／MR8）** | 先用低速保守時序把 DRAM 叫醒讀 mode register：MR5 = 廠商 ID、MR6/MR7 = revision、MR8 = density 與 IO width，據此選對應的 EMI/DRAMC 參數表 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **ZQ calibration** | 校準 driver strength 與 ODT 阻抗，對抗製程與溫度漂移 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **CA training** | 校 command/address bus 對 CK 的時序。CA 錯了後面全錯，所以排在最前面 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **Write leveling** | 校 DQS 對 CK 的相位。fly-by 走線讓每個 byte lane 的到達時間不同，需逐 lane 補償 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **DQS gating window** | 讀取時 controller 何時打開 DQS 接收窗。**最容易因 layout 不良而失敗的項目之一** | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **RX/TX eye、DATLAT** | 掃描讀／寫的 data eye 逐 bit 調 delay 找眼圖中心；DATLAT 決定 read data 回來要等幾個 cycle 取樣 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **Full-K vs Fast-K** | Full-K 第一次開機跑完整校正並把結果序列化寫進 flash 保留區；Fast-K 之後開機直接讀回套用。**「改了 DRAM code 卻沒看到行為改變」的頭號原因就是走了 Fast-K 吃到舊資料** | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **window 寬度 = margin** | 判讀 calibration log 的關鍵：不是看 pass/fail，而是看每個 lane 找到的 window 有多寬。過了但只剩幾個 delay step 等於不定時炸彈 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **Shmoo test** | 掃電壓（Vcore／VDDQ／VDD2）× 頻率畫出 pass/fail 圖，從形狀判斷是電壓不足、時序偏移還是雜訊 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **Golden board** | 永遠留一片已知良好的板子當基準，新板 window 明顯較窄即代表硬體差異而非軟體 bug | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **coreboot MediaTek DRAM code** | 公開世界裡最接近真實 MTK DRAM init 的東西——MT8173/8183/8186（Chromebook SoC）因 coreboot 須開源，MediaTek 把 `dramc_pi_calibration_api.c` 等貢獻進上游，可直接對照學習 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |

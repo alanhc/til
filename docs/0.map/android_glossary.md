@@ -675,3 +675,25 @@ sidebar_position: 1
 | **驗證「攻擊失敗」而非「機制存在」** | 弱驗證是查設定檔（secure boot enabled、console disabled、JTAG disabled、anti-rollback 已設定）；強驗證是實測（刷未簽章映像確認拒絕開機、實接 UART 確認無輸出、實接除錯器確認連不上、刷舊版本確認被拒）。**設定檔會說謊，實測不會** |
 | **量產殘留** | 測試憑證、內部工具的特權介面、產線快速刷機路徑——共通點是「當初有正當理由」，然後沒人負責移除，因為**沒有人會因為多留了一個 debug hook 而測試失敗**。要靠流程關卡攔截而非測試 |
 | **五類典型實作缺陷** | (1) 驗證失敗但只 log 一行就繼續執行；(2) 簽章只涵蓋 header，內容可替換；(3) 先載入到最終位址再原地驗證（其他 DMA 主控可改 → TOCTOU）；(4) 信任鏈斷點（信任鏈是樹不是線，漏掉一根枝條不易察覺）；(5) 回退／recovery／子系統重啟路徑不驗證。**共同點：都不是密碼學問題，破的是「什麼時候驗、驗多少、驗完怎麼辦」的工程決定** |
+
+---
+
+## 二十四、MTK Boot Chain 與 LK 端的 AVB
+
+> 出自 [MTK Boot 深入筆記](../mtk-boot-deep-dive.md)。AVB 本體術語見上方第七節「Verified Boot」與第十四節，這裡只列 MTK 鏈路與 LK 端特有的部分。
+> 記憶體共享（dma-buf / dma-heap）相關名詞見 [Embedded 名詞表](embedded_glossary.md) 第八節。
+
+| 名詞 | 說明 |
+|---|---|
+| **MTK boot chain** | `BootROM → Preloader（BL2）→ ATF/TEE → LK（BL33）→ Kernel`。對照高通是 `PBL → XBL → TZ → ABL`（見上方第五節對照表） |
+| **SBC key** | MTK Secure Boot 的信任起點：public key hash 燒在 eFuse 裡，BootROM 用它驗 Preloader 簽章。**整條鏈是「上一級驗下一級」，任何一環沒驗就是整條斷掉** |
+| **Preloader 驗誰** | Preloader 除了把 DRAM 弄起來，還負責載入並驗證 `lk`、`tee`（ATF）、`gz`（GenieZone）。開機 logo／充電動畫不一定在 LK——逆向資料指出部分機種由 Preloader 負責 |
+| **LK 的職責清單** | 進 fastboot mode、畫 logo／充電畫面、讀 `misc` 決定 recovery／fastbootd／normal、A/B slot 選擇、AVB 驗證、組 kernel cmdline 後載入 `boot`／`vendor_boot`／`dtbo`／`init_boot` |
+| **hash vs hashtree 的取捨** | `boot.img` 幾十 MB，開機時算完整 hash 成本可接受；`system.img` 幾 GB 只能用 hashtree，把驗證成本攤到 runtime 每次 I/O。代價是 dm-verity 有持續開銷，且**壞 block 要讀到才會報錯，不是開機就抓到** |
+| **tamper-evident storage** | AVB 規範要求 rollback index、驗證用金鑰、LOCKED/UNLOCKED 狀態都存在防竄改儲存；常見實作是 RPMB，由 TEE（如 OP-TEE）持金鑰存取。AVB 1.1 後另加 named persistent values 可存任意 key-value |
+| **rollback index 規則** | 除非 `rollback_index[n] >= stored_rollback_index[n]` 對所有 n 成立，否則拒絕該 image；裝置會隨時間把 `stored_rollback_index[n]` 往上推。擋的是「**簽章合法但有已知漏洞的舊版 image**」 |
+| **YELLOW vs ORANGE vs RED 的畫面行為** | YELLOW（鎖著＋使用者自燒 root of trust）與 ORANGE（已解鎖）都是顯示警告後**10 秒自動消失**繼續開機；RED（驗證失敗）的警告**不能由軟體自動關掉，必須使用者按實體鍵** |
+| **`bootloader_message_ab`** | `misc` 分區裡的 slot metadata：`priority`（0–15，越大越優先）、`tries_remaining`、`successful_boot`。LK 挑 priority 最高且（successful 或 tries > 0）的 slot，每試一次 tries 減一；全用光就進 recovery |
+| **AVB 與 A/B 正交** | 每個 slot 有自己的 vbmeta，各驗各的——兩套機制彼此獨立，不要混在一起想 |
+| **`get_unlock_ability`** | 開發者選項的「OEM unlocking」寫下的 bit，存在防竄改區。`fastboot flashing unlock` 前 LK 會檢查它，並在解鎖時**強制 wipe userdata**——就是為了防止「撿到別人手機直接 unlock 拿資料」 |
+| **只刷 boot 沒刷 vbmeta** | `vbmeta verification failed` 最常見的成因。開發時用 `fastboot --disable-verity --disable-verification flash vbmeta vbmeta.img` |
