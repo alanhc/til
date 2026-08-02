@@ -1,0 +1,24 @@
+{
+  "name": "alanhc's TIL",
+  "short_name": "TIL",
+  "description": "Today I Learned — alanhc 的技術筆記",
+  "start_url": "/til/",
+  "scope": "/til/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2e8555",
+  "lang": "zh-Hant",
+  "icons": [
+    {
+      "src": "/til/img/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/til/img/docusaurus.png",
+      "sizes": "200x200",
+      "type": "image/png"
+    }
+  ]
+}
