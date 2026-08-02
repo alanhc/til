@@ -42,6 +42,7 @@ sidebar_position: 4
 |---|---|
 | [Hardware（硬體存取）](../BMC/hardware.md) | 佔位頁：I2C／SMBus／PMBus、EEPROM／FRU、GPIO 工具（`gpiodetect`／`gpioset`）、`devmem`、ADC、SPI 等關鍵字清單 |
 | [PMBus](../BMC/pmbus.md) | 佔位頁：probe／read-write 原語／`i2cdetect`／`P=IV`／linear-direct 等關鍵字 |
+| [Device Driver（統整）](../BMC/device_driver/device_driver.md) | Driver 與 Device Tree 關係圖、SMBus／PMBus 筆記、Linear11 浮點格式，以及 user space → PMBus core → driver `read_word_data` → I2C 的呼叫鏈；另有 Kconfig／Makefile／binding yaml 的檔案位置對照 |
 | [Porting PMBus Driver](../BMC/device_driver/porting_pmbus_driver.md) | 完整實作指南：讀 schematic 找 bus → 寫 device tree node（`compatible`／`reg`）→ Kconfig／defconfig／Makefile → 填 `pmbus_driver_info` 與 `.read_word_data` → binding yaml → 用 `dd` 拼 image 上板燒錄 → 用 `P=I*V` 驗證 |
 | [Device Tree](../BMC/device_tree.md) | 佔位頁：dts／dtsi／dtb／dtc、`compatible`、binding yaml、phandle、`linux-aspeed` 原始碼路徑等關鍵字 |
 | [CPLD](../BMC/cpld.md) | 板上可程式邏輯裝置（非揮發，開機即運作）：伺服器用它做 power sequencing、reset／clock 邏輯、glue logic、presence／strap 讀取；BMC 經 GPIO／I2C／JTAG 與它互動，並可在板做 in-system programming |
@@ -53,8 +54,6 @@ sidebar_position: 4
 | [MCTP](../BMC/mctp.md) | DMTF PMCI 家族的傳輸協定，用 EID 定址、與底層匯流排無關，可跑在 SMBus／I2C、PCIe VDM、USB、Serial、KCS；上層承載 PLDM、NC-SI、SPDM，OpenBMC 以 libmctp／mctpd／pldmd 實作 |
 | [Schematic 判讀](../BMC/schemantic.md) | 佔位頁：i2c topology／timing／address table／tmp75 等關鍵字 |
 | [Spec / Datasheet 判讀](../BMC/spec.md) | 佔位頁：tmp75／eeprom datasheet、`i2cget`、block diagram 等關鍵字 |
-
-> 本節另有一份統整頁 `BMC/device_driver/_index.md`（Driver 與 Device Tree 關係圖、SMBus／PMBus 筆記、Linear11 浮點格式，以及 user space → PMBus core → driver `read_word_data` → I2C 的呼叫鏈）。因檔名以底線開頭、Docusaurus 不產生路由，故此處以純文字標示、不做連結。
 
 ---
 

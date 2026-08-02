@@ -70,7 +70,6 @@ ROM → 2. ATF (EL3) → 3. OP-TEE (Secure EL1) → 4. U-Boot (Non-secure EL1) �
 **Secure World vs Normal World：**
 - Secure World 也有自己的 EL0–EL3 對應層（例如 Secure EL1、Secure EL3）。
 - Secure Monitor 通常執行在 **EL3**，負責世界切換（SMC handler）。
-![[Pasted image 20251104215201.png]]
 
 https://github.com/ARM-software/arm-trusted-firmware
 ARM TrustZone = Secure World 保護 SoC 裡的信任根

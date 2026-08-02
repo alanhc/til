@@ -61,7 +61,7 @@ sidebar_position: 5
 | **image recipe** | 定義最終要放進 rootfs 的套件集合 | [yocto](../BMC/yocto.md) |
 | **machine / distro conf** | 選硬體與發行版設定 | [yocto](../BMC/yocto.md) |
 | **`bitbake obmc-phosphor-image`** | OpenBMC 標準 image 的建置指令（前置 `. setup <machine>`）。產物在 `tmp/deploy/images/<machine>/` | [yocto](../BMC/yocto.md) |
-| **Buildroot** | 另一套嵌入式建置系統，同樣往下產出 kernel / u-boot / driver / device tree。改 driver 通常只會動到 **Driver** 與 **Device Tree** 兩塊 | `BMC/device_driver/_index.md`、[porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
+| **Buildroot** | 另一套嵌入式建置系統，同樣往下產出 kernel / u-boot / driver / device tree。改 driver 通常只會動到 **Driver** 與 **Device Tree** 兩塊 | [device_driver](../BMC/device_driver/device_driver.md)、[porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 
 ### Gerrit Workflow
 
@@ -138,9 +138,9 @@ sidebar_position: 5
 | 名詞 | 說明 | 出處 |
 |---|---|---|
 | **I2C** | BMC 存取板上晶片（sensor、EEPROM、CPLD、retimer）最主要的匯流排 | [hardware](../BMC/hardware.md) |
-| **SMBus** | 基於 I2C 的系統管理匯流排協定 | [hardware](../BMC/hardware.md)、`BMC/device_driver/_index.md` |
+| **SMBus** | 基於 I2C 的系統管理匯流排協定 | [hardware](../BMC/hardware.md)、[device_driver](../BMC/device_driver/device_driver.md) |
 | **`i2cdetect`** | 掃描 bus 上有哪些位址有裝置，也可用來查是否有 driver 佔用 | [hardware](../BMC/hardware.md)、[pmbus](../BMC/pmbus.md) |
-| **`UU` vs 位址數字** | `i2cdetect` 輸出中：印出位址數字（如 `63`）代表 **no device driver**；印 `UU` 代表**目前有 driver 佔用** | `BMC/device_driver/_index.md` |
+| **`UU` vs 位址數字** | `i2cdetect` 輸出中：印出位址數字（如 `63`）代表 **no device driver**；印 `UU` 代表**目前有 driver 佔用** | [device_driver](../BMC/device_driver/device_driver.md) |
 | **`i2cget` / `i2cset` / `i2ctransfer`** | 直接對 I2C 裝置讀寫。`-y` 不詢問直接執行、`-f` 強制存取（即使已被 driver 佔用） | [hardware](../BMC/hardware.md)、[fru](../BMC/fru.md) |
 | **`i2cget -fy 7 0x63 0x8c w`** | 讀 bus 7、位址 0x63、command 0x8c 的 word——驗證 driver 讀值最快的方式 | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 | **`13-0048`** | sysfs 上 I2C 裝置的命名：**bus 13 上位址 0x48 的裝置**，路徑 `/sys/bus/i2c/devices/13-0048` | [fru](../BMC/fru.md) |
@@ -153,26 +153,26 @@ sidebar_position: 5
 
 | 名詞 | 說明 | 出處 |
 |---|---|---|
-| **PMBus (Power Management Bus)** | 建立在 SMBus 上的電源管理協定，用來讀電壓、電流、功率等 | [pmbus](../BMC/pmbus.md)、`BMC/device_driver/_index.md` |
+| **PMBus (Power Management Bus)** | 建立在 SMBus 上的電源管理協定，用來讀電壓、電流、功率等 | [pmbus](../BMC/pmbus.md)、[device_driver](../BMC/device_driver/device_driver.md) |
 | **PMBus 讀寫原語** | read byte / read word / write byte / write word | [pmbus](../BMC/pmbus.md) |
 | **PMBus 資料格式** | **linear**（m=1）與 **direct** 兩種。格式定義在 `pmbus.h` | [pmbus](../BMC/pmbus.md)、[porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
-| **Linear11** | 浮點編碼格式：N = 高 5 bit 有號整數、Y = 低 11 bit 有號整數，實際值 = Y 乘以 2 的 N 次方 | `BMC/device_driver/_index.md`、[ai_bmc](../ai_bmc.md) |
+| **Linear11** | 浮點編碼格式：N = 高 5 bit 有號整數、Y = 低 11 bit 有號整數，實際值 = Y 乘以 2 的 N 次方 | [device_driver](../BMC/device_driver/device_driver.md)、[ai_bmc](../ai_bmc.md) |
 | **direct format 的 m / b / R** | direct 格式需依公式填入三個係數：`X = (1/m) * (Y * 10^(-R) - b)`，程式中設定 `info->m[...]`、`info->b[...]`、`info->R[...]` | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 | **`pmbus_driver_info`** | driver 的核心結構。`.pages` 指定裝置支援幾個 page、`.format[PSC_VOLTAGE_IN]` 指定資料格式、`.func[0]` 用 functionality bitmask 啟用支援的 PMBus 指令 | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 | **`pmbus_do_probe(client, info)`** | probe 流程的第二步：填完 `pmbus_driver_info` 後呼叫它交給 PMBus core | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
-| **`pmbus_read_word_data()`** | 送 PMBus 指令讀取指定 register 的 16-bit word。另有 `pmbus_read_byte_data()`、`pmbus_write_word_data()` | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md)、`BMC/device_driver/_index.md` |
+| **`pmbus_read_word_data()`** | 送 PMBus 指令讀取指定 register 的 16-bit word。另有 `pmbus_read_byte_data()`、`pmbus_write_word_data()` | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md)、[device_driver](../BMC/device_driver/device_driver.md) |
 | **`.read_word_data`** | driver 的 word 讀取 handler，負責讀出 sensor 值 | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 | **`PMBUS_READ_VIN` 等常數** | PMBus register 常數，定義在 `pmbus.h` | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 | **VIN / VOUT / POUT / IOUT 對照** | function bitmask `PMBUS_HAVE_VIN` → reg `PMBUS_READ_VIN` → sysfs `in1`；VOUT → `in2`；POUT → `power2`；IOUT → `curr2` | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 | **`P = I * V` 驗證** | porting 完成後，用輸入輸出值是否滿足此式、且落在 schematic 標示的範圍內來驗證 | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md)、[pmbus](../BMC/pmbus.md) |
-| **呼叫鏈** | user space（如 `sensors`）→ PMBus core → driver 的 `read_word_data` → 底層 I2C 送 command code → 取得 word | `BMC/device_driver/_index.md` |
+| **呼叫鏈** | user space（如 `sensors`）→ PMBus core → driver 的 `read_word_data` → 底層 I2C 送 command code → 取得 word | [device_driver](../BMC/device_driver/device_driver.md) |
 
 ### Device Driver 與 Device Tree
 
 | 名詞 | 說明 | 出處 |
 |---|---|---|
-| **`probe`** | driver 與裝置配對成功時被呼叫的初始化函式，porting 的核心工作之一 | [pmbus](../BMC/pmbus.md)、`BMC/device_driver/_index.md` |
-| **Kconfig** | 定義 config 選項讓 kernel 能在 menuconfig 中辨識並啟用 driver。位置 `linux/drivers/hwmon/pmbus/Kconfig` | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md)、`BMC/device_driver/_index.md` |
+| **`probe`** | driver 與裝置配對成功時被呼叫的初始化函式，porting 的核心工作之一 | [pmbus](../BMC/pmbus.md)、[device_driver](../BMC/device_driver/device_driver.md) |
+| **Kconfig** | 定義 config 選項讓 kernel 能在 menuconfig 中辨識並啟用 driver。位置 `linux/drivers/hwmon/pmbus/Kconfig` | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md)、[device_driver](../BMC/device_driver/device_driver.md) |
 | **defconfig** | 預設設定檔（`<linux>/arch/arm/configs/aspeed_<project>_defconfig`）。`y` = 編進 kernel、`m` = 編成模組 | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 | **Makefile 一行** | `obj-$(CONFIG_SENSORS_XXX) += xxx.o`，告訴編譯器 `.config` 有這個選項時要 build | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 | **`MODULE_DEVICE_TABLE(i2c, ...)`** | 宣告 driver 支援的 i2c device id 表 | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
@@ -182,7 +182,7 @@ sidebar_position: 5
 | **binding yaml** | driver 的 device tree 文件，位置 `linux/Documentation/devicetree/bindings/hwmon/...`，用 `$id` / `$schema` / `properties` 描述 | [device_tree](../BMC/device_tree.md)、[porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 | **phandle** | Device Tree 中指向另一個 node 的參照 | [device_tree](../BMC/device_tree.md) |
 | **device tree 階層** | 由 `.dts` 逐層 include `.dtsi`，如 `aspeed-<project>-<board>-evt.dts` → `...-ast2600-<board>.dtsi` → `...-swb.dtsi` → `...-swb-i2c.dtsi`。插入 node 前要先找對層級 | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
-| **i2c alias** | 在 `<board>-i2c-aliases.dtsi` 中用 `alias` 為 bus 取固定編號，避免編號浮動 | `BMC/device_driver/_index.md` |
+| **i2c alias** | 在 `<board>-i2c-aliases.dtsi` 中用 `alias` 為 bus 取固定編號，避免編號浮動 | [device_driver](../BMC/device_driver/device_driver.md) |
 | **`linux-aspeed`** | Yocto 建置樹中 kernel 原始碼的位置（`build/workspace/sources/linux-aspeed`） | [device_tree](../BMC/device_tree.md) |
 
 ### GPIO / 中斷 / 其他匯流排
@@ -251,7 +251,7 @@ sidebar_position: 5
 |---|---|---|
 | **hwmon** | Linux 的 hardware monitoring 子系統，用**統一介面**把溫度、電壓、電流、風扇轉速、功率暴露到 user space | [hwmon](../BMC/hwmon.md)、[sensor_porting](../BMC/sensor_porting.md) |
 | **`/sys/class/hwmon/hwmonN/`** | hwmon 的 sysfs 節點位置 | [hwmon](../BMC/hwmon.md) |
-| **`temp1_input` / `in0_input` / `fan1_input` / `curr1_input` / `power1_input`** | hwmon 的命名慣例，值多為毫度／毫伏／毫安 | [hwmon](../BMC/hwmon.md)、`BMC/device_driver/_index.md` |
+| **`temp1_input` / `in0_input` / `fan1_input` / `curr1_input` / `power1_input`** | hwmon 的命名慣例，值多為毫度／毫伏／毫安 | [hwmon](../BMC/hwmon.md)、[device_driver](../BMC/device_driver/device_driver.md) |
 | **`*_max` / `*_crit` / `*_label`** | 提供門檻與名稱的 hwmon 屬性 | [hwmon](../BMC/hwmon.md) |
 | **找 driver 落在哪個 hwmon** | 逐一 `cat /sys/class/hwmon/hwmon*/name` 比對——hwmon 編號會浮動，不能寫死 | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 | **driver define** | 感測晶片（tmp75、adm1275、pmbus 裝置）的 kernel driver 註冊成 hwmon device，並定義提供哪些 channel/屬性 | [hwmon](../BMC/hwmon.md) |
@@ -386,7 +386,7 @@ sidebar_position: 5
 | **coredump analysis** | crash 時保留 core 檔，事後 `gdb /path/to/binary /path/to/core` 再 `bt` 印 backtrace 找 crash 位置。需先 `ulimit -c unlimited` | [debug](../BMC/debug.md) |
 | **debug symbol / strip** | 分析時**務必用帶 debug symbol 的未 strip 版本 binary**，backtrace 才能對應到原始碼行號 | [debug](../BMC/debug.md) |
 | **`systemd-coredump` / `coredumpctl`** | OpenBMC 多以 systemd-coredump 收集 core，用 `coredumpctl list` / `coredumpctl gdb` 取用 | [debug](../BMC/debug.md) |
-| **`dmesg`** | 查 kernel log，如 `dmesg \| grep -i "i2c\|aspeed\|sensor"` | `BMC/device_driver/_index.md`、[openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
+| **`dmesg`** | 查 kernel log，如 `dmesg \| grep -i "i2c\|aspeed\|sensor"` | [device_driver](../BMC/device_driver/device_driver.md)、[openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
 | **`journalctl`** | `journalctl -b`（本次開機所有 log）、`-u bmcweb`（特定服務）、`-f`（即時追蹤） | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md)、[systemd](../BMC/systemd.md) |
 | **`systemctl list-units --failed`** | 列出啟動失敗的服務。也可用 `systemctl list-units "phosphor*" "obmc*" "bmcweb*"` 看 OpenBMC 服務群 | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
 

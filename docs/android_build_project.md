@@ -40,8 +40,6 @@ repo has been initialized in /home/alanhc/aosp
 ```
 ![alt text](<截圖 2025-11-05 晚上7.24.58.png>)
 ![alt text](<截圖 2025-11-05 晚上7.24.21.png>)
-![[Pasted image 20251105192430.png]]
-![[Pasted image 20251105192502.png]]
 
 $ repo sync -c -j1 --fail-fast
 Syncing: 100% (987/987), done in 41m53.124s
@@ -87,7 +85,7 @@ ls -l /dev/kvm /dev/net/tun /dev/dri/renderD*  # 權限應分別屬於 kvm / cvd
 ```
 
 https://source.android.com/docs/core/architecture/bootloader
-![[Pasted image 20251022212501.png]]
+
 ## 詞彙表
 - Kernel
 	- _Android Common Kernel (ACK)_
