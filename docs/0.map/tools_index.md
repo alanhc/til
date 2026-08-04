@@ -32,7 +32,7 @@ sidebar_position: 9
 | [Cloudflare Tunnel](../cloudflare.md) | 佔位性質，只有指令片段沒有說明：`cloudflared tunnel create` 建 tunnel → 編 `~/.cloudflared/config.yml` 的 ingress 規則（把網域導到 `localhost:3000`）→ `cloudflared tunnel route dns` 綁 DNS |
 | [Supabase](../supabase.md) | 開源的 Firebase 替代方案：以 PostgreSQL 為核心，含 Row Level Security 控權、Auth（email／OAuth／magic link）、Storage、Realtime 訂閱、Deno 跑的 Edge Functions，並自動依資料表產生 REST／GraphQL API，附 Docker self-host 文件連結 |
 | [Discord Bot 開發](../discord.md) | 開發前置：Developer Portal 建 Application 取 Bot Token、要開哪些 Privileged Gateway Intents（Message Content Intent 才讀得到訊息）、OAuth2 URL Generator 產邀請連結、discord.py／discord.js 選擇，以及現代做法用 Slash Commands 取代前綴指令 |
-| [遠端 Server 控制方式](../remote_server_idea.md) | 草稿筆記：依情境挑做法——一次性小資料用 stdin pipe 或 ssh 帶 args、一堆檔案用 rsync、頻繁讀寫同一份用 sshfs 或 ControlMaster + scp、兩邊程式要互相讀寫則 SSH port forward + Redis/sqlite |
+| [遠端 Server 控制方式](../remote_server_idea.md) | 四種情境的選型對照表，每種都有實際指令與取捨：`ssh + args`／stdin pipe、`rsync` 只傳差異、**`ControlMaster` 連線重用**（最容易被忽略但收益最大的設定）、`sshfs`（方便但每次操作都是一次網路往返）、`ssh -L` port forward + Redis/SQLite（附 **不要透過 sshfs 多方寫入 SQLite** 的警告）；末段給選擇順序 |
 
 ---
 

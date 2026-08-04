@@ -1,3 +1,5 @@
+# Pixel 無法 adb root
+
 ## 背景
 adb root
 

@@ -1,3 +1,5 @@
+# NVIDIA GPU 檢查
+
 lsmod | grep nvidia
 nvidia-smi -L
 nvidia-smi

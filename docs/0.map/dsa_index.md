@@ -17,7 +17,7 @@ sidebar_position: 8
 | [Single Linked List](../DSA/Linked_List/0.linked_list.md) | **本系列主線**：`main.c`／`list.h`／`list.c` 三檔從零實作，dummy head 省空串列特判；insert／delete、fast-slow 找中點、delete_dup、swap、reverse／reverseK、帶 comparator 的 merge sort，附 `gcc -Wall` 輸出 |
 | [Doubly Linked List](../DSA/Linked_List/1.double_linked_list.md) | prev／next 雙指標、已知節點插刪 O(1)、哨兵簡化邊界；與 array 的四項比較，適合 LRU cache、deque |
 | [Linux Kernel Linked List](../DSA/Linked_List/3.linux_linked_list.md) | kernel `list_head` 為何 intrusive／doubly／circular；`container_of` 由成員回推外層 struct、`list_for_each_entry` 巨集、走訪中刪除要用 `_safe` 版 |
-| [LeetCode 題目清單](../DSA/Linked_List/2.leetcode.md) | **佔位頁**：六行題號（2095、82、24、25、2487、23），尚無解題內容 |
+| [Linked List 經典題](../DSA/Linked_List/2.leetcode.md) | 先講三個核心技巧（**dummy head**、**快慢指標**、**三指標翻轉**）並附程式碼，再逐題拆解 2095／82／24／25／2487／23 的做法與最容易踩的坑（82 vs 83 為何一個要 dummy head、23 的三種解法複雜度對照）；末段列 linked list 三大 bug 類型 |
 
 ---
 

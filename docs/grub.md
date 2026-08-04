@@ -1,3 +1,4 @@
+# GRUB 被 Windows 覆蓋的修復
 
 在原本的ubuntu電腦買了一個新硬碟並灌windows後，發現grub被覆蓋掉了，導致無法進入ubuntu系統。
 解決方法如下：

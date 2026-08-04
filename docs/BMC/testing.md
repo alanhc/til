@@ -2,12 +2,6 @@
 
 BMC 韌體驗證通常圍繞三件事展開：**test plan（測試計畫）→ functional testing（功能測試）→ report（測試報告）**。
 
-functional testing
-
-report
-
-test plan
-
 ## 流程說明
 
 1. **test plan（測試計畫）**：在測試前先定義測試範圍、對象版本、測試環境（硬體平台、連線方式）、通過標準與各項 test case。讓測試有依據且可重複。

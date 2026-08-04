@@ -1,3 +1,5 @@
+# Pixel Image 對照
+
 我們 build 出來的 (m 編譯)
 Image	來源
 boot.img	kernel + ramdisk，AOSP build

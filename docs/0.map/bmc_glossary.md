@@ -30,6 +30,11 @@ sidebar_position: 5
 | **D-Bus** | OpenBMC 的**服務溝通核心**。所有服務（bmcweb、ipmid、entity-manager、sensor、logging）都掛在同一條 message bus 上互相取用資料 | [dbus](../BMC/dbus.md)、[openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
 | **dbus-broker / dbus-daemon** | 實際承載 message bus 的程式 | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
 | **object / interface / property / signal** | D-Bus 的四個基本概念：物件路徑、介面、屬性、訊號 | [dbus](../BMC/dbus.md) |
+| **service (bus name)** | 一支行程在 bus 上註冊的名字，代表「誰提供這些資料」。**四層定址**由外而內是 service → object path → interface → member | [dbus](../BMC/dbus.md) |
+| **property / method / signal 的分工** | property 是可讀寫的狀態值；method 是可呼叫且會等回傳的函式；**signal 是主動廣播的事件通知**（如 `PropertiesChanged`、`InterfacesAdded`），OpenBMC 靠它讓元件彼此解耦 | [dbus](../BMC/dbus.md) |
+| **type signature** | `busctl call` 的參數型別字串：`s` string、`b` bool、`i`/`u` int32/uint32、`d` double、`a` array、`v` variant | [dbus](../BMC/dbus.md) |
+| **`busctl monitor`** | 即時印出某服務收發的所有訊息，適合觀察 signal 何時被發出 | [dbus](../BMC/dbus.md) |
+| **sdbusplus** | OpenBMC 對 systemd `sd-bus` 的 C++ 封裝。搭配 phosphor-dbus-interfaces 的 YAML 自動產生 binding，daemon 繼承後只需實作行為 | [dbus](../BMC/dbus.md)、[openbmc](../BMC/openbmc.md) |
 | **`busctl`** | 查詢／操作 D-Bus 的命令列工具 | [dbus](../BMC/dbus.md) |
 | **`busctl tree`** | 列出某個 service 底下的物件樹（如 `busctl tree xyz.openbmc_project.HwmonTempSensor`） | [dbus](../BMC/dbus.md)、[openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
 | **`busctl introspect`** | 檢視某物件提供哪些 interface / property / method | [dbus](../BMC/dbus.md) |
@@ -61,6 +66,10 @@ sidebar_position: 5
 | **image recipe** | 定義最終要放進 rootfs 的套件集合 | [yocto](../BMC/yocto.md) |
 | **machine / distro conf** | 選硬體與發行版設定 | [yocto](../BMC/yocto.md) |
 | **`bitbake obmc-phosphor-image`** | OpenBMC 標準 image 的建置指令（前置 `. setup <machine>`）。產物在 `tmp/deploy/images/<machine>/` | [yocto](../BMC/yocto.md) |
+| **`DEPENDS` vs `RDEPENDS`** | 前者是**建置期**依賴（編譯要用到的函式庫），後者是**執行期**依賴（跑起來才需要） | [openbmc](../BMC/openbmc.md) |
+| **`devtool modify <recipe>`** | 把某個套件的原始碼取出到 `build/<machine>/workspace/sources/<recipe>/` 直接修改，之後 bitbake 會用改過的樹去編。改 kernel／device tree 的標準做法 | [openbmc](../BMC/openbmc.md)、[device_tree](../BMC/device_tree.md) |
+| **`bitbake -c cleansstate` / `-c devshell` / `-e`** | 分別是：清建置快取強制重編、進入該套件的建置環境手動除錯、印出所有變數最終解析值 | [openbmc](../BMC/openbmc.md) |
+| **rofs / rwfs（唯讀 rootfs）** | OpenBMC 的 rootfs **預設唯讀**，可寫入部分是 overlay 分割。**直接改 `/usr/` 底下的檔案重開就消失**，需持久化的放 `/var/lib/`、`/etc/` | [openbmc](../BMC/openbmc.md) |
 | **Buildroot** | 另一套嵌入式建置系統，同樣往下產出 kernel / u-boot / driver / device tree。改 driver 通常只會動到 **Driver** 與 **Device Tree** 兩塊 | [device_driver](../BMC/device_driver/device_driver.md)、[porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 
 ### Gerrit Workflow
@@ -84,10 +93,13 @@ sidebar_position: 5
 |---|---|---|
 | **IPMI** | 傳統的伺服器管理協定，二進位格式、難擴充，正逐步被 Redfish 取代 | [ipmi](../BMC/ipmi.md)、[redfish](../BMC/redfish.md) |
 | **ipmid** | OpenBMC 處理 IPMI 協定的服務（KCS / LAN channel） | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
-| **SDR (Sensor Data Record)** | IPMI 的感測器描述紀錄 | [ipmi](../BMC/ipmi.md)、[openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
-| **SEL (System Event Log)** | IPMI 的系統事件紀錄 | [ipmi](../BMC/ipmi.md)、[sel_logger](../BMC/sel_logger.md) |
+| **SDR (Sensor Data Record)** | IPMI 的感測器**描述**紀錄，**不是讀值**。內含 sensor 編號／型別／單位／線性化換算係數／各級門檻——BMC 讀到的是 raw byte，要靠 SDR 才能轉成 °C·V·RPM，也才知道算不算異常。全部存在 **SDR Repository** | [ipmi](../BMC/ipmi.md)、[openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
+| **SEL (System Event Log)** | IPMI 的硬體事件日誌，存在 BMC 的**非揮發記憶體**，主機斷電也不會消失，是事後追查當機的第一手資料。空間有限（數百～數千筆），滿了可能停止記錄，維運上要定期收走 | [ipmi](../BMC/ipmi.md)、[sel_logger](../BMC/sel_logger.md) |
+| **`ipmitool sel elist`** | 比 `sel list` 多展開 SDR 資訊，比較好讀。`sel clear` 清空**清掉就沒了**，先備份 | [ipmi](../BMC/ipmi.md) |
 | **FRU (Field Replaceable Unit)** | 可現場更換的單元（主機板、電源、風扇背板）。每片板子放一顆 EEPROM，以 **IPMI Platform Management FRU Information** 格式存製造商、產品名、序號、part number | [fru](../BMC/fru.md)、[ipmi](../BMC/ipmi.md) |
-| **IPMI raw command** | 直接送原始 byte 的指令，如 `ipmitool raw 0x04 0x2d 0x01` | [ipmi](../BMC/ipmi.md)、[ai_bmc](../ai_bmc.md) |
+| **IPMI raw command** | 直接送原始 byte 的指令，格式 `ipmitool raw <NetFn> <Cmd> [data...]`，如 `ipmitool raw 0x04 0x2d 0x01`。**沒有任何保護**，打錯可能觸發非預期行為 | [ipmi](../BMC/ipmi.md)、[ai_bmc](../ai_bmc.md) |
+| **NetFn (Network Function)** | raw command 的功能分類碼：`0x00` Chassis、`0x04` Sensor/Event、`0x06` App、`0x0a` Storage、`0x2c` DCMI，`0x2e`／`0x30` 起為 **OEM 自訂區**（`ipmitool` 沒有對應子命令時就走 raw） | [ipmi](../BMC/ipmi.md) |
+| **RMCP+** | IPMI v2.0 的網路傳輸協定（UDP 623），相較舊版 RMCP 支援加密與 RAKP 金鑰交換。`ipmitool -I lanplus` 即指定它 | [ipmi](../BMC/ipmi.md)、[sol](../BMC/sol.md) |
 | **KCS** | Keyboard Controller Style，Host 與 BMC 間的 IPMI 傳輸介面之一。`ipmid` 無回應時常見原因就是 KCS 驅動問題 | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md)、[mctp](../BMC/mctp.md) |
 | **IPMI LAN channel** | 經網路下 IPMI 指令的通道，也可用來設定網路（相容舊工具） | [network](../BMC/network.md)、[openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
 
@@ -147,6 +159,13 @@ sidebar_position: 5
 | **`/sys/class/i2c-dev`** | I2C 在檔案系統上的介面路徑 | [hardware](../BMC/hardware.md) |
 | **i2c topology / address table** | 看 schematic 時要確認的兩件事：bus 怎麼接、每顆裝置的位址。**schematic 的 bus 編號從 1 開始數** | [schemantic](../BMC/schemantic.md)、[porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 | **i2c-mux** | I2C 多工器，用來把一條 bus 擴展成多條子 bus | [hotplug](../BMC/hotplug.md) |
+| **open-drain / 上拉電阻** | I2C 裝置只能把線拉低，回高電位靠上拉電阻（常見 2.2k／4.7k／10kΩ）。**一條 bus 只該有一組上拉**；阻值太大上升緣太慢會間歇性讀錯 | [hardware](../BMC/hardware.md)、[schemantic](../BMC/schemantic.md) |
+| **ACK** | 每個 byte 後接收端拉低 SDA 一個時脈。**沒有 ACK 就代表該位址沒裝置**——`i2cdetect` 正是靠這點掃描 | [hardware](../BMC/hardware.md) |
+| **repeated START** | 讀暫存器的標準模式：先寫 pointer，**不放開 bus** 直接再發一次 START 轉成讀，避免中途被其他 master 插隊 | [hardware](../BMC/hardware.md) |
+| **clock stretching** | slave 來不及時把 SCL 壓住讓 master 等待。部分控制器支援不完整，是難查的相容性問題來源 | [hardware](../BMC/hardware.md) |
+| **7-bit vs 8-bit 位址** | 線上傳的是「7-bit 位址左移一位 + R/W」。**Linux／device tree／`i2cdetect` 一律用 7-bit**，datasheet 與電路圖常寫 8-bit。看到位址 > `0x77` 就要警覺，八成要除以 2 | [schemantic](../BMC/schemantic.md)、[spec](../BMC/spec.md) |
+| **`clock-frequency`** | device tree 上設定 I2C 速度。**必須取這條 bus 上所有裝置支援的最低值** | [schemantic](../BMC/schemantic.md) |
+| **Linux bus 編號 ≠ 電路圖編號** | `/dev/i2c-N` 的 N 取決於 device tree `aliases` 與註冊順序；**mux 底下每個 channel 都是獨立的新 bus 編號**。用 `i2cdetect -l` 對照 | [schemantic](../BMC/schemantic.md) |
 | **i2c-hotplug** | 在可熱插拔裝置（模組、cable card、riser）出現/消失時動態建立或移除 I2C bus 與 device node，不需重開機。由 presence GPIO 或 interrupt 觸發。**重點是拔除時要乾淨移除**，避免殘留 stale 的 `/sys/bus/i2c/devices/...` | [hotplug](../BMC/hotplug.md) |
 
 ### PMBus
@@ -157,6 +176,10 @@ sidebar_position: 5
 | **PMBus 讀寫原語** | read byte / read word / write byte / write word | [pmbus](../BMC/pmbus.md) |
 | **PMBus 資料格式** | **linear**（m=1）與 **direct** 兩種。格式定義在 `pmbus.h` | [pmbus](../BMC/pmbus.md)、[porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 | **Linear11** | 浮點編碼格式：N = 高 5 bit 有號整數、Y = 低 11 bit 有號整數，實際值 = Y 乘以 2 的 N 次方 | [device_driver](../BMC/device_driver/device_driver.md)、[ai_bmc](../ai_bmc.md) |
+| **Linear16 (ULINEAR16)** | **專給 `READ_VOUT`**：整個 16-bit word 都是無號尾數 Y，指數 N 另外放在 `VOUT_MODE` 的低 5 bit（有號）。分開是為了給電壓更高解析度 | [pmbus](../BMC/pmbus.md) |
+| **`VOUT_MODE` (0x20)** | 回報 VOUT 用哪種格式與指數。**probe 時要先讀它才能正確換算電壓** | [pmbus](../BMC/pmbus.md) |
+| **`PAGE` (0x00)** | PMBus 的分頁機制：多路輸出的晶片用它切換目前操作哪一路，各路有各自的 `READ_VOUT` 等暫存器 | [pmbus](../BMC/pmbus.md) |
+| **格式判斷錯誤** | 移植 driver 最常見的 bug：用 Linear 解 Direct 的值，會得到「看起來有點像但就是不對」的數字。用 `P=IV` 或轉換效率是否 > 100% 可快速察覺 | [pmbus](../BMC/pmbus.md) |
 | **direct format 的 m / b / R** | direct 格式需依公式填入三個係數：`X = (1/m) * (Y * 10^(-R) - b)`，程式中設定 `info->m[...]`、`info->b[...]`、`info->R[...]` | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 | **`pmbus_driver_info`** | driver 的核心結構。`.pages` 指定裝置支援幾個 page、`.format[PSC_VOLTAGE_IN]` 指定資料格式、`.func[0]` 用 functionality bitmask 啟用支援的 PMBus 指令 | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 | **`pmbus_do_probe(client, info)`** | probe 流程的第二步：填完 `pmbus_driver_info` 後呼叫它交給 PMBus core | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
@@ -196,7 +219,10 @@ sidebar_position: 5
 | **`devmem`** | 直接讀寫實體記憶體位址（暫存器）的工具 | [hardware](../BMC/hardware.md) |
 | **ADC** | 類比數位轉換，BMC 用來讀電壓（AST2600 上的驅動為 `aspeed-adc`） | [hardware](../BMC/hardware.md)、[openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
 | **SPI（single / dual / quad / octal）** | 序列周邊介面，依資料線數量分級。BMC 的 U-Boot / kernel / rootfs 都放在 SPI Flash 上 | [hardware](../BMC/hardware.md) |
-| **SCM / DCSCI** | 板卡/模組類別代號 | [hardware](../BMC/hardware.md) |
+| **SCM (System Controller Module)** | 把 BMC 與其周邊（flash、RAM、網路 PHY、TPM）從主機板拆出來做成獨立子卡。主機板改版時管理子系統不必重新驗證 | [hardware](../BMC/hardware.md) |
+| **DC-SCM / DC-SCI** | OCP 把 SCM 標準化的規格。**DC-SCM** 是那張卡（Datacenter-ready Secure Control Module）；**DC-SCI** 是卡與主機板之間的介面規格（LPC/eSPI、I2C/I3C、PCIe、USB、UART 與電源/reset 控制線）。有 1.0／2.0 兩世代 | [hardware](../BMC/hardware.md) |
+| **`gpio-line-names`** | device tree 上替每支 GPIO 命名的 property。填好之後 `gpioinfo` 會直接印出名稱，**是對照電路圖最快的方式** | [hardware](../BMC/hardware.md) |
+| **sysfs GPIO 已 deprecated** | `/sys/class/gpio` 的全域編號會隨 kernel 版本與 probe 順序改變，腳本容易失效。**新專案一律用 libgpiod**（chip + offset 定址） | [hardware](../BMC/hardware.md) |
 | **IRQ (Interrupt Request)** | 硬體通知 CPU 有事件發生，CPU 暫停當前工作轉去執行 irq handler，**不必忙碌輪詢即可即時反應** | [interrupt](../BMC/interrupt.md) |
 | **`/proc/interrupts`** | 觀察每個 IRQ 編號、各 CPU 上的觸發次數、中斷控制器與裝置名稱。`watch -n1 cat /proc/interrupts` 可看哪個中斷正頻繁觸發 | [interrupt](../BMC/interrupt.md) |
 | **top half** | 硬體中斷 handler，在 interrupt context 執行：**必須極短、不可睡眠**，通常只做硬體 ack 與記錄 | [interrupt](../BMC/interrupt.md) |
@@ -212,6 +238,9 @@ sidebar_position: 5
 | **`i2ctransfer -y -f 13 w2@0x48 0x00 0x00 r128`** | 無 driver 時直接讀 EEPROM：對 bus 13、位址 0x48 先寫 2-byte 內部位址（word address），再連讀 128 bytes | [fru](../BMC/fru.md) |
 | **Common Header** | FRU dump 開頭的區塊，內含指向 Chassis / Board / Product Info 各區塊的 offset | [fru](../BMC/fru.md) |
 | **`ipmitool fru` / `frutool`** | 把 FRU raw bytes 解析成人類可讀欄位 | [fru](../BMC/fru.md) |
+| **FruDevice** | entity-manager 的子程式：掃描各 I2C bus 的 `0x50`–`0x57`，驗證 FRU header 後解析並掛上 D-Bus。**它是硬體偵測整條鏈的起點**——FRU 沒燒好會出現「什麼感測器都沒有」 | [sensor_porting](../BMC/sensor_porting.md) |
+| **EEPROM 位址寬度** | 2Kbit（256 byte）以下用 1 byte word address，再大要 2 byte。**用錯會讀到完全錯的位置**，是最常見的錯誤 | [spec](../BMC/spec.md) |
+| **write cycle time / WP 腳** | EEPROM 寫入後需約 5ms 內部寫入時間（期間不回 ACK）；WP 腳拉高則唯讀，板上常接 GPIO，燒 FRU 前要先放掉 | [spec](../BMC/spec.md) |
 
 ### 板上元件
 
@@ -346,13 +375,23 @@ sidebar_position: 5
 | **unit 檔案位置** | `/etc/systemd/`（設定）與 `/lib/systemd/system/`（系統 service 檔案） | [systemd](../BMC/systemd.md)、[openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
 | **標準 target 順序** | `sysinit.target` → `basic.target` → `network.target` → `multi-user.target`（bmcweb、ipmid、phosphor-log-manager、entity-manager、phosphor-fan-presence…） | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
 | **OpenBMC 特有 target** | `obmc-standby.target`（BMC 就緒、Host 仍關機）、`obmc-chassis-on@0.target`（Host 開機中）、`obmc-host-on@0.target`、`obmc-host-off@0.target` | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
+| **target 是同步點不是程式** | target 本身什麼都不做，只表達「系統到達某階段」，讓其他 unit 掛在它上面一起被拉起。是 SysV runlevel 的一般化 | [systemd](../BMC/systemd.md) |
+| **`Type=dbus`** | 服務要等到在 D-Bus 上註冊到 `BusName` 才算啟動完成。**OpenBMC 大量使用**，因為元件間的相依是 D-Bus 層級的 | [systemd](../BMC/systemd.md) |
+| **unit 覆寫優先序** | `/etc/systemd/system/` > `/run/systemd/system/` > `/lib/systemd/system/`。`enable` 的實作是在 `*.target.wants/` 建 symlink | [systemd](../BMC/systemd.md) |
+| **drop-in 覆寫** | 只改幾個欄位而不整份複製：`/etc/systemd/system/foo.service.d/override.conf`，用 `systemctl edit` 建立。改完要 `daemon-reload` | [systemd](../BMC/systemd.md) |
+| **journald / `journalctl`** | systemd 的 log 是**二進位格式**，不能 `cat`。`-u` 看單一服務、`-b -1` 看上次開機（查重開原因）、`-k` 等同 dmesg | [systemd](../BMC/systemd.md) |
+| **BMC 上 journal 預設不持久** | 常只存在 `/run/log/journal/`，**一重開就沒了**。要跨重開保留需設 `Storage=persistent`，但 flash 空間與寫入壽命有限，要一併設 `SystemMaxUse=` | [systemd](../BMC/systemd.md) |
 
 ### Flash 燒錄
 
 | 名詞 | 說明 | 出處 |
 |---|---|---|
 | **MTD (Memory Technology Device)** | Linux 的 flash 裝置抽象層，rootfs 從 `/dev/mtdblockN` 掛載 | [flash](../BMC/flash.md)、[openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
-| **`flashcp` / `flash_erase` / `nand write` / `dd`** | 更新 BMC flash 的常用工具 | [flash](../BMC/flash.md) |
+| **`flashcp` / `flash_erase` / `nandwrite` / `dd`** | 更新 BMC flash 的常用工具。**`flashcp` 是首選**（一次完成擦除→寫入→驗證）；`nandwrite` 供 NAND 用（會跳過 bad block） | [flash](../BMC/flash.md) |
+| **不能用 `dd` 寫 flash** | flash 寫入只能把 bit 從 1 變 0，`dd` 不會先擦除，結果是舊資料與新資料的 **bitwise AND**——看似成功實際全壞。`dd` 只適合讀出來備份 | [flash](../BMC/flash.md) |
+| **`/dev/mtdN` vs `/dev/mtdblockN`** | 前者是 character device，MTD 工具用它寫；後者是 block device，可 mount 但**寫入行為受限，不要拿來寫 image** | [flash](../BMC/flash.md) |
+| **erase block** | flash 不能直接覆寫，要改一個 byte 得先把整個 erase block（NOR 常見 4K／64K）擦成全 `0xFF`。`/proc/mtd` 的 `erasesize` 欄位即是 | [flash](../BMC/flash.md) |
+| **更新 u-boot 的風險** | `mtd0` 是**唯一寫壞就無法用軟體救回**的區段，只能用 SPI 燒錄夾外接重燒。非必要不要更新，一定要更新先 `dd` 備份 | [flash](../BMC/flash.md) |
 | **用 `dd` 拼 image** | 依 offset 把 u-boot（seek=65536）、uImage（seek=524288）、dtb（seek=12689408）分別寫進同一個 image 檔（`conv=notrunc bs=1`） | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 | **上板燒錄** | `scp` image 到 BMC 的 `/var/`，再 `dd if=... of=/dev/mtdblock0 bs=64k seek=0` 後 `reboot` | [porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 

@@ -1,3 +1,5 @@
+# Whisper 語音轉文字
+
 繁體中文可以用聯發科開發個
 
 Breeze ASR

@@ -2,11 +2,6 @@
 
 資料中心以 **cluster（叢集）** 為單位組織大量伺服器，透過高速網路把多台機器組成一個運算/儲存整體。常見的節點角色分工如下：
 
-cluster
-- headnode
-- compute node
-- storage node
-
 ## 各節點角色
 
 - **headnode（管理/登入節點）**：又稱 management node 或 login node，負責使用者登入、作業排程（job scheduler，如 Slurm/PBS）、監控與部署，是進入叢集的入口，通常不跑重負載運算。

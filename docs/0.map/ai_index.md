@@ -15,7 +15,7 @@ sidebar_position: 2
 
 | 文章 | 內容 |
 |---|---|
-| [AI 生態總覽](../AI.md) | 速記與對照表：OpenAI／Google／Anthropic／Perplexity 在 Chat、POC、Browser、筆記工具、地端 IDE、CLI、Agent framework 各格的對應產品；另一張表比較三家的 Agent framework（MCP + Agents SDK vs ADK/Vertex vs Claude Agent SDK）、Web IDE、本地 IDE、CLI 與筆記工具；含 AI 簡史（2020 GPT-3 → 2022 ChatGPT → 2023 GPT-4）與 self-host 選型（JAN vs LM Studio、ollama vs vLLM） |
+| [AI 生態總覽](../AI.md) | 三家陣營的產品位置對照表 ×2（Chat／POC／Browser／筆記／地端 IDE／CLI／Agent framework；Agent framework／Web IDE／本地 IDE／CLI／筆記工具）；**AI 歷史年表**（Transformer → GPT-3 的 in-context learning → RLHF → ChatGPT → GPT-4 → agent 時代）；**MCP** 解決 M×N → M+N 整合問題與 Tools/Resources/Prompts 三種能力；**self-host 分兩層**——桌面 App（JAN vs LM Studio）與推論引擎（ollama vs vLLM，附並發/硬體/量化取捨表）；使用原則與 `CLAUDE.md`／`AGENTS.md`／`GEMINI.md` 對照 |
 | [為什麼公司推不動 Agentic AI](../ai-why-companies-struggle-agentic-ai.md) | **長篇觀點文**：導入 agentic AI 卡住的四道組織的牆——①管理層覺得不好管（能力—部署驗證落差）②出事沒人負責（accountability gap，用委託代理問題與眾手問題解釋「責任蒸發」）③同事怕被取代（STARA awareness、配合但不投入）④agent 拆解角色後責任滑到 code review。附 security vs RD 斷層、四個務實抓手，與「agent 不是病因、是顯影劑」的結論。19 筆文獻含逐項查證狀態 |
 | [Why Companies Can't Get Agentic AI Off the Ground (EN)](../ai-why-companies-struggle-agentic-ai-en.md) | 上篇的英文版 |
 | [AI 時代的「基本功」](../ai_basic_knowledge.md) | **觀點文**：拆解「工具會變、基本功最重要」這句話——基本功是事後追認的（組語、手動記憶體管理都當過基本功）、這句話無法被證偽所以只提供安慰；但「什麼都會過時」也是逃避，因為技術棧各層半衰期不均勻。結論：AI 讓「驗證輸出對不對」的能力空前值錢。附 Deming & Noray、GitHub Copilot 生產力研究等文獻 |
@@ -30,7 +30,7 @@ sidebar_position: 2
 | [Claude Code](../claude_code.md) | 官方 agentic CLI 簡介，含 Chrome 整合（透過瀏覽器擴充讓 agent 導覽、點擊、讀取頁面） |
 | [Claude Code 安裝](../claude_install.md) | `npm install -g @anthropic-ai/claude-code` 全域安裝、Node.js 需求、首次啟動登入流程，並提醒以官方 setup 文件為準 |
 | [Claude Code Channels](../claude_channel.md) | 佔位頁，目前只有一句說明與官方 channels 文件連結 |
-| [Claude](../claude.md) | 佔位頁，目前只有一張截圖，無文字內容 |
+| [Claude](../claude.md) | 佔位頁，目前只有一張截圖，無文字內容（已補標題） |
 | [Claude UI](../claude_ui.md) | 佔位頁，兩張 Claude 使用介面截圖 |
 | [用 Ollama 跑 Claude Code](../claude_use_ollama.md) | `ollama launch claude` 的模型選單實錄：`minimax-m2.5:cloud`、`glm-5:cloud`、`kimi-k2.5:cloud` 等雲端模型，以及 `glm-4.7-flash`（~25GB）、`qwen3:8b`（~11GB）等本地模型 |
 | [Claude Skills](../claude_skills.md) | 連結收藏：`npx skills add anthropics/claude-plugins-official --skill skill-creator`、`/plugin marketplace add anthropics/skills`，以及 anthropics/skills repo、官方 Skill 建置指南 PDF 與中文教學 |
@@ -45,7 +45,7 @@ sidebar_position: 2
 |---|---|
 | [MCP](../mcp.md) | **實作主線**：用 python-sdk 的 FastMCP 寫 MCP server（`@mcp.tool()` / `@mcp.resource()` / `@mcp.prompt()` 三種裝飾器範例）、`uv run --with mcp main.py` 執行、用 `cloudflared tunnel` 暴露到公網，再到 ChatGPT 的「連接器」設定填入 `/mcp` 網址並直接呼叫 |
 | [使用自訂義的 GPTs](../gpts.md) | 完整實作：用 FastAPI + yt-dlp 寫一支抓 YouTube 字幕的 backend（含 VTT 解析與 5 秒內字幕合併邏輯）、`cloudflared tunnel` 對外、在 GPTs 用 `openapi.json` 匯入動作，最後撰寫 prompt 測試 |
-| [Agent 相關收藏](../agent.md) | 佔位頁，目前只有五條 GitHub 連結（agency-agents、MiroFish、impeccable、OpenViking、nanochat），無說明文字 |
+| [AI Agent 相關專案](../agent.md) | 依用途分類的五個專案：**agency-agents**（200+ 專業角色 agent 定義檔）、**impeccable**（提升 agent 前端設計品質的指引系統）、**OpenViking**（不用向量庫、把記憶/技能組成 `viking://` 虛擬檔案系統的 context database）、**MiroFish**（多 agent 模擬預測引擎）、**nanochat**（單 GPU node 跑完整 LLM pipeline 的極簡框架） |
 | [遠端 Playwright MCP 控制本機 Chrome](../claude_remote_playwright_mcp.md) | **深入版**：從遠端 Linux 控制 Windows 上 Chrome 的完整方案。原理是 Chrome DevTools Protocol（`--remote-debugging-port=9222` 會開一個 HTTP + WebSocket 伺服器），Playwright 用 `connectOverCDP()` 連既有瀏覽器；四步驟教學（獨立 `--user-data-dir` 啟 Chrome → `ssh -N -R` 反向隧道 → Linux 端 curl 驗證 → Playwright MCP 用 `--cdp-endpoint`），並強調 CDP 完全沒有驗證機制，絕不能把 9222 直接暴露公網 |
 | [AI 測試（Playwright Agent）](../ai_testing.md) | 極簡速記：Playwright agent 的三個角色 Planner／Generator／Healer，以及 Playwright MCP Server（瀏覽器自動化）與 Playwright Test MCP Server（測試工作流程）的分工 |
 | [Firecrawl](../firecrawl.md) | 把網站轉成 LLM 可用資料的爬取工具：輸入 URL 回傳乾淨 markdown、自動處理 JS 渲染與雜訊；四個主要功能 `scrape`／`crawl`／`map`／`extract`，可串進 RAG / agent pipeline |
@@ -78,7 +78,7 @@ sidebar_position: 2
 | [Gemini CLI](../gemini.md) | 佔位頁，一句簡介加一條中文教學連結 |
 | [用 Gemini CLI 串 Google Sheet](../gemini_google_sheet.md) | 真實對話紀錄：讓 Gemini CLI 用視覺能力辨識圖片金額、重寫 `parse_accounts.py` 解析多行 Key: Value 並補上 amount 欄位產生 CSV；接著問「怎麼連到 Google Sheet」，得到手動匯入 vs 用 `gspread` + 服務帳戶 JSON 金鑰自動上傳兩種方法（含把 sheet 分享給 `client_email` 的關鍵步驟） |
 | [Google NotebookLM](../ai_google_notebook_lm.md) | AI 研究與筆記助理，特色是以「你上傳的資料源」為依據回答並附引用來源；Audio Overview 可生成雙人對談 podcast 式語音摘要 |
-| [Apple Intelligence](../ai_apple_intelligence.md) | 佔位頁，目前只有 Apple 官方支援文件與產品頁連結，加一張截圖 |
+| [Apple Intelligence](../ai_apple_intelligence.md) | Apple 內建 AI 的定位（散進系統 App 而非獨立對話視窗）與**分層處理**架構（裝置端 → Private Cloud Compute → ChatGPT）；四項主要功能對照表（Writing Tools、Image Playground、通知摘要、備忘錄錄音摘要）各附官方說明連結，末段是實際使用觀察 |
 | [在 VSCode 使用 AI coding 工具](../ai_vscode.md) | VSCode 透過 extension 整合各家 agent（Copilot、Claude Code、Codex）；以 Codex extension 為例，可在側邊欄讓 agent 讀工作區、提修改建議並套用 diff |
 
 ---

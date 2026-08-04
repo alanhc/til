@@ -1,3 +1,4 @@
+# Linux Kernel Image 名詞對照
 
 - vmlinux
     - 型態：ELF 可執行檔

@@ -70,7 +70,7 @@ sidebar_position: 6
 |---|---|
 | [半導體](../半導體/半導體.md) | 半導體基礎：N/P 型摻雜、PN 接面、MOSFET、CMOS；產業鏈分工（fabless／foundry／OSAT／IDM）與代表廠商；光罩、微影、蝕刻、沉積、離子佈植等製程與製程節點意義 |
 | [晶片](../晶片.md) | 影片筆記：Apple M5 與 NVIDIA 路線的比較（「Copying Nvidia?」），含三張截圖 |
-| [Chip](../chip.md) | 佔位頁，目前只有一條 ChatGPT 對話連結，尚無整理內容 |
+| [Chip](../chip.md) | 佔位頁：只有一條**私人 ChatGPT 對話連結**（外人無法開啟），尚無整理內容 |
 | [NVIDIA GPU](../gpu_nvidia.md) | Linux 上確認 NVIDIA 驅動狀態的指令與實測輸出：`lsmod \| grep nvidia` 看 `nvidia`/`nvidia_uvm`/`nvidia_drm`/`nvidia_modeset` 模組相依、`nvidia-smi` 查 RTX 5070 Ti 的驅動版本、CUDA 版本、溫度功耗與佔用 VRAM 的 process |
 | [Raspberry Pi](<../raspberry pi.md>) | 單板電腦筆記：用 Raspberry Pi Imager 燒錄 OS 並預先設定 SSH／Wi-Fi／帳號、GPIO 接周邊的應用場景、官方文件與一支影片連結 |
 
@@ -82,6 +82,7 @@ sidebar_position: 6
 
 | 文章 | 內容 |
 |---|---|
+| [IC 設計的前段／中段／後段](../BMC/ic-design-flow.md) | **這條鏈的上游**：從 Spec 到 GDSII 的完整數位 IC 流程。前段（架構／微架構／RTL coding／驗證方法學：directed、constrained random、formal、emulation）；中段（Synthesis 與 SDC 約束太鬆/太緊的後果、DFT 的 Scan/MBIST/ATPG/JTAG/compression、LEC 等價性驗證）；後段（Floorplan→Placement→CTS→Routing→Signoff，含 STA/IR Drop/EM/DRC/LVS/Antenna/SI 檢查表）。另談「中段」邊界在各公司浮動、類比 IC 沒有合成步驟、流程實為迴授而非瀑布。**與下方量產測試系列直接相接**：DFT 決定了 ATE 上能測到什麼 |
 | [半導體量產測試全景](../semiconductor-test-overview-cp-ft-slt-ate.md) | **系列總綱**：CP（晶圓）→ FT（封裝後）→ SLT（出貨前）三個 test insertion 加上 ATE（設備）的定位；結構性 vs 功能性兩種測試哲學、「缺陷越晚發現越貴」的十倍法則經濟學、四角色對照表，以及從 chip vendor 看品質過濾／良率歸因／產品分級／閉環回饋四件事 |
 | [ATE 是什麼](../what-is-ate.md) | 破除最常見的混淆——ATE 是 CP/FT **共用的設備**，不是一個測試階段。DFT／ATPG／scan chain 的結構性測試原理、fault model 與 coverage、市場格局，以及 ATE 覆蓋率的先天極限（為何仍需要 SLT） |
 | [CP 晶圓測試](../what-is-cp-wafer-test.md) | 封裝前用探針卡扎裸 die、產出 wafer map 篩壞品；探針卡的接觸電阻／寄生電感如何限制高頻與大電流測試、CP 能不能省（盲封），以及最容易混淆的 CP vs WAT（測產品 vs 測製程） |

@@ -27,7 +27,7 @@ sidebar_position: 0
 |---|---|
 | [韌體安全全景](../firmware_security.md) | **總圖**：把韌體安全當領域組織的五道防線——供應鏈金鑰／開機信任鏈／執行期隔離／韌體更新／攻擊面。串起 [Secure Boot 解析](../Secure_Boot_解析.md)、[TF-A 解析](../ARM_Trusted_Firmware_解析.md)、[SELinux](../selinux.md) 三篇深入版，並補上執行期保護、攻擊面（含 MTK BROM exploit）、供應鏈等目前沒展開的塊 |
 | [Android Boot Flow](../android_boot_flow.md) | 完整開機流程：Boot ROM → Bootloader → Kernel → Init → Zygote → System Server → Launcher，含 partition 結構與除錯方法 |
-| [Bootloader](../bootloader.md) | Little Kernel (LK)、Aboot、PBL/SBL 兩階段 bootloader、SoC 廠商生態 |
+| [Bootloader](../bootloader.md) | 為何要分階段（最早的程式碼受限於晶片內 ROM/SRAM 的極小空間）；TF-A 的 **BL0/BL1/BL2/BL31/BL32/BL33** 通用命名表與各家對應不整齊的提醒；Android 三階段 **PBL（Boot ROM，不可更新、secure boot 的信任根）→ SBL/XBL（初始化 DRAM）→ LK/aboot（fastboot、AVB、載入 kernel）**；LK 其實是有排程器的極小 OS，Qualcomm 的 aboot 是它的 fork |
 | [ARM Trusted Firmware (ATF)](../atf.md) | BL1~BL33 各階段、Exception Level (EL0~EL3)、TrustZone、OP-TEE、Secure/Normal World、CCA 演進時間軸 |
 | [ARM Trusted Firmware 元件](../arm_trust_firmware.md) | TF-A 主要元件：PSCI、SMC Dispatcher、SiP service、Root of Trust |
 | [ARM Trusted Firmware (TF-A) 解析](../ARM_Trusted_Firmware_解析.md) | **深入版**：BL1~BL33 各階段職責、TBBR 憑證鏈如何銜接 AVB、BL31 常駐的 Secure Monitor／PSCI／中斷路由、各家 SoC 階段命名對照（高通 PBL/XBL/TZ、MTK Preloader/ATF/LK）、platform port 與 QEMU 上手路徑 |
@@ -48,7 +48,7 @@ sidebar_position: 0
 | [Pixel 8 AOSP 完整工作流程](../aosp_pixel_full_workflow.md) | **主線教學**：build ID ↔ AOSP tag ↔ vendor driver 三者對齊 → repo sync → vendor blob → lunch/m → fastboot flashall，含常見錯誤與救磚 |
 | [Pixel 8 AOSP Full Workflow (EN)](../aosp_pixel_full_workflow_EN.md) | 上篇的英文版 |
 | [Android Build Project](../android_build_project.md) | 環境套件安裝、repo init/sync、Cuttlefish 虛擬機建置、詞彙表（ACK、GKI、VNDK） |
-| [AOSP Codebase](../aosp_codebase.md) | `.repo/manifests/default.xml` 查目前 branch revision |
+| [AOSP Codebase](../aosp_codebase.md) | `repo` 與 manifest 的關係：`.repo/` 目錄結構、`default.xml` 的 `revision`／`remote`／`sync-j` 與個別 `<project>` 可覆蓋版本；**`repo manifest -r` 把浮動分支展開成固定 SHA**（重現 build 的唯一可靠做法）；`GLOBAL-PREUPLOAD.cfg` 的 preupload hook；`repo sync` 選項表；用 `local_manifests` 加自己的 repo 而不改上游 |
 | [Android Build Number 解析](../Android_build_number.md) | `BP4A.251205.006` 各欄位含義（代號／分支／日期／patch） |
 | [搞懂三種 Build Variant：user／userdebug／eng](../android-build-variants.md) | 三者的定位與底層差異：`ro.secure`／`ro.debuggable` 兩個屬性怎麼決定能不能 `adb root`、模組安裝範圍（eng 全裝 vs user 只裝 product 要求）、dexpreopt 最佳化開關與效能落差；附完整對照表與「重現使用者問題／量效能／QA 一律用 `userdebug` 而非 `eng`」的實務原則 |
 | [Android Product Flavor 完整教學](../android-product-flavor-完整教學.md) | **App 層（Gradle）**：一份程式碼產出多個 App——build type／product flavor／build variant 三者關係、Groovy 與 Kotlin DSL 兩種寫法、flavor 能客製什麼（`applicationId`／`BuildConfig`／manifest placeholder／source set 資源與程式碼覆寫）、flavor dimensions 多維度組合、免費版 vs 付費版實戰、依 flavor 加依賴，以及常見陷阱 |
@@ -59,7 +59,7 @@ sidebar_position: 0
 
 | 文章 | 內容 |
 |---|---|
-| [Pixel 硬體代號](../pixel_hardware.md) | `zuma` = Tensor G3 SoC、`shiba` = Pixel 8、kernel 分支 `android-gs-zuma-*` |
+| [Pixel 硬體代號](../pixel_hardware.md) | **SoC 代號 vs 裝置代號**的一對多關係（`zuma` → `shiba`/`husky`/`akita`）：kernel 側用 SoC 代號（`android-gs-zuma-*`，gs = Google Silicon），AOSP 側用裝置代號（`lunch aosp_shiba-userdebug`）；附 `user`/`userdebug`/`eng` variant 差異與 `getprop` 查證方式 |
 | [Pixel Study](../pixel_study.md) | 實作全紀錄：ADB 安裝、開發者模式、repo sync、lunch、flashall log、anti-rollback 錯誤、`flash-all.sh` 救磚 |
 | [Pixel Fastboot Deep Dive](../pixel_fastboot_deepdive.md) | `fastboot flashall -w` 完整輸出逐行紀錄 |
 | [Pixel Image 來源對照](../pixel_img.md) | 哪些 image 是 `m` build 出來的、哪些是 vendor blob、哪些是 Google 原廠 binary |
@@ -73,7 +73,7 @@ sidebar_position: 0
 
 | 文章 | 內容 |
 |---|---|
-| [Pixel Root](../pixel_root.md) | Magisk（user-space，patch `init_boot.img`）vs KernelSU（kernel-space，改 `boot.img`）比較 |
+| [Pixel Root](../pixel_root.md) | Magisk vs KernelSU 對照表，並解釋**為何是不同的 image**（Android 13 後 generic ramdisk 拆成 `init_boot.img`，Magisk 換 `init` 所以改它；KernelSU 把 su 編進 kernel 所以改 `boot.img`）；解鎖 bootloader 前置、兩者的實際刷入步驟、以及 Play Integrity／OTA 覆蓋／刷錯版本變磚等注意事項 |
 | [Pixel 無法 adb root](../pixel_can_not_run_as_root.md) | `adbd cannot run as root in production builds` 的解法：Magisk patch init_boot，含 `/sys/class/` 節點列表 |
 | [Dirty SEPolicy 偵測：一種讓所有 Root 方案都現形的新向量](../dirty-sepolicy-detection.md) | 2026 年起銀行／金流 App（Shopee、BRImo、Birbank 等）採用的偵測手法：直接讀任何 App 都能開的 `/sys/fs/selinux/policy`，解析核心中**正在生效**的 binary policy，比對原廠指紋找污染痕跡（可疑 type／permissive domain／`untrusted_app` 異常權限）。之所以打擊面全覆蓋（Magisk／KernelSU 全分支／APatch），是因為**注入 sepolicy 規則是 root 的功能性必要條件，無法迴避**，傳統藏檔案／改包名的表層隱藏完全失效。反制思路是在核心 `security_read_policy` 路徑上 hook，對非特權 App 回傳乾淨副本（KernelSU 的 Hide SELinux modifications／APatch `selinux_hook` KPM）；附用 `strace` 自行驗證某 App 是否使用此向量的方法 |
 
@@ -120,6 +120,7 @@ sidebar_position: 0
 |---|---|
 | [Android Migration](../android-migration.md) | **系列第一篇（總論）**：Android 大版本遷移為何是一條跨三家公司的串行供應鏈、一次升級的工作分解（晶片商 BSP → OEM framework rebase → CTS/VTS 認證 → OTA）、Project Treble 如何用 HIDL/AIDL + VINTF/FCM 切開 system/vendor，以及 Treble 沒解決的「要求年年追加」如何通往後兩篇 |
 | [Vendor Freeze](../vendor-freeze.md) | **系列第二篇**：GRF／Longevity GRF 的凍結機制與三方賽局——`ro.board.first_api_level` 等 board property、VINTF／FCM 相容性合約、「3 年一次 kernel 大版本升級」條款、功能天花板如何在 SoC 選型那一刻就被決定 |
+| [從 vendor 分割區看 Project Treble](../project-treble-移植開發者筆記.md) | **移植者視角的完整版**：從「一台陌生機器該問的五個問題」（`ro.treble.enabled`／`first_api_level`／`ro.vndk.version` vs `ro.vendor.api_level`／super／slot_suffix）出發，回頭講 Treble 的成因（Stagefright 與那條走不完的更新鏈）、分割區職責界線（system／vendor／odm／product／system_ext、動態分割區 super、A/B vs A-only）、Vendor Interface 的組成（VINTF manifest × compatibility matrix 的交叉比對、passthrough／binderized／SP-HAL、HIDL→AIDL 遷移、**VNDK 在 Android 15 的退場與 Vendor API level**、SELinux policy 拆分、VTS/CTS-on-GSI）；後半是 GSI 實戰（選映像、關 AVB、fastbootd 刷入、DSU 試跑）與開不了機的除錯路徑對照表，末尾談廠商魔改造成的「理論相容 ≠ 實際可用」落差、GKI/KMI，以及九年後的成果與瓶頸移位 |
 | [Android Kernel](../android-kernel.md) | **系列第三篇**：Android kernel = Linux + Android 補丁（Binder／wakelock／ION 的上游化史）、GKI 之前的四層 fork 碎片化、GKI／KMI 如何把 kernel 切成 Google 核心本體 + vendor module，以及三方各自的角色與工程實務 |
 
 ---

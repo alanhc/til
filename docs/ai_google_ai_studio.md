@@ -1,3 +1,5 @@
+# Google AI Studio
+
 目前體感上還蠻喜歡的建立幾個App
 ![alt text](image-14.png)
 類似Anki的閃卡App

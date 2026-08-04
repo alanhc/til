@@ -1,3 +1,4 @@
+# Pixel Fastboot Deep Dive
 
 ```
 $ fastboot flashall -w

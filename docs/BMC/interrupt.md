@@ -2,10 +2,6 @@
 
 硬體透過 **IRQ（Interrupt Request）** 通知 CPU 有事件發生（如網路封包到達、timer 到期），CPU 暫停當前工作轉去執行對應的 **irq handler**。這讓系統不必忙碌輪詢（polling）即可即時反應。
 
-/proc/interrupts
-
-irq handler
-
 ## 觀察中斷
 
 `/proc/interrupts` 可看到每個 IRQ 編號、在各 CPU 上的觸發次數、中斷控制器與對應裝置名稱：

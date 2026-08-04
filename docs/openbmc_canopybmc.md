@@ -1,3 +1,5 @@
+# CanopyBMC
+
 https://canopybmc.org/blog/qemu-to-hardware-testing-approach/
 
 **Canopy OpenBMC**（正式名稱 **Canopy**）是一個**建立在 OpenBMC 之上的企業級 OpenBMC 發行版（distribution）**，目標是讓 OpenBMC 更適合產品化，而不只是開發平台。它是由 **BlindSpot Software GmbH** 發起並維護的專案。([Canopy][1])

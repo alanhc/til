@@ -2,12 +2,6 @@
 
 **SOL** 讓管理者透過網路存取主機（host）的序列埠 console，不必實體接一條 serial cable。BMC 把 host 的 serial 資料封裝進 IPMI over LAN 的封包，經網路轉送給遠端 client，達成遠端看 BIOS/開機訊息與登入 console。
 
-network package
-
-port
-
-rmcp+
-
 ## 運作要點
 
 - **RMCP+**：SOL 走 IPMI v2.0 的 **RMCP+**（Remote Management Control Protocol Plus）協定，相較舊版 RMCP 支援加密與更強的 session 驗證（RAKP 金鑰交換），較為安全。

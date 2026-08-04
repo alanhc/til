@@ -1,4 +1,4 @@
-
+# 韌體 Image 管理
 
 QA 在 XTS 期間可能要image，但一個專案無時無刻要有人上code，要怎麼去透過自動化機制去管理，這就是 會有正式image可以比較嚴謹給QA使用以及用於提前找出問題讓 system integration team 在正式image 前就發現問題
 因此 firmware image 會有分成 正式與非正式
