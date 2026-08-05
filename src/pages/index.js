@@ -19,8 +19,8 @@ function HomepageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
-            to="/docs/intro">
-            GoGo 🚀
+            to="/docs/map">
+            從知識地圖開始 🚀
           </Link>
         </div>
       </div>
@@ -32,8 +32,8 @@ export default function Home() {
   const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+      title="Android、BMC 與嵌入式系統實作筆記"
+      description="以 chip vendor 與韌體工程師視角寫的技術筆記：AOSP build system、Android 開機流程與 AVB、SELinux 除錯、OpenBMC、Linux kernel driver、半導體測試（CP/FT/SLT）與 AI 工具實作。">
       <HomepageHeader />
       <main>
         <HomepageFeatures />

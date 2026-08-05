@@ -10,6 +10,13 @@ import {nativeIdealImageRemarkPlugin} from 'docusaurus-plugin-native-ideal-image
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
+const baseUrl = '/til/';
+
+// plugin-sitemap 的 ignorePatterns 是拿 route.path 去比對，而 route.path 一律
+// 含 baseUrl（例如 /til/docs/map），所以這裡的 pattern 必須自己帶上 /til 前綴，
+// 不然一條都不會命中。
+const withBaseUrl = (p) => `${baseUrl}${p.replace(/^\//, '')}`;
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'alanhc\'s TIL',
@@ -25,7 +32,7 @@ const config = {
   url: 'https://alanhc.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/til/',
+  baseUrl,
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -75,6 +82,22 @@ const config = {
         theme: {
           customCss: './src/css/custom.css',
         },
+        // sitemap 只放真正有內容的頁。tag / author / archive 這類導覽頁沒有獨立
+        // 內容價值，搜尋頁更是 crawl trap；全部塞進 sitemap 只會稀釋整站評分。
+        sitemap: {
+          ignorePatterns: [
+            '/search',
+            '/docs/tags',
+            '/docs/tags/**',
+            '/blog/tags',
+            '/blog/tags/**',
+            '/blog/authors',
+            '/blog/authors/**',
+            '/blog/archive',
+            // Docusaurus 預設範例文章，還沒換成真內容前不主動送索引
+            '/blog/first-post',
+          ].map(withBaseUrl),
+        },
       }),
     ],
   ],
@@ -117,7 +140,23 @@ const config = {
           {from: '/docs/ubuntu/ppa_error', to: '/docs/ubuntu_ppa_error'},
           {from: '/docs/money/money', to: '/docs/money'},
           {from: '/docs/money/投資', to: '/docs/投資'},
-          {from: '/docs/tutorial-basics/markdown-features', to: '/docs/markdown-features'},
+          // 已移除的 Docusaurus 預設範例頁，一律導回知識地圖，不要留 404
+          {
+            to: '/docs/map',
+            from: [
+              '/docs/intro',
+              '/docs/markdown-features',
+              '/docs/tutorial-basics/markdown-features',
+              '/docs/tutorial-basics/congratulations',
+              '/docs/tutorial-basics/create-a-blog-post',
+              '/docs/tutorial-basics/create-a-document',
+              '/docs/tutorial-basics/create-a-page',
+              '/docs/tutorial-basics/deploy-your-site',
+              '/docs/tutorial-extras/manage-docs-versions',
+              '/docs/tutorial-extras/translate-your-site',
+              '/markdown-page',
+            ],
+          },
         ],
       },
     ],
@@ -199,11 +238,11 @@ const config = {
         style: 'dark',
         links: [
           {
-            title: 'Docs',
+            title: '筆記',
             items: [
               {
-                label: 'Tutorial',
-                to: '/docs/intro',
+                label: '知識地圖',
+                to: '/docs/map',
               },
             ],
           },
