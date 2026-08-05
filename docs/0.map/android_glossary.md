@@ -50,6 +50,9 @@ sidebar_position: 1
 | **`repo init`** | 初始化 manifest。`--partial-clone` 減少下載量、`-b <tag>` 指定分支/tag |
 | **`repo sync`** | 同步原始碼。`-c` 只 sync 當前 branch（省 ~50% 空間）、`-j8` 併行數（開太多易撞 503） |
 | **manifest** | `.repo/manifests/default.xml`，記錄各 project 來源與 revision |
+| **`aosp.xml`** | 描述 AOSP 部分的典型 manifest：`<remote>` 指來源、`<default revision=...>` 指預設版本、每個 `<project path= name=>` 一行代表一個 git repo。實務上會與晶片廠 BSP、品牌廠客製的 manifest 疊起來用，**分成三份的理由是權責分離**——出問題時一看就知道該找誰 |
+| **manifest 的 `revision` 為何釘死** | 通常鎖在特定 tag／commit 而非某 branch 的最新狀態。**整棵樹是一個經過驗證的組合**，不是三個可以各自更新的元件；只把 AOSP 那層往前推而其他兩層沒動，輕則 build 不過，重則 build 得過但行為詭異（後者更難查） |
+| **PDK（Platform Development Kit）** | Google 在新版 Android 公開前，透過 NDA 先交給 SoC 廠與品牌廠的平台開發套件。**作用是把整條供應鏈的時間軸往前推**——驅動、電源、camera pipeline、codec 都得跟著框架改動調整，等公開才開始做，機器要再等一年才升得上去。與 Treble／GKI 的關係：PDK 是**流程上的提前**，Treble/GKI 是**架構上的鬆綁**，兩者在解同一個問題 |
 | **Soong / Blueprint** | 現代 AOSP 建置系統，設定檔為 `Android.bp` |
 | **`Android.bp`** | Soong 的模組定義檔 |
 | **`Android.mk`** | 舊版 Make-based 模組定義檔 |
