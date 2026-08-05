@@ -728,3 +728,27 @@ sidebar_position: 1
 | **每台機器獨一無二的校準資料區** | 射頻校準值、廠測參數在產線寫入並與該台硬體綁定，**整區被覆蓋後無法用另一台機器的備份還原**。兩家都有性質相同的區域，任何刷機流程都要先確認它是否落在覆蓋範圍內 |
 | **anti-rollback 不可逆** | 兩家都用熔絲裡的版本計數器防止刷回舊版韌體。**一旦升版觸發計數器遞增就降不回去**——送測樣機、開發板重複燒錄前要先規劃，否則測試機會被鎖死在某個版本 |
 | **移植成本的真正大頭** | 幾乎不用改：平台無關的 kernel driver、HAL 之上、framework 修改、多數 SELinux policy。要重寫：bootloader 客製、DTS 的 SoC 部分、電源策略、camera/display vendor HAL。**最容易被低估的是產線流程**——燒錄工具、治具、產測與校準寫入方式完全不同，工廠端切換成本經常高於軟體端 |
+
+---
+
+## 二十六、實機 driver 開發、量測與 upstream
+
+> 出自 [Pixel 8 Kernel Driver 開發實戰](../pixel8-kernel-tutorial.md)、[driver 完整歷程](../pixel8-driver-course.md)、[軟體整合層 Bringup](../pixel8-bringup.md)、[送出 kernel patch](../upstream-runbook.md)、[Pixel 8 CPU/GPU/NPU 量測](../article-zh.md)。Kleaf／KMI 的定義見第十九節。
+
+| 名詞 | 說明 |
+|---|---|
+| **`ddk_module`** | Kleaf 提供的 kernel module build rule。**它會自動產生 Kbuild，手寫的那份不會被使用**，只會讓你以為改了卻沒生效 |
+| **`CONFIG_MODULE_SIG_FORCE`** | 強制模組簽章。Pixel 8 上**沒有開**，所以未簽章的 `.ko` 照樣載得進去，只是 kernel 被標記 taint、`lsmod` 顯示 `(OE)`。build 時的 `sign-file: certs/signing_key.pem` OpenSSL 錯誤因此可以忽略 |
+| **vermagic** | `.ko` 內記錄的 kernel 版本與設定指紋。載入時比對不過會被拒絕；但版本不完全相符不必然失敗，關鍵是 KMI 相容而非字串完全一致 |
+| **兩種 bringup** | 同一個詞的兩半：**板級 bringup**（新板子硬體是未知數——電源時序、時鐘樹、reset、DDR training、pinmux、把 serial console 弄出來）vs **軟體整合層**（硬體已被 bring up 過，工作在 device tree、probe 路徑、HAL／SELinux／VINTF／image 打包）。**手機廠講 bringup 多半指後者，SoC 廠多半指前者**，兩邊都沒用錯 |
+| **`ANDROID:` commit 前綴** | commit title 以 `ANDROID:` 開頭代表是 ACK 專屬修改，**只能送 Gerrit，不要送 LKML**。送 patch 前用 `git log -S "函式名" -- 檔案.c` 一秒判斷題材屬性 |
+| **`android-mainline`** | ACK 的改動先進這條分支，再往下合到各發行分支。**直接送舊發行分支多半會被退成 churn**。查證用 `git fetch --depth=1 aosp android-mainline`（完整 fetch 會拉幾百 MB） |
+| **counter multiplexing** | 硬體 PMU 計數器不夠時，核心會輪流啟用事件。simpleperf **不做 `time_enabled/time_running` 回推補償**，而 `task-clock` 是軟體事件照跑不誤 → 分子縮水分母不變，超過 3 個硬體事件後所有比值被系統性壓低（2.92 → 1.36 GHz），**且沒有任何警告** |
+| **`task-clock`** | 量測時必放進事件清單。有它時 simpleperf 用 CPU 時間當分母，沒有時退回 wall-clock——程式若會睡眠（如卡在 `ppoll`），時脈會被稀釋成 1/4 |
+| **`simpleperf list raw`** | 列出原生 PMU 事件**以及每個事件支援哪些核心**。通用別名如 `branch-instructions` 對應的 `raw-br-immed-retired` 只支援 cpu 0-7，**在 X3（cpu8）上無聲失效**——所以量測要自帶一致性檢查（三個叢集的分支總數必須收斂） |
+| **`time_in_state`（Mali）** | GPU 各頻率的累積駐留毫秒數。前後相減即可反推**有效頻率**，是「鎖頻到底有沒有生效」的唯一硬證據。未鎖頻時短工作負載讓 governor 來不及升頻，1801 ms 中有 1204 ms 待在 150 MHz 地板，有效頻率只有峰值的 23% |
+| **`power_policy` / `scaling_min_freq` / `scaling_max_freq`** | 鎖 Mali 頻率**三個都要寫，缺一不可**（`always_on` + min = max） |
+| **NNAPI 無聲退回** | 指定 `--nnapi_accelerator_name=google-edgetpu` 但模型是 float32 時，TFLite 照樣印 `NNAPI delegate created` 甚至回報節點被委派，**實際卻退回 XNNPACK 跑 CPU**。只有 int8 量化圖能上 EdgeTPU |
+| **`inference_count`（rio）** | `/sys/devices/platform/1a000000.rio/` 下由 TPU 驅動維護的硬體推論計數器。前後差值是**唯一在無聲退回時仍會露餡的訊號**（跑 CPU 時差值恆為 0） |
+| **EdgeTPU on AOSP** | `rio`/`gxp` 驅動與 `android.hardware.neuralnetworks.IDevice/google-edgetpu` 在**純 AOSP build 上是活的，不需要 GMS**。但 NNAPI 已於 Android 15 deprecated，而 LiteRT NPU delegate 尚無 Pixel 版、Tensor SDK 只支援 G5，**G3 上 NNAPI 目前仍是唯一公開路徑** |
+| **offload 的隱性成本** | 兩個常被忽略的：模型編譯給 TPU 要 1.1–2.1 秒／process（單次推論才 1 ms，短命工作負載根本不該 offload）；**餵資料的核心也算成績**——host thread 綁 A510 vs X3 差 62%，TPU 本身完全沒變 |

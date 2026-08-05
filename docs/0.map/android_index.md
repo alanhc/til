@@ -66,6 +66,10 @@ sidebar_position: 0
 | [Pixel Flash Debug](../pixel_flash_debug.md) | `Failed to find AVB_MAGIC at offset: 0` 根因分析——不該加 `--disable-verity`，含成功 flash 紀錄 |
 | [用 Android Flash Tool 刷不同版本](../pixel_flash_another_version.md) | 網頁版 flash.android.com 操作重點 |
 | [Pixel Driver](../pixel_driver.md) | Root 權限與 kernel module 載入前置作業 |
+| [Pixel 8 Kernel Driver 開發實戰](../pixel8-kernel-tutorial.md) | **⚠ 撰寫中**：在 shiba 上從零寫 kernel module 並實機驗證。前置檢查（`CONFIG_MODULE_SIG_FORCE` 沒開 → 未簽章 module 照樣載入，只是 taint 成 `(OE)`）、只 sync GKI kernel source、用 Kleaf 的 `ddk_module` 而非手寫 Kbuild、vermagic 版本不完全相符為何仍可載入 |
+| [從 hello world 到 Binder：一支 Android driver 的完整歷程](../pixel8-driver-course.md) | **⚠ 撰寫中**：上篇的「歷程版」——同一支 driver 怎麼一步步從 hello world 長出 sysfs、ioctl、dma-buf 到 Binder。開頭用兩個指令證明你不需要刷機、也不需要整棵 Pixel tree |
+| [Pixel 8 軟體整合層 Bringup](../pixel8-bringup.md) | **⚠ 撰寫中**：`.ko` 以外的那一整套——分割區與 A/B、ramdisk、cmdline、dtbo、device tree、vendor HAL、image 手術。開頭釐清**兩種 bringup**：傳統板級（電源時序／DDR training／pinmux，Pixel 8 做不到，改用 BeagleBone 補）vs 軟體整合層（DT、probe 路徑、HAL／SELinux／VINTF） |
+| [送出 kernel patch：實際跑過一遍的步驟](../upstream-runbook.md) | **⚠ 撰寫中**：投 ACK / Gerrit 的操作手冊。重點是**選題材的三道關卡**（這段程式碼在 mainline 存不存在？mainline 現在還錯不錯？`android-mainline` 現在還錯不錯？），`ANDROID:` 開頭的 commit 只能送 Gerrit 不能送 LKML，以及 `--depth=1` fetch `android-mainline` 來查證 |
 
 ---
 
@@ -90,6 +94,7 @@ sidebar_position: 0
 | [從 `mount -o remount` 到 OverlayFS：Driver 開發者必須弄懂的 remount 機制](../android-remount-deep-dive.md) | **深入版**：為何現代 Android 分區改不動——dm-verity／AVB、dynamic partition right-sizing 沒有剩餘空間、EROFS 根本不可寫三道約束；AOSP 的解法是把 `adb remount` 重新實作成 **overlayfs**（lower = 唯讀原分區，upper = `/cache/overlay` 或 `super` 裡的 `scratch` 邏輯分區），所以你看到的是「出廠 image + 你的 diff」的合成視圖。含標準流程、對 driver／HAL／firmware／`init.*.rc`／vendor sepolicy 的迭代價值，以及九條踩坑（first stage init 與 ramdisk 蓋不到、空間會爆、remount 過的機器不能吃 OTA、bootloader fastboot 刷機不會被偵測到） |
 | [SurfaceFlinger：Android 畫面是怎麼被「合成」出來的](../surfaceflinger-composition-and-debugging.md) | 從「開分割畫面就耗電、滑動掉幀但 App profiler 正常」這類 bug 出發：SurfaceFlinger 的定位、BufferQueue → **BLAST**（Android 12+）的資料流變化、VSYNC 與 Choreographer 的節奏。核心是**Device Composition（HWC 硬體合成）vs Client Composition（GPU 合成）這個分歧點**——fallback 到 GPU 為何直接反映在功耗與溫度上、哪些情況會 fallback（層數超過、格式/縮放不支援、有 blur/圓角）、平板多視窗場景為何特別容易踩到。除錯五件套：`dumpsys SurfaceFlinger`、TimeStats、Perfetto、Winscope/Layer Trace 與建議的檢查順序 |
 | [DMA-BUF Heaps 完整導覽](../dma-heap-guide.md) | 從 PMEM 群雄割據 → ION 十年統治 → dma-heap 正式接班的歷史脈絡，解釋為何一塊 camera → ISP → GPU → encoder → display 的 buffer 需要專門的配置器（實體連續、對齊、cacheability、TZ 保護記憶體各方需求衝突）。含 heap/exporter/importer 元件拆解、`dma_buf_ops` 與 `dma_heap_add()`、allocate → attach → map → fence 的核心 flow、ION → dma-heap 遷移對照（每個 heap 一個 `/dev/dma_heap/*` node，終於能用檔案權限與 SELinux 分權），以及 `dmabuf_dump`／debugfs 觀測與常見踩雷 |
+| [在沒有 Play 商店的 Pixel 8 上，把 CPU、GPU、NPU 都量出來](../article-zh.md) | 純 AOSP userdebug（無 GMS，跑不了 Geekbench／AITuTu）上自己量三個運算單元。核心是**五個會給出「合理但錯誤」數字的陷阱**：simpleperf 少了 `task-clock` 會用 wall-clock 當分母把時脈稀釋成 1/4、超過 3 個硬體事件觸發 counter multiplexing 但不補償（2.9 → 1.36 GHz）、通用事件別名（`branch-instructions`）在 X3 上無聲失效、Mali 預設 governor 整段跑在 150 MHz 地板讓 GPU 看起來跟 CPU 一樣快（鎖頻後 3.1 倍）、NNAPI 對 float32 模型**默默退回 CPU** 卻照印 delegate created。對應三種自帶證據：三叢集分支總數須收斂、`time_in_state` 反推有效頻率、EdgeTPU 的硬體 `inference_count` 差值。附 NNAPI deprecated 之後 Tensor G3 無替代路徑的實測（`libedgetpu_client.google.so` 無 C ABI，external delegate segfault） |
 | [效能實驗：Codec 判讀](../performance_experient.md) | YouTube debug overlay 判讀硬解／軟解、`[exo2]` vs `[plat]`、VP9 Profile 2 HDR fallback、掉幀分析 |
 
 ---
