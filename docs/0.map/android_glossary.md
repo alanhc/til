@@ -755,3 +755,25 @@ sidebar_position: 1
 | **`inference_count`（rio）** | `/sys/devices/platform/1a000000.rio/` 下由 TPU 驅動維護的硬體推論計數器。前後差值是**唯一在無聲退回時仍會露餡的訊號**（跑 CPU 時差值恆為 0） |
 | **EdgeTPU on AOSP** | `rio`/`gxp` 驅動與 `android.hardware.neuralnetworks.IDevice/google-edgetpu` 在**純 AOSP build 上是活的，不需要 GMS**。但 NNAPI 已於 Android 15 deprecated，而 LiteRT NPU delegate 尚無 Pixel 版、Tensor SDK 只支援 G5，**G3 上 NNAPI 目前仍是唯一公開路徑** |
 | **offload 的隱性成本** | 兩個常被忽略的：模型編譯給 TPU 要 1.1–2.1 秒／process（單次推論才 1 ms，短命工作負載根本不該 offload）；**餵資料的核心也算成績**——host thread 綁 A510 vs X3 差 62%，TPU 本身完全沒變 |
+
+---
+
+## 二十七、SoC 專案規劃與人力估算
+
+> 出自 [規劃方法論](../soc-android-planning-methodology.md)、[工作表](../soc-android-planning-worksheet.md)、[規劃書範本](../soc-android-planning-proposal-template.md)、[一頁摘要範本](../soc-android-planning-onepager-template.md)。Vendor API Level／VSR／GRF 的制度面定義見第十八節與 [Vendor Freeze](../vendor-freeze.md)。
+
+| 名詞 | 說明 |
+|---|---|
+| **D+D** | **Vendor Domain + System Domain**。Treble 之後以 partition 為界的兩個域，是整份規劃書的骨架：vendor/odm 系列歸晶片商、system/product 系列歸 AOSP + OEM |
+| **N+3 規則** | Google 保證 system 相容於最近 3 代 vendor 實作，即 **vendor N 可搭配 system N ~ N+3**。vendor level 選越新，產品可支援的 system 代數越長，但可沿用的既有程式碼越少 |
+| **M0 ~ M10 里程碑鏈** | Kick-off → Pre-silicon 就緒 → Silicon Back → Boot to Shell → Boot to Home → Alpha SDK → Beta SDK(Feature Complete) → xTS Green → PV/RC SDK → GMS 認證 → MP + LTS。**全新架構 M0→MP 約 20~26 個月，衍生型約 12~16 個月** |
+| **反推法 vs 順推法** | 時程一律從 MP 日往回推。順推（從今天往後排）得出的日期永遠對不上客戶要的 MP 日；反推後若發現「起跑日已經過了」，那個缺口本身就是最該向主管報告的結論 |
+| **雙軸估算模型** | `估算人月 = 前一代實際人月 ×（IP 軸係數 + 版本軸係數）`。**IP 軸**是硬體差異（沿用 0.1／升版 0.4／新開發 1.2），**版本軸**是跨 vendor API level 的介面與合規重做（大 0.6／中 0.3／小 0.1）。兩者獨立發生，必須相加 |
+| **純版本軸成本** | 「就算晶片跟前一代一模一樣，光是跨 vendor API level 要付的人月」＝ Σ（各模組前一代人月 × 版本軸係數）。用來說明專案為何不能當衍生型估 |
+| **IP Delta Map** | 逐項標記 CPU/GPU/ISP/VPU/NPU/Modem/DSP/TEE 等子系統為「沿用／升版／全新／換供應商」的表。**這是整個專案工時的唯一真實來源**，沒有它人力估算就是拍腦袋 |
+| **整合與 debug 稅** | 由下而上（WBS 逐項加總）估出來的數字要再 **×1.3**。另有常被漏算的 25~35%：測試自動化維護、客戶 FAE 支援、月度 security patch、跨域整合 debug、release engineering |
+| **三法交叉驗證** | 類比法（上一代實際 × delta 比例）／由下而上（WBS ×1.3）／由上而下（競品團隊規模反推）。三者差距超過 30% 代表 Delta Map 有洞，**回頭補資訊而不是取平均** |
+| **EAP / PDK 早期存取** | Google 在公開發布前先把平台交給 SoC 廠與品牌廠（通常發布前 3~6 個月）。**若 MP 排在公開發布後不久，這是 Go/No-Go 級前提而非風險項**——沒有它，整合與 xTS 在物理上不可能趕在發布前完成。制度背景見 [PDK 與 aosp.xml](../android-pdk-aosp-xml.md) |
+| **三個外部相依** | 排程必須卡住的：Google AOSP source drop（2026 起每年 Q2/Q4，決定 rebase 窗口）、每月 Android Security Bulletin（SPL 承諾綁住維運人力）、IP 供應商 driver release（GPU/Modem 廠，**最常見的隱形要徑**） |
+| **tape-out / silicon back / 客戶 MP** | 規劃時最常見的雞同鴨講：主管口中的「明年」指哪一個？**三者相差 12~18 個月**，這是第 1 週就要問清楚的第一題 |
+| **pre-silicon 平台** | Emulator / FPGA / Virtual Platform。有的話可提前 6~9 個月開工；沒有的話所有 bring-up 必須排在 silicon back 之後，時程直接往後推 6 個月以上 |
