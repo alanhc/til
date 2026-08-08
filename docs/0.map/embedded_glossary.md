@@ -347,3 +347,23 @@ sidebar_position: 7
 | **Shmoo test** | 掃電壓（Vcore／VDDQ／VDD2）× 頻率畫出 pass/fail 圖，從形狀判斷是電壓不足、時序偏移還是雜訊 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
 | **Golden board** | 永遠留一片已知良好的板子當基準，新板 window 明顯較窄即代表硬體差異而非軟體 bug | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
 | **coreboot MediaTek DRAM code** | 公開世界裡最接近真實 MTK DRAM init 的東西——MT8173/8183/8186（Chromebook SoC）因 coreboot 須開源，MediaTek 把 `dramc_pi_calibration_api.c` 等貢獻進上游，可直接對照學習 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+
+---
+
+## 十、異構 SoC 的 IPC 與三種 Domain
+
+> 出自 [異構 SoC 的 IPC 與三種 Domain](../til-heterogeneous-ipc-and-domains.md)（素材為 mainline kernel、TF-A 與兩塊開發板）。
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **三種 domain** | 「domain」在不同文件指不同東西，拆成三個獨立面向才學得下去：**lifecycle**（這顆核活著嗎？掛了誰救？→ `remoteproc`）、**power**（有沒有電？refcount 多少？→ `genpd`）、**memory/access**（能存取哪段記憶體？位址怎麼翻譯？→ IOMMU／carveout） | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **device tree 是交會點** | `power-domains`、`iommus`、`mboxes`、`memory-region` 四個 property 一起讀，才是一顆 IP 的完整身分 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **`remoteproc`** | 管協處理器生命週期的框架：`/sys/class/remoteproc/remoteprocN/state` 寫 start/stop，firmware 放 `/lib/firmware` | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **`genpd`（generic power domain）** | Linux 的電源域框架，管 IP 的上下電與 refcount；哪些 IP 共用同一個 domain 決定了「關掉會一起掉的有哪些」 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **異構 IPC 的四個零件** | 不管叫 RPMsg、IPI、mailbox 還是 SCPI，拆開都是：**共享記憶體 + vring**（資料）、**mailbox / doorbell**（通知對方的中斷）、**resource table**（韌體宣告它要多少記憶體、幾組 vring）、**name service**（endpoint 協商）。RPMsg 只是把這四樣包成標準 API | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **resource table** | 韌體 ELF 裡的一張表，宣告它需要的 carveout 與 vring 位址。把它跟 `dmesg`／`/proc/iomem` 對起來，「韌體怎麼跟 kernel 講好記憶體怎麼分」就具體了 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **carveout** | 從系統記憶體切出來保留給某顆 IP 或協處理器專用的實體區塊（相對於走 IOMMU 動態對映） | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **往返延遲的大頭在排程** | 拆解一次 IPC 往返（遠端數指令週期、Linux 端 ftrace 抓 mailbox IRQ → vring callback → user space wakeup）通常會發現：延遲主要不在 IPC 本身而在**排程喚醒**。這個結論在任何 NPU/DSP 的 command submission 上都成立 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **PRU（Programmable Real-time Unit）** | AM3358（BeagleBone Black）上的兩顆 200 MHz 協處理器，無 cache、無 pipeline stall，所以**指令數就是時間**，很適合拿來量測 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **有 SCP vs 無 SCP** | 同一件事的兩種架構：有 SCP（工作外包給管理處理器，代價是要處理 IPC、生命週期、故障恢復）vs 無 SCP（EL3 自己下場寫 power sequence 暫存器，簡單但 CPU 得醒著才能決策）。Allwinner A64/H5 屬前者（ARISC，社群有 crust 這套開源 SCP 韌體），H6/H616 拿掉 ARISC 改由 BL31 直接控制，是很好的對照組 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **從故障回頭讀** | 正常運作時學不到東西——**只有壞掉時才會暴露誰依賴誰**。讓遠端進無窮迴圈、寫壞 vring index、傳輸中途 stop，觀察 remoteproc 的偵測與 recovery 路徑 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |

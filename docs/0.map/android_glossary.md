@@ -80,6 +80,10 @@ sidebar_position: 1
 | **VNDK** | Vendor Native Development Kit，vendor 可用的原生介面集合 |
 | **VINTF** | Vendor Interface，透過 manifest 與 compatibility matrix 檢查 framework/vendor 相容性 |
 | **HIDL / AIDL** | HAL 介面定義語言（AIDL 為現代作法） |
+| **`m systemimage` / `m vendorimage`** | 只重建單一 partition image，而不是 full build。改 framework／system app 走前者，改 vendor HAL／driver 走後者。出自 [優化 Build Time](../android-build-time-optimization.md) |
+| **`m <module>` / `mmm <path>`** | 只編單一模組（產出 jar／so／apk），Soong 增量編譯下通常是分鐘等級 |
+| **增量編譯狀態（`out/`）** | 首次 full build 之後最重要的資產。**環境變數改變或 `lunch` target 切換都會讓 Soong invalidate 大量目標**，觸發近乎全量重建——所以不要隨手 `make clean`、也不要讓 CI 與本機共用同一個 `out/` |
+| **`out/build.trace.gz`** | build 的時間軌跡檔，可用 Chrome 的 `chrome://tracing` 開啟，看時間實際花在哪個階段 |
 
 ### App 端（Gradle）
 
@@ -777,3 +781,23 @@ sidebar_position: 1
 | **三個外部相依** | 排程必須卡住的：Google AOSP source drop（2026 起每年 Q2/Q4，決定 rebase 窗口）、每月 Android Security Bulletin（SPL 承諾綁住維運人力）、IP 供應商 driver release（GPU/Modem 廠，**最常見的隱形要徑**） |
 | **tape-out / silicon back / 客戶 MP** | 規劃時最常見的雞同鴨講：主管口中的「明年」指哪一個？**三者相差 12~18 個月**，這是第 1 週就要問清楚的第一題 |
 | **pre-silicon 平台** | Emulator / FPGA / Virtual Platform。有的話可提前 6~9 個月開工；沒有的話所有 bring-up 必須排在 silicon back 之後，時程直接往後推 6 個月以上 |
+
+---
+
+## 二十八、Vendor 升級的四道契約
+
+> 出自 [Android Vendor 升級要跨過的四道牆](../til-android-vendor-upgrade.md)。KMI／symbol list／ABI 檢查見第十九節，VINTF／HIDL／AIDL 的基本定義見第三節，SELinux 見第十節，AVB 見第七節——這裡只列「升級時」才會咬人的部分。
+
+| 名詞 | 說明 |
+|---|---|
+| **升級的四道牆** | KMI（kernel ↔ vendor module，載入時、二進位層級）、VINTF（system ↔ vendor，build time + boot time）、AIDL/HIDL（framework ↔ HAL，編譯 + 執行）、SELinux（process ↔ resource，執行時）。四者是同一件事的四個面向：**Treble 把原本隱含的耦合，一條條變成顯式、可驗證的契約** |
+| **編譯錯誤是最不重要的** | 有明確錯誤訊息、改完就過。真正花時間的是「編得過、燒得進、**開不了機**，或開得了機但 VTS 全紅」這一類 |
+| **KMI 是二進位契約** | 包含函式簽章、struct layout 與匯出的 symbol 集合。**struct 欄位順序改變就破 ABI，即使原始碼看起來相容**；症狀是模組載入失敗，或更糟——載入成功但行為錯亂 |
+| **manifest vs compatibility matrix** | Manifest 宣告「我提供什麼」，compatibility matrix 宣告「我要求對方至少提供什麼」。vendor manifest × framework matrix、framework manifest × device matrix 兩兩交叉檢查 |
+| **matrix diff = HAL 遷移清單** | 升級初期把新版 framework compatibility matrix 和自己的 vendor manifest 做 diff，這份 diff 幾乎就是接下來的工作清單 |
+| **VINTF 對不上的症狀** | 不是編譯錯誤，而是**開機時直接停住**，且 log 未必指向明顯原因 |
+| **HIDL → AIDL 的三個不只是換語法** | threadpool 行為差異（常見「功能都對但偶發卡住」）、`hidl_memory` 要換成 AIDL 的記憶體共享機制、stable AIDL 對介面變更（加欄位／改順序）有嚴格相容性規範 |
+| **sepolicy mapping file** | 銜接 platform policy 與 vendor policy 的對應檔，讓不同版本的兩邊能共存 |
+| **denial 三分類** | 撞到 neverallow 的（架構問題，最優先，因為修法可能很大）→ 重複大量出現的（通常單一根因，處理一次解決一片）→ 零星出現的（最後看，有些會在前兩類修完後自然消失）。**最容易犯的錯是逐條 allow 下去**，把噪音藏起來或掩蓋真正的架構問題 |
+| **rollback index 是單向的** | 開發機上不小心燒了較新版本，之後想燒回舊版可能被防降級機制擋住 |
+| **先開機、再收尾** | 盡早換到「能開機」的狀態，哪怕功能大量殘缺。理由不是為了看到桌面，而是**把未知變成可計數**——開機前你無法回答「還要多久」，開機後問題變成一份可排序、可估時、可砍的清單 |

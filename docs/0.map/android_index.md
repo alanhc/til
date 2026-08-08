@@ -51,6 +51,7 @@ sidebar_position: 0
 | [AOSP Codebase](../aosp_codebase.md) | `repo` 與 manifest 的關係：`.repo/` 目錄結構、`default.xml` 的 `revision`／`remote`／`sync-j` 與個別 `<project>` 可覆蓋版本；**`repo manifest -r` 把浮動分支展開成固定 SHA**（重現 build 的唯一可靠做法）；`GLOBAL-PREUPLOAD.cfg` 的 preupload hook；`repo sync` 選項表；用 `local_manifests` 加自己的 repo 而不改上游 |
 | [Android Build Number 解析](../Android_build_number.md) | `BP4A.251205.006` 各欄位含義（代號／分支／日期／patch） |
 | [搞懂三種 Build Variant：user／userdebug／eng](../android-build-variants.md) | 三者的定位與底層差異：`ro.secure`／`ro.debuggable` 兩個屬性怎麼決定能不能 `adb root`、模組安裝範圍（eng 全裝 vs user 只裝 product 要求）、dexpreopt 最佳化開關與效能落差；附完整對照表與「重現使用者問題／量效能／QA 一律用 `userdebug` 而非 `eng`」的實務原則 |
+| [優化 Android Platform Build Time](../android-build-time-optimization.md) | **工作流層面的優化**，而不是 build 系統調校：只 build 受影響的 image（`m systemimage`／`m vendorimage`／`m <module>`）、保護 `out/` 的增量狀態（環境變數或 `lunch` target 一變就近乎全量重建）、用 `out/build.trace.gz` 看時間花在哪。燒錄端則是單 partition `fastboot flash` 取代整包 download，而**大多數驗證根本不用燒錄**——userdebug 上 `adb remount` + `adb sync` 是秒級迴圈（改 framework 重啟 zygote、改 HAL kill service、改 app `install -r`）。附三層工作流（日常迭代／階段確認／最終驗證）與常見障礙對策（user build 擋 remount、流程規定要燒整包、增量 build 莫名變全量），末尾補 Gradle 端做法 |
 | [Android Product Flavor 完整教學](../android-product-flavor-完整教學.md) | **App 層（Gradle）**：一份程式碼產出多個 App——build type／product flavor／build variant 三者關係、Groovy 與 Kotlin DSL 兩種寫法、flavor 能客製什麼（`applicationId`／`BuildConfig`／manifest placeholder／source set 資源與程式碼覆寫）、flavor dimensions 多維度組合、免費版 vs 付費版實戰、依 flavor 加依賴，以及常見陷阱 |
 
 ---
@@ -104,6 +105,7 @@ sidebar_position: 0
 | 文章 | 內容 |
 |---|---|
 | [韌體開發與 Agentic AI](../android_firmware_development_and_agentic_ai.md) | 把 AOSP build pipeline 封裝成 AI Agent Skill、AI/人的介入邊界設計、三個真實踩坑紀錄 |
+| [用 Coding Agent 讀一棵陌生的 SoC BSP](../til-agent-assisted-bsp-navigation.md) | 一份可重複使用的導讀清單。前提是**先把問題設計好**——agent 擅長建索引，判斷該問什麼還是人的工作。六節各附搜尋路徑、prompt 與**驗收問題**（能用自己的話回答才算讀懂）：協處理器 IPC 訊息表（比架構文件更準的 API 合約）→ device tree 攤開三種 domain 的關聯圖 → 追一條 user space 到硬體的完整資料路徑 → EL3／TF-A 那層的 SiP SMC 與 suspend 序列 → 從 commit message 讀設計取捨的理由 → 從故障 log 回頭讀。三個坑：agent 會編出合理但不存在的函式名（結論一律自己 `grep` 驗證）、別讓它一次讀整棵 tree、驗收問題要自己先寫（否則只會得到自洽的幻覺） |
 | [Android 工程師 Agent Skills 規劃](../android_engineer_skills.md) | 10 個適合系統整合團隊的 skill 提案（build 對齊、error triage、flash rescue、bring-up checklist、log analyzer 等） |
 
 ---
@@ -127,6 +129,7 @@ sidebar_position: 0
 | [Vendor Freeze](../vendor-freeze.md) | **系列第二篇**：GRF／Longevity GRF 的凍結機制與三方賽局——`ro.board.first_api_level` 等 board property、VINTF／FCM 相容性合約、「3 年一次 kernel 大版本升級」條款、功能天花板如何在 SoC 選型那一刻就被決定 |
 | [從 vendor 分割區看 Project Treble](../project-treble-移植開發者筆記.md) | **移植者視角的完整版**：從「一台陌生機器該問的五個問題」（`ro.treble.enabled`／`first_api_level`／`ro.vndk.version` vs `ro.vendor.api_level`／super／slot_suffix）出發，回頭講 Treble 的成因（Stagefright 與那條走不完的更新鏈）、分割區職責界線（system／vendor／odm／product／system_ext、動態分割區 super、A/B vs A-only）、Vendor Interface 的組成（VINTF manifest × compatibility matrix 的交叉比對、passthrough／binderized／SP-HAL、HIDL→AIDL 遷移、**VNDK 在 Android 15 的退場與 Vendor API level**、SELinux policy 拆分、VTS/CTS-on-GSI）；後半是 GSI 實戰（選映像、關 AVB、fastbootd 刷入、DSU 試跑）與開不了機的除錯路徑對照表，末尾談廠商魔改造成的「理論相容 ≠ 實際可用」落差、GKI/KMI，以及九年後的成果與瓶頸移位 |
 | [你的手機在 Android 發表前就準備好了：聊聊 PDK 與 aosp.xml](../android-pdk-aosp-xml.md) | **入門向補充**：為何新版 Android 一發表就有手機跟著升級——**PDK（Platform Development Kit）**讓 Google 在公開前先把平台交給 SoC 廠與品牌廠，把整條供應鏈的時間軸往前推（與 Treble／GKI 是「流程上的提前」vs「架構上的鬆綁」，在解同一個問題）。後半解釋 `repo` 與 manifest：`aosp.xml` 的 `<remote>`／`<default>`／`<project>` 結構、實務上 AOSP／晶片廠 BSP／品牌廠客製三份 manifest 疊起來才是完整的樹（權責分離），以及**`revision` 是刻意釘死的**——整棵樹是一個驗證過的組合，偷偷把 AOSP 那層往前推會 build 不過或跑起來行為詭異 |
+| [Android Vendor 升級要跨過的四道牆](../til-android-vendor-upgrade.md) | **實戰視角的補充**：升級的痛點不是編譯錯誤（有明確訊息、改完就過），而是「編得過、燒得進、開不了機，或開得了機但 VTS 全紅」。本質是**介面契約的重新協商**，四道牆各是一條契約——**KMI**（二進位層級，struct layout 改了就破，症狀可能是載入成功但行為錯亂）、**VINTF**（manifest 宣告我提供什麼 × compatibility matrix 宣告我要求什麼，build time 與 boot time 都檢查，對不上是開機停住而非編譯錯誤）、**HIDL→AIDL**（threadpool 行為差異造成的偶發卡住、`hidl_memory` 換機制、stable AIDL 的版本演進規則）、**SELinux**（每版新增 neverallow；denial 要先分類再處理，撞 neverallow 的是架構問題最優先）。橫向還有一條信任鏈（vbmeta → dm-verity → rollback index，且 rollback index 是單向的）。方法論是**先開機、再收尾**——價值不在看到桌面，而在把未知變成可計數的清單 |
 | [Android Kernel](../android-kernel.md) | **系列第三篇**：Android kernel = Linux + Android 補丁（Binder／wakelock／ION 的上游化史）、GKI 之前的四層 fork 碎片化、GKI／KMI 如何把 kernel 切成 Google 核心本體 + vendor module，以及三方各自的角色與工程實務 |
 
 ---
