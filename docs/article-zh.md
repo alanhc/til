@@ -326,9 +326,23 @@ Segmentation fault
 >
 > `RegisterGraph` 收的是已編譯好的 Darwinn graph container，餵不進 `.tflite`；runtime 的錯誤字串自己就說了：「Please recompile the model with the latest compiler」、「Graph container version ... make sure the graph is compiled with the right version」、「You might have compiled your model for <= P24 but it is running on a P25+ device」。編譯好的 graph 是以 `edgetpu-custom-op` 這個 custom op 內嵌在 `.tflite` 裡的。
 >
-> 至於那個 container 必須從哪裡來，目前仍是未解，我不打算再用猜的。裝置上是有編譯器的：`/vendor/lib64/libedgetpu_tflite_compiler.so` 存在，但只有 root 讀得到、也不在 public 清單裡；而公開的 `libedgetpu_client.google.so` 只有 85 KB、DT_NEEDED 全是 binder/AIDL stub，卻導出 `CompileSubgraphFlatbuffer` —— 所以它一定是轉呼叫到特權服務，而不是自己編。NNAPI 顯然已經在走這條路：本文的數字裡，每個行程的 graph 編譯要花 1.1–2.1 秒。至於非特權的呼叫者能不能也驅動它，我沒有測過。
+> 裝置上也是有編譯器的：`/vendor/lib64/libedgetpu_tflite_compiler.so` 存在，但只有 root 讀得到、也不在 public 清單裡；而公開的 `libedgetpu_client.google.so` 只有 85 KB、DT_NEEDED 全是 binder 與 AIDL stub，卻導出 `CompileSubgraphFlatbuffer` —— 所以它是轉呼叫到特權服務，而不是自己編。NNAPI 顯然已經在走這條路：本文的數字裡，每個行程的 graph 編譯要花 1.1–2.1 秒。
 >
-> 我真正能觀察到的門檻是權限。`/dev/edgetpu-soc` 是 `system:system 0660`、SELinux label `edgetpu_device`，而 `adb shell` 是 uid 2000、不在 `system` 群組、SELinux 為 Enforcing —— 所以 shell binary 開不了裝置節點，一切都得經過服務。在 Tensor G5（Pixel 10、Android 16）上那個服務有註冊為 `com.google.edgetpu.IEdgeTpuAppService/default`，而且同一支 client 函式庫導出的 C 符號從 G3 的 7 個增加到 33 個，多出一整套 `TachyonComputeService_*` / `TachyonComputeSession_*` 會話 API，其中有 `TachyonComputeSessionConfig_setPrivileged` —— 至少暗示「非特權會話」是被設計進去的情境。而在這台 AOSP G3 build 上，那個 app service 根本沒有註冊。兩顆晶片都仍然沒有 `tflite_plugin_create_delegate`。
+> 那第三方為什麼不能直接用？我寫了一個拋棄式的 app 去問，答案不是任何一個顯而易見的候選。不是 API —— 它完整而且公開。不是 SELinux —— binder 交易確實抵達了特權服務。也不是 uid，雖然 uid 確實擋下了 `adb shell`：`GetEdgeTpuFd` 會呼叫 `getuid()`，要求 `uid % 100000` 落在 app 的 `[10000, 19999]` 區間，所以 shell 的 2000 被以 EINVAL 拒絕，並留下一行「System and vendor processes should not use GetEdgeTpuFd」。換成真正的 app uid，呼叫就穿透到服務，然後服務這樣回答：
+>
+> ```
+> E vendor.google.edgetpu_app_service@1.0-service:
+>     <pkg> is not in the EdgeTPU allowed list or signature mismatched.
+>     Please add the app to the edgetpu allowlist.
+> E EdgetpuTachyonCApi: getEdgeTpuFd failed, error code -8:
+>     Current application should not be allowed to access EdgeTPU.
+> ```
+>
+> **真正的關卡是 vendor 端、以套件名稱與簽章為鍵的白名單。** 客戶端沒有任何辦法通過它。所以在原廠裝置上，第三方存取 TPU 這條路是關著的，NNAPI 仍是唯一的路 —— 而這正是本文這套 harness 在用的，所以所有數字都成立。
+>
+> 兩個給後人複製的技術細節。Vendor public library 從 app 的 default linker namespace 是搆不到的，它的 `permitted_paths` 裡沒有 `/vendor/lib64`；要用 `dlsym(RTLD_DEFAULT, "__loader_android_get_exported_namespace")` 取得 `sphal` namespace ——注意無前綴的 `android_get_exported_namespace` 解析不到——再交給 `android_dlopen_ext` 搭配 `ANDROID_DLEXT_USE_NAMESPACE`。而要以 app uid 執行原生測試程式，就把它包進 APK 的 `lib/arm64-v8a/lib*.so` 再用 `run-as` 執行：解壓出來的 lib 目錄標籤是 `apk_data_file`、可執行，反觀 `run-as` 對 `/data/local/tmp` 底下的任何東西都會被拒絕 `execute`。
+>
+> 在 Tensor G5 上，同一支 client 函式庫導出的 C 符號從 G3 的 7 個增加到 33 個，多出一整套 `TachyonComputeService_*` / `TachyonComputeSession_*` 會話 API —— 但它的服務 `com.google.edgetpu.tachyon.IComputeService/default` 在裝置上並沒有註冊。兩顆晶片都仍然沒有 `tflite_plugin_create_delegate`。
 >
 > 本文所有數字都是走 NNAPI 量到的，不受這個更正影響。
 
