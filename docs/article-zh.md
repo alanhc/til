@@ -324,7 +324,11 @@ Segmentation fault
 
 > **更正（2026-08-21）**：本節原本寫「那支函式庫匯出 115 個 C++ 符號，**沒有任何 C ABI**」，並據此斷言 NNAPI 是唯一的公開 TPU 路徑。這是錯的——我只查了 `libedgetpu_client.google.so` 一支就以偏概全。同樣列在 `/vendor/etc/public.libraries.txt`、App 一樣搆得到的 `libedgetpu_util.so`，匯出 **256 個符號、全部是 C ABI**：199 個 `DarwinnApi2_*` 加 12 個 `DarwinnDelegate_*`，包含 `DarwinnDelegate_CreateVirtualDevice`、`DarwinnApi2_VirtualDevice_RegisterGraph`、`RequestQueue_Submit`、`Request_Wait`、`Request_TimingInfo_GetTpuWorkNsec`。非 TFLite 的 TPU 路徑是存在的。
 >
-> 真正的障礙是編譯器，不是 ABI。`RegisterGraph` 收的是已編譯好的 Darwinn graph container，餵不進 `.tflite`；runtime 的錯誤字串自己就說了：「Please recompile the model with the latest compiler」、「Graph container version ... make sure the graph is compiled with the right version」、「You might have compiled your model for <= P24 but it is running on a P25+ device」。要產出那個 container 需要 Tensor SDK 的編譯器。在 Tensor G5（Pixel 10、Android 16）上重驗過：同一套 `DarwinnApi2_*`，236 個符號全是 C，另外多一支 `libedgetpu_litert.so` 提供 63 個 Tachyon C API——兩顆晶片都仍然沒有 `tflite_plugin_create_delegate`。
+> `RegisterGraph` 收的是已編譯好的 Darwinn graph container，餵不進 `.tflite`；runtime 的錯誤字串自己就說了：「Please recompile the model with the latest compiler」、「Graph container version ... make sure the graph is compiled with the right version」、「You might have compiled your model for <= P24 but it is running on a P25+ device」。編譯好的 graph 是以 `edgetpu-custom-op` 這個 custom op 內嵌在 `.tflite` 裡的。
+>
+> 至於那個 container 必須從哪裡來，目前仍是未解，我不打算再用猜的。裝置上是有編譯器的：`/vendor/lib64/libedgetpu_tflite_compiler.so` 存在，但只有 root 讀得到、也不在 public 清單裡；而公開的 `libedgetpu_client.google.so` 只有 85 KB、DT_NEEDED 全是 binder/AIDL stub，卻導出 `CompileSubgraphFlatbuffer` —— 所以它一定是轉呼叫到特權服務，而不是自己編。NNAPI 顯然已經在走這條路：本文的數字裡，每個行程的 graph 編譯要花 1.1–2.1 秒。至於非特權的呼叫者能不能也驅動它，我沒有測過。
+>
+> 我真正能觀察到的門檻是權限。`/dev/edgetpu-soc` 是 `system:system 0660`、SELinux label `edgetpu_device`，而 `adb shell` 是 uid 2000、不在 `system` 群組、SELinux 為 Enforcing —— 所以 shell binary 開不了裝置節點，一切都得經過服務。在 Tensor G5（Pixel 10、Android 16）上那個服務有註冊為 `com.google.edgetpu.IEdgeTpuAppService/default`，而且同一支 client 函式庫導出的 C 符號從 G3 的 7 個增加到 33 個，多出一整套 `TachyonComputeService_*` / `TachyonComputeSession_*` 會話 API，其中有 `TachyonComputeSessionConfig_setPrivileged` —— 至少暗示「非特權會話」是被設計進去的情境。而在這台 AOSP G3 build 上，那個 app service 根本沒有註冊。兩顆晶片都仍然沒有 `tflite_plugin_create_delegate`。
 >
 > 本文所有數字都是走 NNAPI 量到的，不受這個更正影響。
 
