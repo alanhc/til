@@ -140,6 +140,7 @@ const config = {
           {from: '/docs/ubuntu/ppa_error', to: '/docs/ubuntu_ppa_error'},
           {from: '/docs/money/money', to: '/docs/money'},
           {from: '/docs/money/投資', to: '/docs/投資'},
+          {from: '/docs/article-zh', to: '/docs/pixel8-cpu-gpu-npu-benchmark'},
           // 已移除的 Docusaurus 預設範例頁，一律導回知識地圖，不要留 404
           {
             to: '/docs/map',

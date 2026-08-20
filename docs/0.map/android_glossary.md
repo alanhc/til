@@ -740,7 +740,7 @@ sidebar_position: 1
 
 ## 二十六、實機 driver 開發、量測與 upstream
 
-> 出自 [Pixel 8 Kernel Driver 開發實戰](../pixel8-kernel-tutorial.md)、[driver 完整歷程](../pixel8-driver-course.md)、[軟體整合層 Bringup](../pixel8-bringup.md)、[送出 kernel patch](../upstream-runbook.md)、[Pixel 8 CPU/GPU/NPU 量測](../article-zh.md)。Kleaf／KMI 的定義見第十九節。
+> 出自 [Pixel 8 Kernel Driver 開發實戰](../pixel8-kernel-tutorial.md)、[driver 完整歷程](../pixel8-driver-course.md)、[軟體整合層 Bringup](../pixel8-bringup.md)、[送出 kernel patch](../upstream-runbook.md)、[Pixel 8 CPU/GPU/NPU 量測](../pixel8-cpu-gpu-npu-benchmark.md)。Kleaf／KMI 的定義見第十九節。
 
 | 名詞 | 說明 |
 |---|---|
