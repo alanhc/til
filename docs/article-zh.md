@@ -318,9 +318,15 @@ Segmentation fault
 
 `inference_count` 差值：**0**。
 
-把符號表拉出來看就懂了——那支函式庫匯出 115 個 C++ 的 `android::darwinn` / `platforms::darwinn` 符號，**沒有任何 C ABI，也沒有 `tflite_plugin_create_delegate`**。TFLite 印的「EXTERNAL delegate created」只是 `dlopen` 成功後的樂觀訊息，接著呼叫不存在的進入點就崩了。
+把符號表拉出來看就懂了——那支函式庫沒有 `tflite_plugin_create_delegate`。TFLite 印的「EXTERNAL delegate created」只是 `dlopen` 成功後的樂觀訊息，接著呼叫不存在的進入點就崩了。
 
-**所以在 Tensor G3 上，deprecated 的 NNAPI 目前仍是唯一的公開 TPU 路徑**，而且它還能用。未來有 G3 可用的 delegate 出現時，`--external_delegate_path` 就是接口，這套腳本不用改。
+**所以在 Tensor G3 上，deprecated 的 NNAPI 目前仍是唯一走 TFLite 到 TPU 的路徑**，而且它還能用。未來有 G3 可用的 delegate 出現時，`--external_delegate_path` 就是接口，這套腳本不用改。
+
+> **更正（2026-08-21）**：本節原本寫「那支函式庫匯出 115 個 C++ 符號，**沒有任何 C ABI**」，並據此斷言 NNAPI 是唯一的公開 TPU 路徑。這是錯的——我只查了 `libedgetpu_client.google.so` 一支就以偏概全。同樣列在 `/vendor/etc/public.libraries.txt`、App 一樣搆得到的 `libedgetpu_util.so`，匯出 **256 個符號、全部是 C ABI**：199 個 `DarwinnApi2_*` 加 12 個 `DarwinnDelegate_*`，包含 `DarwinnDelegate_CreateVirtualDevice`、`DarwinnApi2_VirtualDevice_RegisterGraph`、`RequestQueue_Submit`、`Request_Wait`、`Request_TimingInfo_GetTpuWorkNsec`。非 TFLite 的 TPU 路徑是存在的。
+>
+> 真正的障礙是編譯器，不是 ABI。`RegisterGraph` 收的是已編譯好的 Darwinn graph container，餵不進 `.tflite`；runtime 的錯誤字串自己就說了：「Please recompile the model with the latest compiler」、「Graph container version ... make sure the graph is compiled with the right version」、「You might have compiled your model for <= P24 but it is running on a P25+ device」。要產出那個 container 需要 Tensor SDK 的編譯器。在 Tensor G5（Pixel 10、Android 16）上重驗過：同一套 `DarwinnApi2_*`，236 個符號全是 C，另外多一支 `libedgetpu_litert.so` 提供 63 個 Tachyon C API——兩顆晶片都仍然沒有 `tflite_plugin_create_delegate`。
+>
+> 本文所有數字都是走 NNAPI 量到的，不受這個更正影響。
 
 順帶修正一個流傳的說法：有 issue 稱「Tensor G3 不提供 OpenCL，所以無法做 GPU 推論」。在這台上是錯的——`libOpenCL.so` 就列在 `/vendor/etc/public.libraries.txt`，代表連一般 App 都能透過 sphal namespace 取用，本文所有 GPU 數字都是走它量到的。
 
