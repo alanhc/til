@@ -172,7 +172,45 @@ sidebar_position: 7
 
 ---
 
-## 六、半導體量產測試
+## 六、矽後驗證與量產測試
+
+### 矽後驗證（Post-Silicon Validation）與 debug
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **post-silicon validation（矽後驗證 / post-Si）** | first silicon 回來之後、量產之前的驗證工作。與 pre-silicon 的根本差別是取捨方向相反：**pre-Si 什麼都看得到但跑不快，post-Si 跑得飛快但什麼都看不到** | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **first silicon** | 第一批從晶圓廠回來的晶片，bring-up 的對象 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **DFD（Design-for-Debug）** | 為了 debug 而放進晶片的硬體：trace buffer、trigger 邏輯、breakpoint、可觀測的 debug bus。佔面積耗電，永遠在跟設計搶資源，但**tape-out 之後就沒得加**——first silicon 出問題時它是唯一的眼睛。與 DFT（為量產測試而設計）目的不同 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **RIT（Random Instruction Test）** | 用亂數產生大量合法指令序列，跟 golden reference model（架構模擬器）比對結果，是找 CPU corner case 的主力 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **golden reference model** | 架構層級的參考模擬器，post-Si 拿它當「正確答案」比對真晶片的執行結果 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **power virus** | 刻意寫出讓功耗與切換率飆到極限的程式，用來壓供電、散熱與最壞的 IR drop／di/dt 情境 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md)、[Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **敏感度掃描（sensitivity sweep）** | Post-Si debug 最便宜的診斷工具：轉電壓／頻率／溫度三個旋鈕看失效變好或變壞。**加壓變好 + 降頻變好 + 升溫變壞 → setup violation**；加壓反而變糟 → 疑 hold；三者都沒差 → 比較像純邏輯 bug | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **加速條件（acceleration condition）** | 刻意讓晶片更容易失效的設定（例如降 50mV），把 MTTF 從數小時壓到數十分鐘。**壓縮 MTTF 就是壓縮 debug 週期**，是 post-Si 的核心技巧 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **test narrowing / bisection** | 把 failing case 從「幾十億條指令的 OS 壓測」縮到「幾百行、幾十秒的裸機程式」。價值不只在好 debug——**縮小到這個尺寸才拿得回 pre-Si simulator 用完整可觀測性定案** | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **scan dump** | 失效當下用 JTAG 把整顆晶片的 flip-flop 狀態掃出來看。缺點是掃描時晶片必須停住，只能得到 snapshot 而看不到動態過程 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **on-chip trace buffer** | 晶片內建的環形紀錄區，設好 trigger 條件後錄下失效前最後數千個 cycle 的內部交易，事後回放 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **stepping / metal fix / all-layer respin** | 晶片改版。只改上層金屬層叫 metal fix（較便宜快，能改的有限）；全部重做叫 all-layer respin（貴、以月計）。因此 post-Si 的隱含 KPI 是**在下一次 respin 前把該找的 bug 一次找完** | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **errata（勘誤表）** | 確認是 bug 但決定不修（或來不及修）的問題，寫進公開文件給客戶。各家 CPU 的 "specification update" PDF 基本上就是 post-Si 團隊的工作成果目錄 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **workaround** | 用 microcode patch、firmware、BIOS、driver 或 compiler 繞過硬體 bug，通常付出效能代價換取不 respin | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+
+### 電氣驗證與 Shmoo
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **electrical validation / characterization** | 回答「這顆晶片在什麼條件下才不會算錯」，與功能驗證問的「會不會算錯」是兩件事。產出是 datasheet 規格、binning 規則與 DVFS 表 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **shmoo plot** | 固定其他條件，取兩個參數當座標軸（最常見 電壓 × 頻率），逐格跑測試畫出 pass/fail 邊界圖。**形狀本身就是診斷資訊**。名稱來自 1940 年代漫畫《Li'l Abner》裡的圓胖生物 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md)、[MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **shmoo hole** | 邊界中間出現的破洞——某個特定電壓反而失敗，更高更低都過。常見成因：PLL 在某分頻設定下 jitter 大、on-chip regulator／LDO 在某負載點不穩、PDN 在某切換頻率有 impedance peak（共振）、DLL/SerDes lock 範圍邊界 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **fuzzy boundary（邊界毛躁）** | Pass/fail 交錯不可重複，通常代表測試本身是機率性的，或環境有問題（電源 ripple、接觸不良、溫度沒穩定）。老手的直覺是**先懷疑環境，再懷疑晶片** | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **setup violation vs hold violation（shmoo 判讀）** | setup 是「跑不完」——低壓高頻的右上角失敗，加壓或降頻可救；hold 是「跑太快、下一級還沒 latch 就被蓋掉」——**高壓低頻的左下角失敗，跟頻率無關、降頻救不了** | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **Vmin 曲線** | 每個頻率下能正常工作的最低電壓，也就是 shmoo 邊界那條斜線。因為功耗約正比於 V²，把 Vmin 壓低是省電的主戰場 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md)、[FT 最終測試](../what-is-ft-final-test.md) |
+| **Vmin 是分布不是數字** | 一批晶片的 Vmin 是一個有尾巴的分布。出貨規格要靠大量取樣後外推到目標良率，再疊上 aging margin、量測誤差與電源雜訊 margin；離群的那顆要去查原因 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **guardband（安全餘裕）** | 規格與實測邊界之間刻意留的距離。留太少會出貨後翻車，留太多等於白白浪費效能與功耗 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **Vmin limiter** | 限制 Vmin 的通常不是邏輯 critical path，而是 **SRAM 6T bitcell 的讀寫穩定性**，其次是 PLL／SerDes／ADC 等類比 IP 與 level shifter。所以很多設計給 SRAM 獨立電壓域或加 assist circuit | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **process corner（SS / TT / FF）** | 描述 NMOS 與 PMOS 快慢組合的製程角落（slow-slow／typical／fast-fast）。同一張光罩出來的晶片速度就是會不一樣，validation 必須刻意挑不同 corner 的樣品測 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **temperature inversion** | 傳統上溫度越高電路越慢，但在先進製程的低電壓區會反過來——升溫反而變快。因此**最壞的 timing corner 可能是低溫**，是很容易踩到的直覺陷阱 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **aging（NBTI / HCI / 電遷移）** | 電晶體隨使用時間變慢的老化機制。出貨規格必須預留 aging margin——今天剛好過的晶片三年後可能就不過 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **Kelvin sensing / on-die voltage monitor** | 電源供應器輸出 1.0V，經線材、PCB、封裝、on-die 電阻後電晶體看到的可能只剩 0.93V。要用四線量測或晶片內建監測器才知道真值 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **DVFS 表** | 「哪個頻率配哪個電壓」的對照表，由 characterization 資料產生後燒進 firmware 或 fuse。高階設計會做 per-part 客製，每顆晶片燒進自己的 Vmin 把 guardband 榨到極致 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md)、[FT 最終測試](../what-is-ft-final-test.md) |
 
 ### 測試站點與設備
 

@@ -76,13 +76,15 @@ sidebar_position: 6
 
 ---
 
-## 七、半導體量產測試
+## 七、矽後驗證與半導體量產測試
 
-> 一顆晶片從晶圓到客戶手上的測試流水線。從系統整合／韌體工程師視角看，這條線決定了拿到手的矽是什麼品質、怎麼分級，以及 MTBF 這類軟體穩定性度量為何落在整合團隊。
+> 兩段相接的故事。前半是 **post-silicon validation（矽後驗證）**——first silicon 從 fab 回來之後，在「跑得飛快但幾乎什麼都看不到」的條件下把 bug 找出來，並用電壓／頻率／溫度掃描決定這顆矽在什麼條件下能用。後半是**量產測試**——把驗證階段學到的東西，變成 CP／FT／SLT 上跑的 pattern 與分級規則。從系統整合／韌體工程師視角看，這整條線決定了拿到手的矽是什麼品質、怎麼分級，以及 MTBF 這類軟體穩定性度量為何落在整合團隊。
 
 | 文章 | 內容 |
 |---|---|
 | [IC 設計的前段／中段／後段](../BMC/ic-design-flow.md) | **這條鏈的上游**：從 Spec 到 GDSII 的完整數位 IC 流程。前段（架構／微架構／RTL coding／驗證方法學：directed、constrained random、formal、emulation）；中段（Synthesis 與 SDC 約束太鬆/太緊的後果、DFT 的 Scan/MBIST/ATPG/JTAG/compression、LEC 等價性驗證）；後段（Floorplan→Placement→CTS→Routing→Signoff，含 STA/IR Drop/EM/DRC/LVS/Antenna/SI 檢查表）。另談「中段」邊界在各公司浮動、類比 IC 沒有合成步驟、流程實為迴授而非瀑布。**與下方量產測試系列直接相接**：DFT 決定了 ATE 上能測到什麼 |
+| [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) | **tape-out 之後那一整段**：先用一張對照表講清楚 pre-Si 與 post-Si 的根本取捨——模擬什麼都看得到但跑不快，真晶片跑得飛快但只剩 pin 與 debug port，以及為何 state space、模擬深度、類比行為、製程變異、model 本身出錯這五件事讓 pre-Si 不可能做完。接著走完五個階段：階段 0 tape-out 前就要決定的 **DFD（Design-for-Debug）**（trace buffer、trigger、debug bus——**tape-out 後就沒得加**）、階段 1 bring-up 的檢查順序（power → clock/reset → JTAG → BIST → 第一條指令 → 開機）、階段 2 功能驗證（ISA、RIT 對 golden model、compliance、power virus、concurrency）、階段 3 用 shmoo 掃電氣角落、階段 4 debug 與 triage、階段 5 errata／workaround／stepping 決策。末尾是一個逐日推進的 debug case study（6 小時才當一次 → 建立重現性 → 敏感度掃描判定 setup violation → 找到加速條件把 MTTF 壓到 40 分鐘 → 縮測試回 pre-Si 定案 → metal fix 與 errata），與職務所需技能、相關職位分工 |
+| [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) | **上篇階段 3 的展開**：功能對了不等於能出貨，電氣驗證回答的是「在什麼條件下才不會算錯」。先講 V／F／T 三個旋鈕各自怎麼影響 timing（含 **temperature inversion**——先進製程低電壓下最壞角落可能是低溫而非高溫，這是常見的直覺陷阱），加上製程角落 SS/TT/FF 與 NBTI／HCI 老化。主體是**怎麼讀 shmoo plot**：乾淨斜線 = 正常 critical path；中間破洞 = PLL jitter／LDO 不穩／PDN 共振／lock 範圍邊界；左下角（高壓低頻）壞掉 = hold violation，降頻救不了；邊界毛躁 = 先懷疑環境再懷疑晶片。再談 **Vmin 是一個分布不是一個數字**（要外推到目標良率並疊 aging 與量測 margin，離群值要追），以及 Vmin 通常被 SRAM bitcell 與類比 IP 限制而非邏輯 critical path。最後是測試環境與時間成本（一次 characterization 動輒上百小時，自動化本身就是核心技能）、四個常見陷阱（量到的不是 die 上的電壓、溫度沒穩、測試順序的歷史效應、把環境問題當晶片問題），與資料最終如何變成 datasheet 規格、binning 規則與 DVFS 表 |
 | [半導體量產測試全景](../semiconductor-test-overview-cp-ft-slt-ate.md) | **系列總綱**：CP（晶圓）→ FT（封裝後）→ SLT（出貨前）三個 test insertion 加上 ATE（設備）的定位；結構性 vs 功能性兩種測試哲學、「缺陷越晚發現越貴」的十倍法則經濟學、四角色對照表，以及從 chip vendor 看品質過濾／良率歸因／產品分級／閉環回饋四件事 |
 | [ATE 是什麼](../what-is-ate.md) | 破除最常見的混淆——ATE 是 CP/FT **共用的設備**，不是一個測試階段。DFT／ATPG／scan chain 的結構性測試原理、fault model 與 coverage、市場格局，以及 ATE 覆蓋率的先天極限（為何仍需要 SLT） |
 | [CP 晶圓測試](../what-is-cp-wafer-test.md) | 封裝前用探針卡扎裸 die、產出 wafer map 篩壞品；探針卡的接觸電阻／寄生電感如何限制高頻與大電流測試、CP 能不能省（盲封），以及最容易混淆的 CP vs WAT（測產品 vs 測製程） |
@@ -129,6 +131,15 @@ sidebar_position: 6
    → Yocto Project             ← 大而全
    → Das U-Boot                ← 把 image 開起來
    → Firmware Image 管理       ← 出貨前的通道與晉升機制
+```
+
+**想搞懂 first silicon 回來之後發生什麼事：**
+
+```
+IC 設計的前段／中段／後段        ← 上游：矽是怎麼被做出來的
+   → Post-Silicon Validation 入門  ← 整體流程與 debug 方法論
+   → Shmoo 與電氣驗證              ← 其中最工程的一段：V/F/T 掃描與 Vmin
+   → 半導體量產測試全景            ← 驗證結論怎麼變成量產測試與分級
 ```
 
 **想搞懂一顆晶片出廠前經過哪些測試：**

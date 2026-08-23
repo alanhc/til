@@ -18,7 +18,7 @@ sidebar_position: 0
 | **AI / Agent** | Claude Code / Skills、MCP、Gemini、本地推論（Ollama、Jan AI）、AI 應用與文章 | [AI.md](../AI.md) | [AI 系列索引](ai_index.md) | [AI 名詞表](ai_glossary.md) |
 | **BMC** | OpenBMC、CanopyBMC、IPMI / Redfish、sensor / thermal、Yocto | [BMC/openbmc_boot_flow.md](../BMC/openbmc_boot_flow.md) | [BMC 系列索引](bmc_index.md) | [BMC 名詞表](bmc_glossary.md) |
 | **Linux / 系統** | Kernel、kernel 除錯（Oops／crash dump）、device tree / driver、systemd、memory、Ubuntu 指令、GRUB、Docker | [Linux/Linux.md](../Linux/Linux.md) | 走 `Linux/` 資料夾側邊欄 | 待建 |
-| **Embedded / 韌體 / 硬體** | Bootloader、firmware testing / image management、Raspberry Pi、晶片與半導體、半導體量產測試 | [embedded.md](../embedded.md) | [Embedded 系列索引](embedded_index.md) | [Embedded 名詞表](embedded_glossary.md) |
+| **Embedded / 韌體 / 硬體** | Bootloader、firmware testing / image management、Raspberry Pi、晶片與半導體、矽後驗證與半導體量產測試 | [embedded.md](../embedded.md) | [Embedded 系列索引](embedded_index.md) | [Embedded 名詞表](embedded_glossary.md) |
 | **DSA / 演算法** | Linked List、hash / LRU、樹與堆積、圖與 BFS/DFS、二分與排序、DP／回溯、雙指標／單調堆疊、位元與環形緩衝 | [DSA/Linked_List/0.linked_list.md](../DSA/Linked_List/0.linked_list.md) | [DSA 系列索引](dsa_index.md) | — |
 | **效能 / Benchmark** | CPU DVFS、power / browser benchmark、codec 判讀 | [benchmark.md](../benchmark.md) | 待建 | — |
 | **投資 / 理財** | 投資計劃、個股風險、程式交易、酒田戰法、房、銀行操作 | [投資.md](../投資.md) | 待建 | — |
