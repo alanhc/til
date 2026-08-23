@@ -345,6 +345,8 @@ Segmentation fault
 > 在 Tensor G5 上，同一支 client 函式庫導出的 C 符號從 G3 的 7 個增加到 33 個，多出一整套 `TachyonComputeService_*` / `TachyonComputeSession_*` 會話 API —— 但它的服務 `com.google.edgetpu.tachyon.IComputeService/default` 在裝置上並沒有註冊。兩顆晶片都仍然沒有 `tflite_plugin_create_delegate`。
 >
 > 本文所有數字都是走 NNAPI 量到的，不受這個更正影響。
+>
+> **後續（2026-08-23）**：我把這條非 TFLite 的路實際走完了——用一支 shell binary 把 TPU 開機、載入韌體，並把兩道關卡（DAC＋MAC 擋直接路徑、vendor 白名單擋服務 fallback）分開驗證。同時發現這裡的符號計數還漏了一整組 40 個的 `thr*` API。完整拆解另開一篇：[把 Pixel 8 的 TPU 從一支 shell binary 開機](./pixel8-edgetpu-runtime-teardown.md)。
 
 順帶修正一個流傳的說法：有 issue 稱「Tensor G3 不提供 OpenCL，所以無法做 GPU 推論」。在這台上是錯的——`libOpenCL.so` 就列在 `/vendor/etc/public.libraries.txt`，代表連一般 App 都能透過 sphal namespace 取用，本文所有 GPU 數字都是走它量到的。
 
