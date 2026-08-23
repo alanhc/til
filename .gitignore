@@ -29,3 +29,10 @@ coscup*.md
 
 # Claude Code local worktrees (accidentally committed as a gitlink before)
 .claude/worktrees/
+
+# Claude Code 本機補充 context（不進版控，內容不適合公開）
+.claude/context.local.md
+
+# pre-push 機密掃描的本機關鍵字／例外清單（內容不適合公開）
+.githooks/secret-patterns.local.txt
+.githooks/secret-allow.local.txt

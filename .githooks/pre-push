@@ -1,10 +1,92 @@
 #!/bin/sh
-# Preflight: build the site before pushing so broken internal links,
-# broken image refs, or bad [[wikilinks]] are caught locally instead of
-# failing in CI. Skipped for Obsidian "vault backup" commits.
+# Push 前的兩道檢查：
 #
-# Enabled via: git config core.hooksPath .githooks  (run once, see README)
-# Bypass a single push with: git push --no-verify
+#   1. 機密關鍵字掃描 —— 這個 repo 是公開的，push 到 main 就是發佈，沒有反悔的緩衝。
+#      掃的是「這次要推上去的新增行」，比對 secret-patterns*.txt。
+#      **vault backup commit 也會掃**（那正是沒人看過的自動 commit，最需要擋）。
+#   2. Preflight build —— markdownlint + Docusaurus build，讓壞掉的連結／圖片／
+#      [[wikilinks]] 在本機就被抓到，而不是到 CI 才爆。vault backup commit 會跳過。
+#
+# 啟用方式：git config core.hooksPath .githooks   （跑一次，見 README）
+# 整個 hook 繞過：git push --no-verify
+
+HOOK_DIR=$(dirname "$0")
+
+# ---------- 1. 機密關鍵字掃描 ----------
+
+# pre-push 的 stdin 格式：<local_ref> <local_sha> <remote_ref> <remote_sha>
+ranges=""
+got_input=""
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ -z "$local_sha" ] && continue
+  got_input=1
+  # 全 0 的 local_sha = 刪除 ref，沒有東西要掃
+  case "$local_sha" in *[!0]*) ;; *) continue ;; esac
+  case "$remote_sha" in
+    *[!0]*)
+      ranges="$ranges $remote_sha..$local_sha"
+      ;;
+    *)
+      # 遠端還沒有這個 branch：跟 origin/main 比
+      base=$(git rev-parse --verify -q origin/main 2>/dev/null)
+      if [ -n "$base" ]; then
+        ranges="$ranges $base..$local_sha"
+      else
+        ranges="$ranges $local_sha"
+      fi
+      ;;
+  esac
+done
+
+# 手動執行（完全沒有 stdin）時的退路。
+# 注意要用 got_input 判斷，不能只看 ranges —— 純粹刪 ref 的 push 也會讓 ranges 是空的，
+# 那種情況本來就沒東西要掃，不該退回去掃 HEAD。
+if [ -z "$ranges" ] && [ -z "$got_input" ]; then
+  up=$(git rev-parse --verify -q '@{upstream}' 2>/dev/null)
+  [ -z "$up" ] && up=$(git rev-parse --verify -q origin/main 2>/dev/null)
+  [ -n "$up" ] && ranges="$up..HEAD"
+fi
+
+if [ -n "$ranges" ]; then
+  tmpd=$(mktemp -d) || exit 1
+  trap 'rm -rf "$tmpd"' EXIT INT TERM
+
+  : > "$tmpd/pat"
+  for f in "$HOOK_DIR/secret-patterns.txt" "$HOOK_DIR/secret-patterns.local.txt"; do
+    [ -f "$f" ] && cat "$f" >> "$tmpd/pat"
+  done
+  : > "$tmpd/allow"
+  for f in "$HOOK_DIR/secret-allow.txt" "$HOOK_DIR/secret-allow.local.txt"; do
+    [ -f "$f" ] && cat "$f" >> "$tmpd/allow"
+  done
+
+  # 掃描 .githooks/ 自己沒有意義（關鍵字清單本身就長得像命中）
+  : > "$tmpd/diff"
+  for r in $ranges; do
+    git diff --unified=0 "$r" -- . ':(exclude).githooks/*' >> "$tmpd/diff" 2>/dev/null
+  done
+
+  awk -v PATF="$tmpd/pat" -v ALLOWF="$tmpd/allow" \
+      -f "$HOOK_DIR/scan.awk" "$tmpd/diff" > "$tmpd/hits"
+
+  if [ -s "$tmpd/hits" ]; then
+    echo ""
+    echo "[scan] 擋下 push：新增內容命中機密關鍵字（$(wc -l < "$tmpd/hits" | tr -d ' ') 處）"
+    echo ""
+    sed 's/^/    /' "$tmpd/hits"
+    echo ""
+    echo "[scan] 處理方式："
+    echo "       - 真的敏感 → 改寫內容後重新 commit（或 git commit --amend）"
+    echo "       - 誤判     → 到 .githooks/secret-allow.txt 加一條例外並註明原因"
+    echo "       - 規則過時 → 改 .githooks/secret-patterns.txt / .local.txt"
+    echo "       - 這次先推 → git push --no-verify（連 build 檢查也會一起跳過）"
+    echo ""
+    exit 1
+  fi
+  echo "[scan] 機密關鍵字掃描通過。"
+fi
+
+# ---------- 2. Preflight build ----------
 
 last_msg=$(git log -1 --pretty=%s 2>/dev/null)
 case "$last_msg" in
