@@ -86,6 +86,21 @@ sidebar_position: 7
 
 ---
 
+### UEFI / edk2 除錯
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **toolchain tag（`GCC5` / `GCC` / `GCCNOLTO`）** | edk2 `build -t` 用的工具鏈標籤。**`GCC5` 已被移除**，現有的可用 `grep -oE 'DEFINE (GCC\|CLANG)[A-Z0-9]*_' Conf/tools_def.txt` 查。除錯選 `GCCNOLTO`——LTO 會跨模組 inline 打散函式邊界，source-level stepping 對不上原始碼 | [UEFI gdb 除錯](../booting/uefi-gdb-dxe-debugging.md) |
+| **DSC `[BuildOptions]`** | 加編譯 flag 的有效位置。改 `Conf/tools_def.txt` 的 `GCC_ALL_CC_FLAGS` 不一定會傳到生成的 `GNUmakefile`；驗證機制通不通可拿同區段本來就有的 flag（如 `-mno-mmx`）當對照 | [UEFI gdb 除錯](../booting/uefi-gdb-dxe-debugging.md) |
+| **`DEBUG_ON_SERIAL_PORT` vs `-debugcon`** | `DEBUG()` 輸出的兩個互斥出口。build 時給了前者卻又照教學加 `-debugcon file:...`，會得到 0 行的空檔案，看起來像韌體完全沒有 debug 輸出 | [UEFI gdb 除錯](../booting/uefi-gdb-dxe-debugging.md) |
+| **image base vs `.text` VMA** | serial log 的 `Loading driver at 0x...` 給的是 **image base**，不是 `.text`。偏移取決於 PE/COFF header、linker script 與 build 設定，**每個模組都可能不同——不要背 `base + 0x240`**，用 `objdump -h *.debug` 自己查 | [UEFI gdb 除錯](../booting/uefi-gdb-dxe-debugging.md) |
+| **`add-symbol-file` 只搬 `.text`** | gdb 的 `add-symbol-file <file> <addr>` 第二個參數**只設定 `.text_addr`**。全域變數住在 `.data`，沒被重定位就會拿 ELF 裡的原始 VMA 去讀 → **backtrace 完全正確、變數卻讀出垃圾**，是最會騙人的症狀。正解是 `add-symbol-file f.debug <text> -s .data <data>` | [UEFI gdb 除錯](../booting/uefi-gdb-dxe-debugging.md) |
+| **DXE dispatch 鏈** | 掛上 `DxeCore` symbol 後看得到的七層：`DxeMain` → `CoreDispatcher` → `CoreStartImage` → `_ModuleEntryPoint` → `ProcessModuleEntryPointList` → driver entry。架構圖上那個叫「DXE」的方塊實際上就是這幾層 | [UEFI gdb 除錯](../booting/uefi-gdb-dxe-debugging.md) |
+| **Depex / `mScheduledQueue`** | `[Depex]` 寫在 `.inf` 裡，宣告這個 driver 要等哪些 protocol 就位。dispatcher **一輪一輪掃**：載入 Depex 已滿足的 driver → 它們安裝新 protocol → 再重掃，直到某輪沒有新的可載入。`mScheduledQueue` 就是「已滿足、排隊等載入」的佇列，`EFI_CORE_DRIVER_ENTRY` 裡的 `Depex` 指向那串 dependency expression bytecode | [UEFI gdb 除錯](../booting/uefi-gdb-dxe-debugging.md) |
+| **`fat:rw:<dir>`（QEMU）** | 把本機目錄當成 FAT 磁碟給 guest。host 丟 `.efi` 進去 guest 立刻看得到，做韌體實驗時不必每次重做 image | [UEFI gdb 除錯](../booting/uefi-gdb-dxe-debugging.md) |
+
+---
+
 ## 二、建置系統
 
 ### Yocto

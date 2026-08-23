@@ -757,7 +757,9 @@ sidebar_position: 1
 | **`power_policy` / `scaling_min_freq` / `scaling_max_freq`** | 鎖 Mali 頻率**三個都要寫，缺一不可**（`always_on` + min = max） |
 | **NNAPI 無聲退回** | 指定 `--nnapi_accelerator_name=google-edgetpu` 但模型是 float32 時，TFLite 照樣印 `NNAPI delegate created` 甚至回報節點被委派，**實際卻退回 XNNPACK 跑 CPU**。只有 int8 量化圖能上 EdgeTPU |
 | **`inference_count`（rio）** | `/sys/devices/platform/1a000000.rio/` 下由 TPU 驅動維護的硬體推論計數器。前後差值是**唯一在無聲退回時仍會露餡的訊號**（跑 CPU 時差值恆為 0） |
-| **EdgeTPU on AOSP** | `rio`/`gxp` 驅動與 `android.hardware.neuralnetworks.IDevice/google-edgetpu` 在**純 AOSP build 上是活的，不需要 GMS**。但 NNAPI 已於 Android 15 deprecated，而 LiteRT NPU delegate 尚無 Pixel 版、Tensor SDK 只支援 G5，**G3 上 NNAPI 目前仍是唯一公開路徑** |
+| **EdgeTPU on AOSP** | `rio`/`gxp` 驅動與 `android.hardware.neuralnetworks.IDevice/google-edgetpu` 在**純 AOSP build 上是活的，不需要 GMS**。但 NNAPI 已於 Android 15 deprecated，而 LiteRT NPU delegate 尚無 Pixel 版，**G3 上 NNAPI 目前仍是唯一走得通的路**——原因見下面兩條 |
+| **`libedgetpu_client.google.so` vs `libedgetpu_util.so`** | 兩支都在 `/vendor/etc/public.libraries.txt` 上，App 都搆得到。前者只有 85 KB、`DT_NEEDED` 全是 binder／AIDL stub，**沒有 `tflite_plugin_create_delegate`**，所以 `--external_delegate_path` 會在 `dlopen` 成功後呼叫不存在的進入點而 segfault；後者匯出 **256 個全 C ABI 符號**（199 個 `DarwinnApi2_*` + 12 個 `DarwinnDelegate_*`，含 `CreateVirtualDevice`／`RegisterGraph`／`RequestQueue_Submit`）。**「沒有 C ABI」是只查一支就以偏概全的錯誤結論**——非 TFLite 的 TPU 路徑是存在的 |
+| **vendor 白名單（TPU 存取的真正關卡）** | 擋住第三方用 TPU 的不是 ABI、也不是編譯器（`libedgetpu_tflite_compiler.so` 在裝置上，只是僅 root 可讀且不在 public 清單；公開 client 導出 `CompileSubgraphFlatbuffer` 表示它轉呼叫特權服務）。關卡是 **vendor 端以套件名稱與簽章為鍵的白名單**，客戶端沒有辦法通過。G5 上 client 的 C 符號從 7 個增加到 33 個（多出 `TachyonComputeService_*` 會話 API），但該服務在裝置上並未註冊，兩顆晶片也都仍無 `tflite_plugin_create_delegate` |
 | **offload 的隱性成本** | 兩個常被忽略的：模型編譯給 TPU 要 1.1–2.1 秒／process（單次推論才 1 ms，短命工作負載根本不該 offload）；**餵資料的核心也算成績**——host thread 綁 A510 vs X3 差 62%，TPU 本身完全沒變 |
 
 ---

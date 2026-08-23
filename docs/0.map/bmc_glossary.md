@@ -72,6 +72,14 @@ sidebar_position: 5
 | **rofs / rwfs（唯讀 rootfs）** | OpenBMC 的 rootfs **預設唯讀**，可寫入部分是 overlay 分割。**直接改 `/usr/` 底下的檔案重開就消失**，需持久化的放 `/var/lib/`、`/etc/` | [openbmc](../BMC/openbmc.md) |
 | **Buildroot** | 另一套嵌入式建置系統，同樣往下產出 kernel / u-boot / driver / device tree。改 driver 通常只會動到 **Driver** 與 **Device Tree** 兩塊 | [device_driver](../BMC/device_driver/device_driver.md)、[porting_pmbus_driver](../BMC/device_driver/porting_pmbus_driver.md) |
 
+| **`meta-nvidia`** | OpenBMC 樹內的 NVIDIA 資料中心平台層，含 `gb200nvl-obmc`（GB200 NVL 機櫃）與 `nvl32-obmc`。machine conf 直接 `require conf/distro/include/pldm.inc`，所以 PLDM／MCTP 是平台原生而非自己加進 `IMAGE_INSTALL` | [gb200nvl-qemu](../BMC/gb200nvl-qemu.md) |
+| **`gb200nvl-bmc`（QEMU machine）** | QEMU ≥ 10.1 內建、由 NVIDIA 送進 upstream 的模型，基於 OpenBMC kernel 樹裡同一份 device tree。**注意發布公告寫的是 `gb200-bmc`，實際註冊名是 `gb200nvl-bmc`**，照公告去 `-M help` 找會找不到 | [gb200nvl-qemu](../BMC/gb200nvl-qemu.md) |
+| **`bitbake qemu-system-native`** | 不必自己 `apt` 裝 `libpixman-1-dev`／`libslirp-dev`，讓 Yocto 生一份新版 QEMU（免 sudo）。該 recipe 的 `.bbappend` 沒有任何 machine patch——這反過來是「machine 已在 upstream」的證據 | [gb200nvl-qemu](../BMC/gb200nvl-qemu.md) |
+| **`SLIRP_4.9 not found`** | Yocto 編出的 QEMU binary 與其函式庫不在同一目錄，直接執行會退回載系統舊版 `libslirp`。**不是 build 壞掉**，設 `LD_LIBRARY_PATH` 指向 `recipe-sysroot-native/usr/lib` 即可 | [gb200nvl-qemu](../BMC/gb200nvl-qemu.md) |
+| **`BB_PRESSURE_MAX_MEMORY`** | Yocto 依 Linux PSI（pressure stall information）自動節流的機制，記憶體吃緊時暫停派發新 task。30 GB RAM 上 `BB_NUMBER_THREADS`／`PARALLEL_MAKE` 開到 16 會讓 OOM killer 砍掉 `cc1plus`（`Killed signal terminated program cc1plus`），因為 C++20 recipe 每個 `cc1plus` 吃 1–2 GB。**同一台機器 romulus 用 `-j 16` 過得了，不代表設定安全** | [gb200nvl-qemu](../BMC/gb200nvl-qemu.md) |
+
+---
+
 ### Gerrit Workflow
 
 | 名詞 | 說明 | 出處 |
@@ -269,6 +277,9 @@ sidebar_position: 5
 | **PLDM** | Platform Level Data Model，跑在 MCTP 上的訊息類型，涵蓋 sensor、FRU、firmware update | [mctp](../BMC/mctp.md)、[retimer](../BMC/retimer.md) |
 | **NC-SI over MCTP / SPDM** | MCTP 承載的其他訊息類型（SPDM 用於安全驗證） | [mctp](../BMC/mctp.md) |
 | **libmctp / mctpd / pldmd** | OpenBMC 中 MCTP 的函式庫與 daemon，負責建立端點、路由封包；`pldmd` 提供 PLDM over MCTP 支援 | [mctp](../BMC/mctp.md)、[openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
+| **`pldmd` 自己就是 responder** | 常見誤解是「QEMU 裡沒有 host 就沒人回應 PLDM」。實際上在 `lo` 上 `mctp addr add 8 dev lo` 指派一個 EID 後，`pldmtool base GetPLDMTypes` 就能完成完整交握。log 裡的 `Failed to open remote terminus EID file` 只代表沒有**遠端** host terminus | [gb200nvl-qemu](../BMC/gb200nvl-qemu.md) |
+| **DSP0240 message header** | PLDM 訊息表頭。可用 `pldmtool raw` 看 wire 上的位元組自行驗算：request `80 00 04` = Rq=1／InstanceID=0、PLDMType=0(Base)、GetPLDMTypes；回應第 4 byte 起 8 bytes 是 bitfield，`0x1d` = bit 0/2/3/4 = base／platform／bios／fru，與工具印的 JSON 一致 | [gb200nvl-qemu](../BMC/gb200nvl-qemu.md) |
+| **`CONFIG_MCTP_TRANSPORT_I3C`** | I3C 是 GPU 與加速器底板上 MCTP 常走的匯流排，只出現在 NVIDIA 平台的 kernel config；共用的 `mctp.cfg` fragment 兩邊都要求，但 evb-ast2600 的 kernel 沒有（原文標為觀察而非已驗證的結論） | [gb200nvl-qemu](../BMC/gb200nvl-qemu.md) |
 
 ---
 
