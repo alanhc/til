@@ -1,0 +1,16 @@
+{
+  // Style rules are intentionally OFF — this is a large notes vault imported
+  // from Obsidian, so cosmetic rules (line length, tabs, blank lines) would
+  // generate thousands of false alarms. We only keep rules that catch actual
+  // broken Markdown so the check stays useful without being noisy.
+  //
+  // MD011 (reversed links) and MD037 (spaces in emphasis) are also disabled:
+  // they false-positive on this content's citation style — e.g. "term(en)[29]"
+  // footnote markers — and on MDX comments like {/* truncate */}.
+  "default": false,
+  "MD038": true, // spaces inside code span
+  "MD039": true, // spaces inside link text
+  "MD042": true, // empty link
+  "MD051": true, // broken link fragment (#heading)
+  "MD056": true  // table column count mismatch
+}

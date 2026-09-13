@@ -1,0 +1,422 @@
+---
+title: Embedded / 韌體 / 硬體 名詞表
+sidebar_label: Embedded 名詞表
+sidebar_position: 7
+---
+
+# Embedded / 韌體 / 硬體 名詞表
+
+彙整知識庫中所有嵌入式系統、韌體、硬體與半導體筆記出現過的名詞，用於**從名詞反查回原始筆記**。文章清單見 [Embedded 系列索引](embedded_index.md)。
+
+> ARM Trusted Firmware（BL1~BL33、EL0~EL3、TrustZone、Secure/Normal World、PSCI、SMC、TBBR、OP-TEE 等）術語不在此重複，見 [Android 名詞表](android_glossary.md) 第五節。
+
+---
+
+## 一、開機與 Bootloader
+
+### 泛用概念
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **Reset vector** | CPU 上電或 reset 後 PC 指向的固定位址，從此取第一條指令，執行 SoC 內建的 boot ROM／第一段 code | [開機流程（泛用概念）](../booting/boot.md) |
+| **多階段開機（multi-stage）** | 早期程式空間極小（可能只有幾 KB SRAM），需分階段逐步載入，每階段初始化足夠硬體再交棒給下一階段 | [開機流程（泛用概念）](../booting/boot.md) |
+| **Chain of trust（信任鏈）** | Secure boot 中每一階段驗證下一階段簽章後才執行 | [開機流程（泛用概念）](../booting/boot.md) |
+| **Root of trust** | 信任鏈的起點，通常是不可竄改的 boot ROM | [開機流程（泛用概念）](../booting/boot.md) |
+
+### x86（BIOS / UEFI / GRUB）
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **Reset Vector `0xFFFFFFF0`** | x86 上電後 `CS:IP` 設為 `0xFFFF:0xFFF0`（映射至 `0xFFFFFFF0`），指向主機板 SPI Flash 上的韌體 | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **BSP / AP** | 多核 CPU 中只有 **BSP（Bootstrap Processor）** 跑開機流程，其他核心 **AP（Application Processor）** 等待被喚醒 | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **Real / Protected / Long Mode** | x86 CPU 模式：16-bit Real Mode（開機初期、只能定址 1MB）→ 32-bit Protected Mode → 64-bit Long Mode（現代 kernel 標準）→ 啟用 MMU | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **BIOS** | 傳統韌體。開機執行 POST，遍歷 Boot Order，經 `INT 13h` 讀取 MBR | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **POST（Power-On Self Test）** | 韌體開機時的硬體自我測試（CPU／DRAM／晶片組／儲存／VGA），出錯發出 beep code | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **MBR** | 磁碟第一個磁區（512 bytes），含 Stage 1 bootstrap code（446 bytes）、4 個分割表項與結尾 magic number；載入至 `0x7C00` 執行 | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **Magic Number `0x55AA`** | MBR 結尾兩 bytes，BIOS 用來確認該磁區可開機 | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **UEFI** | BIOS 的現代替代品，32/64-bit、支援 GPT、Secure Boot、圖形 UI 與 PXE 網路開機 | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **SEC / PEI / DXE / BDS** | UEFI PI 規範四階段：SEC（Cache-as-RAM、最早信任根）→ PEI（Pre-EFI，初始化 DRAM、載入 DXE Core）→ DXE（Driver Execution Environment，載入驅動）→ BDS（Boot Device Selection，讀 NVRAM 的 `BootOrder`） | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **Cache-as-RAM** | DRAM 尚未初始化時，把 CPU 快取當 RAM 用，供 SEC 階段執行 | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **ESP（EFI System Partition）** | FAT32 分割區，存放 `.efi` 開機程式（如 `BOOTX64.EFI`、`shimx64.efi`、`grubx64.efi`） | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **Secure Boot（PK / KEK / db）** | UEFI 逐層驗證簽章：Platform Key → Key Exchange Key → 簽章資料庫 `db` → shim／bootloader → kernel，防 Bootkit | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **shim** | Secure Boot 下的第一階 EFI 程式（`shimx64.efi`），再去載入 `grubx64.efi` | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **GRUB Stage 1 / 1.5 / 2** | Legacy GRUB 分階段：Stage 1（MBR，446 bytes，只夠跳轉）→ Stage 1.5（MBR Gap，提供檔案系統驅動）→ Stage 2（完整環境、讀 `grub.cfg`）。UEFI 模式 `grubx64.efi` 直接含完整 GRUB | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **e820 map** | BIOS/GRUB 傳給 kernel 的記憶體映射表 | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **`vmlinuz` / `vmlinux`** | `vmlinuz` 為壓縮過的 kernel image，自帶解壓縮 stub 解出真正的 `vmlinux` ELF，再跳進 `start_kernel()` | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **initramfs / initrd** | kernel 內建的暫時 in-memory rootfs，載入掛載真 rootfs 前所需的模組（`dm_crypt`、RAID、NVMe…），完成後 `pivot_root`／`switch_root` 切換 | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md)、[RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **`pivot_root` / `switch_root`** | 從 initramfs 切換到真正 rootfs 並執行 `/sbin/init` 的動作 | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **MBR vs GPT** | 分割表格式：MBR 上限 2TB、4 主分割區；GPT 上限 9.4ZB、預設 128 分割區、有備份表與 GUID，配 UEFI 使用 | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **`systemd-analyze`** | 分析開機時間：`blame`（各服務耗時）、`critical-chain`（關鍵路徑）、`plot`（視覺化） | [x86 Linux Boot Flow](../booting/x86_linux_boot_flow.md) |
+| **`os-prober` / `update-grub`** | 灌 Windows 覆蓋 GRUB 後修復：`sudo os-prober` 找出其他 OS 分割區、`sudo update-grub` 重建選單 | [GRUB 修復](../grub.md) |
+
+### RISC-V（OpenSBI / SBI）
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **ZSBL（Zero Stage Bootloader）** | 片上 ROM 內建、不可修改的第一段 code，初始化基本時鐘與 SRAM，把 FSBL 載入 SRAM 後跳轉 | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **FSBL（First Stage Bootloader）** | 第一階 bootloader（如 SiFive FSBL、oreboot、或由 U-Boot SPL 扮演），做 DRAM 初始化並載入 OpenSBI | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **OpenSBI** | 開源 M-mode 韌體，實作 SBI 介面、傳遞 FDT 位址、切換至 S-mode 跳進 U-Boot 或 kernel | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **SBI（Supervisor Binary Interface）** | 定義 S-mode（kernel）與 M-mode（韌體）之間標準介面，類比 x86 BIOS INT 或 ARM 的 PSCI | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **M / S / U-mode** | RISC-V 三個特權層級：M-mode（OpenSBI、bootloader，最高權）、S-mode（kernel、hypervisor）、U-mode（應用程式） | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **`ecall`** | S-mode 向下呼叫 M-mode 韌體的指令（類 syscall），SBI 呼叫的觸發方式 | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **SBI 呼叫慣例** | `a7`=Extension ID、`a6`=Function ID、`a0~a5`=參數；`ecall` 後 `a0`=錯誤碼、`a1`=返回值 | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **CSR（Control and Status Registers）** | M/S-mode 的控制暫存器，如 `mhartid`、`mstatus`、`mepc`、`mtvec`、`satp`、`sstatus`、`sepc` | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **hart** | Hardware Thread，RISC-V 的硬體執行緒。Hart 0 為 primary hart 跑開機流程，其餘 secondary hart `WFI` 等待喚醒 | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **HSM（Hart State Management）** | OpenSBI 的 SBI 擴充，負責多核 hart 的啟停管理（`sbi_hsm`） | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **PMP（Physical Memory Protection）** | M-mode 設定的實體記憶體保護，OpenSBI 初始化 M-mode 環境時設定 | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **`fw_jump` / `fw_payload` / `fw_dynamic`** | OpenSBI 三種韌體映像：`fw_payload`（把 U-Boot/kernel 打包進來，QEMU 常用）、`fw_jump`（跳轉到固定位址）、`fw_dynamic`（前階段動態傳遞下一階段資訊，現代主流） | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **FDT（Flattened Device Tree）** | 扁平化的 device tree，OpenSBI 把其位址放在 `a1` 暫存器傳給下一階段，kernel 以 `early_init_fdt()` 解析 | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **Sv39 / Sv48 / Sv57** | RISC-V 分頁模式：Sv39（39-bit 虛擬位址、3 層頁表、64-bit Linux 預設）、Sv48（4 層）、Sv57（5 層） | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **CLINT** | Core Local Interruptor，處理軟體中斷（IPI）與計時器中斷，每個 hart 各一組 | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **PLIC** | Platform-Level Interrupt Controller，處理外部中斷（UART、GPIO、NVMe…），可設各 hart 的優先權與 mask | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **`extlinux.conf`** | 類 GRUB 的 U-Boot 開機設定檔（`DEFAULT`／`LABEL`／`KERNEL`／`FDT`／`APPEND`） | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+
+### U-Boot
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **U-Boot（Das U-Boot）** | 嵌入式平台最常見的開源 bootloader，初始化硬體、載入 kernel 與 device tree，提供互動式命令列 | [Das U-Boot](../Embedded/uboot.md)、[嵌入式系統背景知識](../embedded.md) |
+| **U-Boot SPL vs Proper** | SoC 剛上電只有小容量 SRAM，先跑輕量 **SPL** 初始化 DRAM，再載入完整的 **U-Boot Proper** | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+| **`bootcmd`** | U-Boot 環境變數：自動開機倒數結束後執行的指令 | [Das U-Boot](../Embedded/uboot.md) |
+| **`bootargs`** | U-Boot 環境變數：傳給 Linux kernel 的 cmdline（如 `console=ttyS0,115200 root=/dev/mmcblk0p2`） | [Das U-Boot](../Embedded/uboot.md) |
+| **`printenv` / `setenv` / `saveenv`** | 列出／設定／存回 flash（eMMC/NAND/SPI）中的環境變數 | [Das U-Boot](../Embedded/uboot.md) |
+| **`tftp` / `fatload`** | 從網路（TFTP）或本地儲存（MMC FAT）把 kernel 與 dtb 載入到指定記憶體位址 | [Das U-Boot](../Embedded/uboot.md) |
+| **`booti` / `bootm`** | 啟動 kernel。`booti` 三引數為 `<kernel>`、`<initrd>`（`-` 表無）、`<dtb>` 的載入位址 | [Das U-Boot](../Embedded/uboot.md) |
+| **FIT Image** | Flattened Image Tree，把 kernel + DTB + initramfs 打包成一檔的 U-Boot 標準格式 | [RISC-V Linux Boot Flow](../booting/riscv_linux_boot_flow.md) |
+
+---
+
+### UEFI / edk2 除錯
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **toolchain tag（`GCC5` / `GCC` / `GCCNOLTO`）** | edk2 `build -t` 用的工具鏈標籤。**`GCC5` 已被移除**，現有的可用 `grep -oE 'DEFINE (GCC\|CLANG)[A-Z0-9]*_' Conf/tools_def.txt` 查。除錯選 `GCCNOLTO`——LTO 會跨模組 inline 打散函式邊界，source-level stepping 對不上原始碼 | [UEFI gdb 除錯](../booting/uefi-gdb-dxe-debugging.md) |
+| **DSC `[BuildOptions]`** | 加編譯 flag 的有效位置。改 `Conf/tools_def.txt` 的 `GCC_ALL_CC_FLAGS` 不一定會傳到生成的 `GNUmakefile`；驗證機制通不通可拿同區段本來就有的 flag（如 `-mno-mmx`）當對照 | [UEFI gdb 除錯](../booting/uefi-gdb-dxe-debugging.md) |
+| **`DEBUG_ON_SERIAL_PORT` vs `-debugcon`** | `DEBUG()` 輸出的兩個互斥出口。build 時給了前者卻又照教學加 `-debugcon file:...`，會得到 0 行的空檔案，看起來像韌體完全沒有 debug 輸出 | [UEFI gdb 除錯](../booting/uefi-gdb-dxe-debugging.md) |
+| **image base vs `.text` VMA** | serial log 的 `Loading driver at 0x...` 給的是 **image base**，不是 `.text`。偏移取決於 PE/COFF header、linker script 與 build 設定，**每個模組都可能不同——不要背 `base + 0x240`**，用 `objdump -h *.debug` 自己查 | [UEFI gdb 除錯](../booting/uefi-gdb-dxe-debugging.md) |
+| **`add-symbol-file` 只搬 `.text`** | gdb 的 `add-symbol-file <file> <addr>` 第二個參數**只設定 `.text_addr`**。全域變數住在 `.data`，沒被重定位就會拿 ELF 裡的原始 VMA 去讀 → **backtrace 完全正確、變數卻讀出垃圾**，是最會騙人的症狀。正解是 `add-symbol-file f.debug <text> -s .data <data>` | [UEFI gdb 除錯](../booting/uefi-gdb-dxe-debugging.md) |
+| **DXE dispatch 鏈** | 掛上 `DxeCore` symbol 後看得到的七層：`DxeMain` → `CoreDispatcher` → `CoreStartImage` → `_ModuleEntryPoint` → `ProcessModuleEntryPointList` → driver entry。架構圖上那個叫「DXE」的方塊實際上就是這幾層 | [UEFI gdb 除錯](../booting/uefi-gdb-dxe-debugging.md) |
+| **Depex / `mScheduledQueue`** | `[Depex]` 寫在 `.inf` 裡，宣告這個 driver 要等哪些 protocol 就位。dispatcher **一輪一輪掃**：載入 Depex 已滿足的 driver → 它們安裝新 protocol → 再重掃，直到某輪沒有新的可載入。`mScheduledQueue` 就是「已滿足、排隊等載入」的佇列，`EFI_CORE_DRIVER_ENTRY` 裡的 `Depex` 指向那串 dependency expression bytecode | [UEFI gdb 除錯](../booting/uefi-gdb-dxe-debugging.md) |
+| **`fat:rw:<dir>`（QEMU）** | 把本機目錄當成 FAT 磁碟給 guest。host 丟 `.efi` 進去 guest 立刻看得到，做韌體實驗時不必每次重做 image | [UEFI gdb 除錯](../booting/uefi-gdb-dxe-debugging.md) |
+
+---
+
+## 二、建置系統
+
+### Yocto
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **Yocto Project** | 打造客製化 embedded Linux 發行版的建構框架——不是發行版，而是幫你建出專屬 toolchain／kernel／rootfs 的工具集 | [Yocto Project](../Embedded/yocto.md) |
+| **BitBake** | Yocto 的任務排程與建構引擎，解析 recipe、處理相依、執行 fetch/compile/package 等 task | [Yocto Project](../Embedded/yocto.md) |
+| **OpenEmbedded** | 與 BitBake 搭配的核心 metadata 集，提供大量基礎 recipe | [Yocto Project](../Embedded/yocto.md) |
+| **Recipe（`.bb`）** | 描述如何建一個套件：原始碼來源（`SRC_URI`）、版本、相依（`DEPENDS`）、編譯與安裝步驟 | [Yocto Project](../Embedded/yocto.md) |
+| **`SRC_URI`** | recipe 中指定原始碼來源的變數 | [Yocto Project](../Embedded/yocto.md) |
+| **`DEPENDS`** | recipe 中指定建置相依的變數 | [Yocto Project](../Embedded/yocto.md) |
+| **Layer（`meta-*`）** | 一組 recipe／設定的集合，可疊加組合（`meta`、`meta-poky`、BSP 的 `meta-<vendor>`），以 `bblayers.conf` 管理啟用哪些 layer | [Yocto Project](../Embedded/yocto.md) |
+| **`MACHINE` / `DISTRO`** | `MACHINE` 指定目標硬體、`DISTRO` 指定發行版政策，設在 `conf/local.conf` | [Yocto Project](../Embedded/yocto.md) |
+| **`oe-init-build-env`** | `source` 它以設定環境並進入 `build/` 目錄 | [Yocto Project](../Embedded/yocto.md) |
+| **`bitbake core-image-minimal`** | 建構目標 image，產物在 `tmp/deploy/images/<machine>/`（含 kernel、dtb 與 `.wic`／`.ext4` 等 rootfs image） | [Yocto Project](../Embedded/yocto.md) |
+
+### Buildroot
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **Buildroot** | 另一套嵌入式建置系統，統管 kernel 與 U-Boot，kernel 底下再掛 Driver 與 Device Tree | [Buildroot](../Embedded/buildroot.md)、[嵌入式系統背景知識](../embedded.md) |
+| **`make menuconfig`** | Buildroot 主設定入口（選套件、kernel、rootfs 等） | [Buildroot](../Embedded/buildroot.md) |
+| **`make uboot-menuconfig`** | 設定 U-Boot 的入口 | [Buildroot](../Embedded/buildroot.md) |
+| **`defconfig`** | 預設設定檔，建置系統與 kernel／U-Boot 設定的起點 | [嵌入式系統背景知識](../embedded.md) |
+
+---
+
+## 三、韌體工程實踐
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **Release Channel（發布通道）** | 「正式 vs 非正式 image」對應的概念，經典是 Chrome 四通道 **Canary → Dev → Beta → Stable**：越前面越新越不穩、給早期測試踩雷，越後面越嚴謹 | [Firmware Image 管理](../firmware_image_management.md) |
+| **Build Promotion（建置晉升）** | 同一個 build artifact 不重編譯，「一路晉升」通過各 gate（自動測試 → 候選 → 整合測試 → 正式），保證位元層級相同——**build once, promote many** | [Firmware Image 管理](../firmware_image_management.md) |
+| **Nightly Build** | 每日／每晚自動出的 build，搭配 trunk-based development 隨時可產出非正式 image | [Firmware Image 管理](../firmware_image_management.md) |
+| **Trunk-Based Development** | 主線隨時可出 build 的持續整合模式，原則是 **"master/trunk is always green"**，靠自動化擋掉壞 commit | [Firmware Image 管理](../firmware_image_management.md) |
+| **Shift-Left Testing（測試左移）** | 把測試／整合往開發前段推，越早發現 bug 修復成本越低；非正式 image 是其載體 | [Firmware Image 管理](../firmware_image_management.md) |
+| **Release Candidate（RC）** | 從 release branch 切出、凍結功能（feature freeze）、只修 bug、經完整 regression 才 sign-off 給 QA 的正式 image | [Firmware Image 管理](../firmware_image_management.md) |
+| **CI/CD pipeline** | 承載 build promotion 與分支策略的自動化骨幹（Jenkins、GitLab CI 等） | [Firmware Image 管理](../firmware_image_management.md) |
+| **LAVA** | Linaro 的自動化韌體/OS 測試框架，把 build flash 到實體板開機測試 | [Firmware Testing](../firmware_testing.md) |
+| **openQA** | 開源自動化 OS 測試工具，常與 LAVA 一同出現在韌體 CI 議程 | [Firmware Testing](../firmware_testing.md) |
+| **Linaro validation** | Linaro 的 validation 平台（validation.linaro.org），韌體驗證的參考基礎設施 | [Firmware Testing](../firmware_testing.md) |
+| **「有支援」≠「有生效」** | BSP 支援某安全機制 ＝ 程式碼寫好了，不等於出貨裝置上它正在運作；中間隔著 efuse 有沒有真的燒、燒的是量產還是開發金鑰、生命週期狀態有沒有推進、量產 build 有沒有真的關掉除錯 | [信任邊界](../mobile-trust-boundaries.md) |
+| **驗證「攻擊失敗」而非「機制存在」** | 弱驗證查設定檔（secure boot enabled、JTAG disabled）；強驗證做實測（刷未簽章映像確認拒絕開機、實接除錯器確認連不上、刷舊版確認被 anti-rollback 擋下）。**設定檔會說謊，實測不會** | [信任邊界](../mobile-trust-boundaries.md) |
+| **量產殘留** | 測試憑證、內部特權介面、產線快速刷機路徑——當初都有正當理由，然後沒人負責移除，因為**沒有人會因為多留一個 debug hook 而測試失敗**。要靠流程關卡攔截而非測試 | [信任邊界](../mobile-trust-boundaries.md) |
+| **PSA 生命週期狀態 / ADAC** | Arm PSA Security Model 的 Blank／Development／Production／RMA 四階段記在 efuse、由硬體強制；PSA ADAC 定義受控的除錯重開授權（用晶片唯一 ID 挑戰值回原廠簽章，只解鎖那一顆） | [信任邊界](../mobile-trust-boundaries.md) |
+
+---
+
+## 四、硬體與週邊
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **嵌入式 Linux 四大組成** | Bootloader（上電最先執行、載入 kernel）→ Kernel（管理記憶體/排程/檔案系統/driver）→ rootfs（使用者空間、init 與應用）→ Driver（kernel 與硬體周邊的橋樑） | [嵌入式系統背景知識](../embedded.md) |
+| **Device Tree（`.dts` / `.dtb`）** | 描述板上硬體資訊的資料結構，`.dts` 原始檔編譯成 `.dtb`，由 bootloader 傳給 kernel | [嵌入式系統背景知識](../embedded.md) |
+| **交叉編譯（cross-compile）** | 在一個架構的主機上編譯出另一架構可執行的程式，需對應的 toolchain | [嵌入式系統背景知識](../embedded.md) |
+| **kernel space vs user space** | 核心空間（driver、排程、記憶體管理）與使用者空間（函式庫、應用程式）的權限分界 | [嵌入式系統背景知識](../embedded.md) |
+| **init（BusyBox init / systemd）** | rootfs 掛載後執行的第一個使用者空間程式，管理服務啟動 | [嵌入式系統背景知識](../embedded.md) |
+| **State Machine（狀態機）** | 用「狀態＋事件＋轉換規則」描述系統行為的模型，嵌入式常用來管理開機/待機/工作等狀態；實作四步驟：定義狀態 → 定義事件 → 定義轉換規則 → 實作狀態機 | [State Machine](../Embedded/state_machine.md) |
+| **`nvidia-smi`** | 查 NVIDIA GPU 狀態的指令：驅動版本、CUDA 版本、溫度功耗、佔用 VRAM 的 process | [NVIDIA GPU](../gpu_nvidia.md) |
+| **`lsmod \| grep nvidia`** | 查 NVIDIA kernel 模組相依：`nvidia`、`nvidia_uvm`、`nvidia_drm`、`nvidia_modeset` | [NVIDIA GPU](../gpu_nvidia.md) |
+| **CUDA** | NVIDIA 的 GPU 運算平台，`nvidia-smi` 會顯示其版本 | [NVIDIA GPU](../gpu_nvidia.md) |
+| **Raspberry Pi Imager** | 官方燒錄工具，把 OS 寫入 microSD，開機前可預設 SSH／Wi-Fi／帳號 | [Raspberry Pi](<../raspberry pi.md>) |
+| **GPIO** | 通用輸入輸出腳位，可接感測器與周邊，常用於 IoT、home server、自動化 | [Raspberry Pi](<../raspberry pi.md>)、[嵌入式系統背景知識](../embedded.md) |
+
+---
+
+## 五、半導體與製程
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **半導體** | 導電性介於導體與絕緣體之間的材料（最常見為矽 Si），可透過摻雜與外加電壓控制導電行為，是 IC 的基礎 | [半導體](../半導體/半導體.md) |
+| **N 型 / P 型** | 摻入不同雜質形成多數載子為電子（n-type）或電洞（p-type） | [半導體](../半導體/半導體.md) |
+| **摻雜（doping）** | 摻入雜質改變半導體導電行為的手段 | [半導體](../半導體/半導體.md) |
+| **PN 接面（junction）** | 二極體的基礎，具單向導通特性 | [半導體](../半導體/半導體.md) |
+| **MOSFET** | 現代 IC 最基本的開關元件，由 gate 電壓控制 source–drain 通道導通 | [半導體](../半導體/半導體.md) |
+| **CMOS** | NMOS + PMOS 互補組成，靜態功耗低，是數位邏輯主流製程 | [半導體](../半導體/半導體.md) |
+| **fabless** | 只做 IC 設計、不自建晶圓廠（如聯發科、NVIDIA、高通） | [半導體](../半導體/半導體.md) |
+| **foundry（晶圓代工）** | 專做製造的晶圓廠（如台積電 TSMC） | [半導體](../半導體/半導體.md) |
+| **OSAT（封裝測試）** | 委外封裝與測試廠（如日月光） | [半導體](../半導體/半導體.md) |
+| **IDM** | 設計＋製造整合（如 Intel、三星） | [半導體](../半導體/半導體.md) |
+| **光罩 / 微影 / 蝕刻 / 沉積 / 離子佈植** | 反覆堆疊的核心製程：photomask、lithography、etch、deposition、implant | [半導體](../半導體/半導體.md) |
+| **製程節點** | 如 3nm、5nm，越先進單位面積電晶體越多、效能/功耗越好 | [半導體](../半導體/半導體.md) |
+
+---
+
+## 六、矽後驗證與量產測試
+
+### 矽後驗證（Post-Silicon Validation）與 debug
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **post-silicon validation（矽後驗證 / post-Si）** | first silicon 回來之後、量產之前的驗證工作。與 pre-silicon 的根本差別是取捨方向相反：**pre-Si 什麼都看得到但跑不快，post-Si 跑得飛快但什麼都看不到** | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **first silicon** | 第一批從晶圓廠回來的晶片，bring-up 的對象 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **DFD（Design-for-Debug）** | 為了 debug 而放進晶片的硬體：trace buffer、trigger 邏輯、breakpoint、可觀測的 debug bus。佔面積耗電，永遠在跟設計搶資源，但**tape-out 之後就沒得加**——first silicon 出問題時它是唯一的眼睛。與 DFT（為量產測試而設計）目的不同 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **RIT（Random Instruction Test）** | 用亂數產生大量合法指令序列，跟 golden reference model（架構模擬器）比對結果，是找 CPU corner case 的主力 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **golden reference model** | 架構層級的參考模擬器，post-Si 拿它當「正確答案」比對真晶片的執行結果 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **power virus** | 刻意寫出讓功耗與切換率飆到極限的程式，用來壓供電、散熱與最壞的 IR drop／di/dt 情境 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md)、[Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **敏感度掃描（sensitivity sweep）** | Post-Si debug 最便宜的診斷工具：轉電壓／頻率／溫度三個旋鈕看失效變好或變壞。**加壓變好 + 降頻變好 + 升溫變壞 → setup violation**；加壓反而變糟 → 疑 hold；三者都沒差 → 比較像純邏輯 bug | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **加速條件（acceleration condition）** | 刻意讓晶片更容易失效的設定（例如降 50mV），把 MTTF 從數小時壓到數十分鐘。**壓縮 MTTF 就是壓縮 debug 週期**，是 post-Si 的核心技巧 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **test narrowing / bisection** | 把 failing case 從「幾十億條指令的 OS 壓測」縮到「幾百行、幾十秒的裸機程式」。價值不只在好 debug——**縮小到這個尺寸才拿得回 pre-Si simulator 用完整可觀測性定案** | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **scan dump** | 失效當下用 JTAG 把整顆晶片的 flip-flop 狀態掃出來看。缺點是掃描時晶片必須停住，只能得到 snapshot 而看不到動態過程 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **on-chip trace buffer** | 晶片內建的環形紀錄區，設好 trigger 條件後錄下失效前最後數千個 cycle 的內部交易，事後回放 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **stepping / metal fix / all-layer respin** | 晶片改版。只改上層金屬層叫 metal fix（較便宜快，能改的有限）；全部重做叫 all-layer respin（貴、以月計）。因此 post-Si 的隱含 KPI 是**在下一次 respin 前把該找的 bug 一次找完** | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **errata（勘誤表）** | 確認是 bug 但決定不修（或來不及修）的問題，寫進公開文件給客戶。各家 CPU 的 "specification update" PDF 基本上就是 post-Si 團隊的工作成果目錄 | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+| **workaround** | 用 microcode patch、firmware、BIOS、driver 或 compiler 繞過硬體 bug，通常付出效能代價換取不 respin | [Post-Silicon Validation 入門](../post-silicon-validation-introduction.md) |
+
+### 電氣驗證與 Shmoo
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **electrical validation / characterization** | 回答「這顆晶片在什麼條件下才不會算錯」，與功能驗證問的「會不會算錯」是兩件事。產出是 datasheet 規格、binning 規則與 DVFS 表 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **shmoo plot** | 固定其他條件，取兩個參數當座標軸（最常見 電壓 × 頻率），逐格跑測試畫出 pass/fail 邊界圖。**形狀本身就是診斷資訊**。名稱來自 1940 年代漫畫《Li'l Abner》裡的圓胖生物 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md)、[MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **shmoo hole** | 邊界中間出現的破洞——某個特定電壓反而失敗，更高更低都過。常見成因：PLL 在某分頻設定下 jitter 大、on-chip regulator／LDO 在某負載點不穩、PDN 在某切換頻率有 impedance peak（共振）、DLL/SerDes lock 範圍邊界 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **fuzzy boundary（邊界毛躁）** | Pass/fail 交錯不可重複，通常代表測試本身是機率性的，或環境有問題（電源 ripple、接觸不良、溫度沒穩定）。老手的直覺是**先懷疑環境，再懷疑晶片** | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **setup violation vs hold violation（shmoo 判讀）** | setup 是「跑不完」——低壓高頻的右上角失敗，加壓或降頻可救；hold 是「跑太快、下一級還沒 latch 就被蓋掉」——**高壓低頻的左下角失敗，跟頻率無關、降頻救不了** | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **Vmin 曲線** | 每個頻率下能正常工作的最低電壓，也就是 shmoo 邊界那條斜線。因為功耗約正比於 V²，把 Vmin 壓低是省電的主戰場 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md)、[FT 最終測試](../what-is-ft-final-test.md) |
+| **Vmin 是分布不是數字** | 一批晶片的 Vmin 是一個有尾巴的分布。出貨規格要靠大量取樣後外推到目標良率，再疊上 aging margin、量測誤差與電源雜訊 margin；離群的那顆要去查原因 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **guardband（安全餘裕）** | 規格與實測邊界之間刻意留的距離。留太少會出貨後翻車，留太多等於白白浪費效能與功耗 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **Vmin limiter** | 限制 Vmin 的通常不是邏輯 critical path，而是 **SRAM 6T bitcell 的讀寫穩定性**，其次是 PLL／SerDes／ADC 等類比 IP 與 level shifter。所以很多設計給 SRAM 獨立電壓域或加 assist circuit | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **process corner（SS / TT / FF）** | 描述 NMOS 與 PMOS 快慢組合的製程角落（slow-slow／typical／fast-fast）。同一張光罩出來的晶片速度就是會不一樣，validation 必須刻意挑不同 corner 的樣品測 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **temperature inversion** | 傳統上溫度越高電路越慢，但在先進製程的低電壓區會反過來——升溫反而變快。因此**最壞的 timing corner 可能是低溫**，是很容易踩到的直覺陷阱 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **aging（NBTI / HCI / 電遷移）** | 電晶體隨使用時間變慢的老化機制。出貨規格必須預留 aging margin——今天剛好過的晶片三年後可能就不過 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **Kelvin sensing / on-die voltage monitor** | 電源供應器輸出 1.0V，經線材、PCB、封裝、on-die 電阻後電晶體看到的可能只剩 0.93V。要用四線量測或晶片內建監測器才知道真值 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md) |
+| **DVFS 表** | 「哪個頻率配哪個電壓」的對照表，由 characterization 資料產生後燒進 firmware 或 fuse。高階設計會做 per-part 客製，每顆晶片燒進自己的 Vmin 把 guardband 榨到極致 | [Shmoo 與電氣驗證](../shmoo-and-electrical-validation.md)、[FT 最終測試](../what-is-ft-final-test.md) |
+
+### 測試站點與設備
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **test insertion（測試站點）** | 晶片從晶圓到客戶手上經過的一連串測試站點，每加一站成本顯著上升 | [半導體量產測試全景](../semiconductor-test-overview-cp-ft-slt-ate.md) |
+| **CP（Chip Probing / Wafer Sort）** | 晶圓切割封裝**前**的測試，用探針卡扎裸 die 接點透過 ATE 篩壞品；核心價值是省封裝費並回饋晶圓良率給 fab | [CP 晶圓測試](../what-is-cp-wafer-test.md)、[半導體量產測試全景](../semiconductor-test-overview-cp-ft-slt-ate.md) |
+| **FT（Final Test）** | 晶片**封裝後**的測試，放進 socket 經 load board 接 ATE，驗封裝製程有無引入缺陷、補測 CP 測不了的項目、分 bin 出貨 | [FT 最終測試](../what-is-ft-final-test.md) |
+| **SLT（System-Level Test）** | 出貨前把晶片放進類產品板開機跑韌體/OS，攔 ATE 結構性測試抓不到的漏網缺陷（test escape），把品質壓到客戶要求的 DPPM | [SLT 系統級測試](../what-is-slt-and-why-chip-vendors-care.md) |
+| **ATE（Automated Test Equipment）** | 自動化測試**設備**（不是測試階段），CP 與 FT 共用的機台平台，把測試向量以電訊號打進接腳比對輸出 | [ATE 是什麼](../what-is-ate.md) |
+| **Tester / Handler / Prober** | ATE 環境三要素：tester（機台本體）、prober（移動晶圓對準探針）、handler（抓取封裝品放進 socket、依結果分料） | [ATE 是什麼](../what-is-ate.md)、[FT 最終測試](../what-is-ft-final-test.md) |
+| **probe card（探針卡）** | CP 用來接觸裸 die pad 的介面；分懸臂樑（Cantilever/CPC）、垂直（Vertical/VPC）、MEMS 三類，接觸電阻與寄生電感限制了高頻與大電流測試 | [CP 晶圓測試](../what-is-cp-wafer-test.md)、[ATE 是什麼](../what-is-ate.md) |
+| **load board + socket** | FT/SLT 用來連接封裝品與機台的介面硬體 | [FT 最終測試](../what-is-ft-final-test.md) |
+| **DUT（Device Under Test）** | 受測晶片 | [SLT 系統級測試](../what-is-slt-and-why-chip-vendors-care.md) |
+| **wafer map** | CP 產出的晶圓好壞分布圖（以 ink 點或電子紀錄），封裝廠只取 good die | [CP 晶圓測試](../what-is-cp-wafer-test.md) |
+| **WAT / PCM** | Wafer Acceptance Test（也稱 PCM），測晶圓切割道（scribe line）上的 test key 元件電性參數，監控 **fab 製程**是否穩定——與測產品的 CP 完全不同層次 | [CP 晶圓測試](../what-is-cp-wafer-test.md)、[半導體量產測試全景](../semiconductor-test-overview-cp-ft-slt-ate.md) |
+| **WLCSP** | 晶圓級封裝，產品在晶圓階段就完成封裝，CP 測完切割即出貨，無傳統 FT | [CP 晶圓測試](../what-is-cp-wafer-test.md)、[半導體量產測試全景](../semiconductor-test-overview-cp-ft-slt-ate.md) |
+| **盲封** | 製程成熟、良率穩定時跳過 CP 直接封裝的做法，風險自負 | [CP 晶圓測試](../what-is-cp-wafer-test.md) |
+| **redundancy analysis / laser repair** | 記憶體 CP 特有：算出可修復位址，用雷射把 repairable die 救回，同時提升良率與可靠度 | [CP 晶圓測試](../what-is-cp-wafer-test.md) |
+
+### 測試哲學與 DFT
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **結構性測試（Structural Test）** | CP/FT 主體：不驗功能而驗「電路結構有沒有做對」，依賴 DFT，有 fault model 可量化 coverage、測試時間秒級 | [半導體量產測試全景](../semiconductor-test-overview-cp-ft-slt-ate.md)、[ATE 是什麼](../what-is-ate.md) |
+| **功能性測試（Functional Test）** | SLT 主體：直接模擬終端使用情境（開機、跑 OS、真實 workload），抓結構測試抓不到的缺陷，但無 coverage 理論、時間長、fail 難除錯 | [半導體量產測試全景](../semiconductor-test-overview-cp-ft-slt-ate.md) |
+| **DFT（Design for Test）** | 設計階段就埋進晶片的測試電路（scan chain、MBIST），讓 ATE 能控制與觀測內部節點 | [ATE 是什麼](../what-is-ate.md) |
+| **ATPG（Automatic Test Pattern Generation）** | 自動產生測試向量的工具，配合 scan chain 控制/觀測內部節點 | [ATE 是什麼](../what-is-ate.md) |
+| **scan chain** | 把晶片內部暫存器串成移位鏈，把深埋電路「攤開」給機台看 | [ATE 是什麼](../what-is-ate.md) |
+| **MBIST（Memory Built-In Self-Test）** | 記憶體區塊內建自我測試電路，機台下指令收結果即可 | [ATE 是什麼](../what-is-ate.md) |
+| **fault model（故障模型）** | 讓覆蓋率可精確計算的模型：stuck-at、transition、bridging 等 | [ATE 是什麼](../what-is-ate.md)、[半導體量產測試全景](../semiconductor-test-overview-cp-ft-slt-ate.md) |
+| **stuck-at fault** | 最常見的故障模型（節點卡在固定 0 或 1），可計算「pattern 覆蓋了 98.5% stuck-at fault」這類工程陳述 | [ATE 是什麼](../what-is-ate.md) |
+| **fault coverage** | 一組 pattern 對某 fault model 的覆蓋率，可量化 | [ATE 是什麼](../what-is-ate.md)、[DFT 工程實務](../DFT_Design_for_Test_工程實務.md) |
+| **transition / at-speed fault** | 節點會翻轉但翻得太慢的延遲型故障，需在功能頻率下用兩個 pattern（launch → capture）測 | [DFT 工程實務](../DFT_Design_for_Test_工程實務.md) |
+| **shift / capture** | scan test 的兩個階段：shift 把測試向量沿 scan chain 移入移出（慢速時脈），capture 讓組合邏輯在一個時脈內把結果打進 FF | [DFT 工程實務](../DFT_Design_for_Test_工程實務.md) |
+| **scan FF（scan flip-flop）** | 多一個 scan input 與 scan enable 的 FF，測試模式下串成 scan chain，是 scan design 的基本單元 | [DFT 工程實務](../DFT_Design_for_Test_工程實務.md) |
+| **test compression** | 用解壓縮器／壓縮器把少量外部 channel 展開成大量內部 scan chain，壓 pattern 資料量與測試時間 | [DFT 工程實務](../DFT_Design_for_Test_工程實務.md) |
+| **LBIST（Logic BIST）** | 邏輯自測：LFSR 產生偽隨機 pattern、MISR 把回應壓成 signature 比對，車用／安全等級晶片常要求開機自測 | [DFT 工程實務](../DFT_Design_for_Test_工程實務.md) |
+| **LFSR / MISR** | 線性回授移位暫存器（產生偽隨機測試向量）與多輸入簽章暫存器（把大量回應壓成一個 signature），LBIST 的兩端 | [DFT 工程實務](../DFT_Design_for_Test_工程實務.md) |
+| **Boundary Scan（IEEE 1149.1 / JTAG）** | 在 IO pad 旁串一圈 boundary scan cell，用 TAP（TCK/TMS/TDI/TDO）測板級焊接與晶片間連線，也是進 scan/BIST 的入口 | [DFT 工程實務](../DFT_Design_for_Test_工程實務.md) |
+| **TAP controller** | JTAG 的 16 狀態機，由 TMS 驅動在 instruction／data register 之間切換；bringup 時讀得到 IDCODE 是第一個里程碑 | [DFT 工程實務](../DFT_Design_for_Test_工程實務.md)、[DFT Verification 學習筆記](../DFT_Verification_學習筆記.md) |
+| **OCC（On-Chip Clock Controller）** | at-speed test 時在晶片內部切換 shift 慢速時脈與 capture 功能時脈的控制電路 | [DFT Verification 學習筆記](../DFT_Verification_學習筆記.md) |
+
+### DFT 驗證（simulation 端）
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **VCS / Verdi** | Synopsys 的模擬器與 debug／波形工具；DFT verification 的日常組合——VCS 跑 RTL/gate sim，Verdi 做 signal tracing 與 FSDB 波形 debug | [DFT Verification 學習筆記](../DFT_Verification_學習筆記.md) |
+| **gate-level simulation** | 在合成後 netlist 上跑模擬，用來驗 ATPG 產出的 pattern 與 ATE 預期一致 | [DFT Verification 學習筆記](../DFT_Verification_學習筆記.md) |
+| **SDF back-annotation** | 把 Standard Delay Format 的實際延遲反標進 gate-level sim，才驗得到 setup/hold 相關問題 | [DFT Verification 學習筆記](../DFT_Verification_學習筆記.md) |
+| **X-propagation** | 未初始化 FF／時脈 reset 問題導致的未知值在 netlist 上擴散，是 gate sim 最常見的殺手，debug 靠 driver trace 往回追 | [DFT Verification 學習筆記](../DFT_Verification_學習筆記.md) |
+| **hierarchical verification（IP／cluster／full chip）** | 三層驗證策略：單一 macro 獨立驗 → 數個 IP 整合驗介面 → 整顆晶片驗 top 連線與 DFT mode 切換 | [DFT Verification 學習筆記](../DFT_Verification_學習筆記.md) |
+| **chip bringup** | 矽從 fab 回來後第一次點亮：scan chain 通不通、JTAG IDCODE 讀不讀得到是早期關鍵里程碑 | [DFT Verification 學習筆記](../DFT_Verification_學習筆記.md)、[Bring-up 全紀錄](../bringup-article.md) |
+
+### 分級、良率與品質度量
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **binning** | 依測試結果把晶片實體分料（physical binning），除好壞外還依效能等級分級 | [FT 最終測試](../what-is-ft-final-test.md) |
+| **speed binning** | 依 Fmax／Vmin 把同一顆設計分成不同 speed grade 販售，決定 SKU 與定價 | [FT 最終測試](../what-is-ft-final-test.md)、[半導體量產測試全景](../semiconductor-test-overview-cp-ft-slt-ate.md) |
+| **Fmax / Vmin** | 最高工作頻率／最低工作電壓，FT 量測用於 speed binning 與系統軟體 DVFS 設定 | [FT 最終測試](../what-is-ft-final-test.md)、[ATE 是什麼](../what-is-ate.md) |
+| **DPPM（Defective Parts Per Million）** | 每百萬顆的不良數，chip vendor 寫進合約的品質承諾；汽車客戶動輒要求個位數 | [SLT 系統級測試](../what-is-slt-and-why-chip-vendors-care.md) |
+| **十倍法則** | 缺陷越晚被發現越貴：CP 攔到損失一顆 die、FT 多賠封裝費、逃到客戶產線要拆板重工、逃到終端是 field return 與品牌傷害 | [半導體量產測試全景](../semiconductor-test-overview-cp-ft-slt-ate.md) |
+| **test escape** | 逃過測試站點的漏網缺陷，SLT 的攔截對象 | [SLT 系統級測試](../what-is-slt-and-why-chip-vendors-care.md) |
+| **SDC（Silent Data Corruption）** | 晶片不當機、只默默算錯的靜默資料損毀，多源自 timing margin 勉強及格的邊際缺陷，需特定指令/資料才觸發 | [SLT 系統級測試](../what-is-slt-and-why-chip-vendors-care.md)、[ATE 是什麼](../what-is-ate.md) |
+| **邊際缺陷（marginal defect）** | 電性「勉強及格」（timing margin 偏低但未低到 scan fail），特定電壓/溫度/資料下才出錯 | [SLT 系統級測試](../what-is-slt-and-why-chip-vendors-care.md) |
+| **Shift Right + Shift Left** | 先在 SLT 攔系統級失效（shift right），再把失效模式回饋給 ATE pattern 與設計規則（shift left）形成閉環 | [SLT 系統級測試](../what-is-slt-and-why-chip-vendors-care.md) |
+| **adaptive SLT** | 依前段測試資料用預測模型給每顆晶片打 DPPM 風險標籤，高風險跑完整測項、低風險精簡或跳過 | [SLT 系統級測試](../what-is-slt-and-why-chip-vendors-care.md) |
+| **chiplet / 2.5D/3D 封裝** | 先進封裝讓「每顆 die 都 known-good」不等於「組起來 known-good-system」，引入 die-to-die interconnect、封裝應力、熱耦合等新失效模式 | [SLT 系統級測試](../what-is-slt-and-why-chip-vendors-care.md) |
+
+### MTBF 與系統整合
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **MTBF（Mean Time Between Failures）** | 教科書上是可修復系統的平均故障間隔（總運作時間 ÷ 故障次數）；在行動裝置產品線語境更常指**整機軟體穩定性指標**，客戶把門檻寫進出貨 exit criteria | [MTBF 與系統整合](../mtbf-and-why-si-owns-it.md) |
+| **MTTF（Mean Time To Failure）** | 用於不可修復元件（壞了就換）的平均壽命，晶片、燈泡講 MTTF | [MTBF 與系統整合](../mtbf-and-why-si-owns-it.md) |
+| **MTTR（Mean Time To Repair）** | 平均修復時間；`MTBF = MTTF + MTTR`，可用度 = `MTBF / (MTBF + MTTR)` | [MTBF 與系統整合](../mtbf-and-why-si-owns-it.md) |
+| **Monkey** | Android 內建壓測工具，注入偽隨機（seed 可重現）使用者事件流對整個軟體堆疊施壓，是 MTBF 壓測核心 | [MTBF 與系統整合](../mtbf-and-why-si-owns-it.md) |
+| **MTBF triage** | 把壓測收集的 crash 去重、初判、跨 stack log 分析後分派給 owner 團隊的循環；本質是「以統計形式呈現的跨團隊 log 分析」，落在系統整合（SI）團隊 | [MTBF 與系統整合](../mtbf-and-why-si-owns-it.md) |
+| **系統整合（SI）** | 模組團隊對零件負責、SI 對「組起來撐不撐得住」負責；MTBF 與 SLT 都是其主場，需跨層 debug 能力歸因失效 | [MTBF 與系統整合](../mtbf-and-why-si-owns-it.md) |
+
+---
+
+## 七、Driver 與效能觀測
+
+### MediaTek UART APDMA
+
+> 出自 [MediaTek UART APDMA](../mtk-uart-apdma.md)。
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **APDMA（Application Processor DMA）** | MediaTek 掛在 peripheral bus 上、服務 UART/I2C/SPI 等低速周邊的 DMA controller。upstream 只有 UART 那支被 mainline 化（`CONFIG_MTK_UART_APDMA`） | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+| **VFF（Virtual FIFO）** | 把 DRAM 的一塊 ring buffer 當成「虛擬的大 FIFO」，由硬體讀寫指標 `VFF_RPT`／`VFF_WPT` 推進。不是常見的 one-shot「搬完通知你」模型 | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+| **`VFF_VALID_SIZE` / `VFF_LEFT_SIZE`** | 永遠是「可被消費的量」與「還有空間可生產的量」；消費者／生產者身分依 TX/RX 方向鏡像對調 | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+| **wrap bit（`VFF_RING_WRAP`）** | 低 16 bits 是 offset、bit 16 是繞圈標記。經典的「多一個 bit 解 full/empty 歧義」手法——只看 offset 時 `RPT == WPT` 無法分辨空或滿 | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+| **TX/RX threshold 不對稱** | TX 門檻 = 整個 ring（等全空才中斷），RX 門檻 = 3/4 ring（留 1/4 給中斷後 SW 還沒處理完的期間繼續寫，防 overrun）。反映兩方向風險不同：TX 慢只是延遲，RX 慢會掉資料 | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+| **`VFF_DEBUG_STATUS`** | driver 在 `stop: fail` / `flush: fail` 時主動印出的暫存器值，是硬體卡在哪的直接證據 | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+| **virt-dma** | kernel 的 virtual DMA channel 框架（`drivers/dma/virt-dma.h`），driver 不自己管 descriptor queue | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+| **residue** | dmaengine 回報的「還沒完成的量」；RX 端用 `rx_size - residue` 反推實際收到多少，是整條 RX 路徑的資料量真相來源 | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+| **無聲降級（silent fallback）** | 本篇最重要的除錯觀念：port 是 console 就被強制關 DMA、`dma-names` 數量不對就靜默退回 PIO——兩者都不留任何 log。遇到「功能正常但效能不對」優先懷疑這類失敗模式 | [mtk-uart-apdma](../mtk-uart-apdma.md) |
+
+### 效能觀測三層
+
+> 出自 [PMU、Ftrace、EMI](../pmu-ftrace-emi.md)。
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **PMU（Performance Monitoring Unit）** | ARM 核心內建的硬體事件計數器（ARMv8 對應 PMUv3），計 cycle／retired instruction／cache refill／TLB miss／branch misprediction 等；Linux 的 `perf` 是它的軟體介面 | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
+| **PMU（Power Management Unit）** | 同一縮寫的另一義：電源管理單元／PMIC。看上下文分辨——出現 counter/IPC/cache miss 是前者，出現 regulator/rail/suspend 是後者 | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
+| **counter multiplexing** | 要求的 event 數超過實體 counter（ARM 約 6 + 1 cycle counter）時，kernel 分時輪流計數再按比例推估；`perf stat` 的百分比欄位低於 100% 時結果只能當趨勢參考 | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
+| **Ftrace** | kernel 內建追蹤框架，介面在 `/sys/kernel/tracing`。tracer 有 `function`／`function_graph`／`irqsoff`／`preemptoff`／`wakeup`；也是 tracepoint 與 kprobe 的輸出通道 | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
+| **filter 一定要設** | 全開 `function` tracer 會在幾秒內塞滿 ring buffer，且 tracing 本身的 overhead 會讓 timing 相關的 bug 消失 | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
+| **EMI（External Memory Interface）** | SoC 語境下 EMI 多半指外部 DRAM 的控制器子系統，是全晶片所有 master 搶頻寬的匯流點；不是電磁干擾 | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
+| **EMI MPU（Memory Protection Unit）** | 把實體記憶體切 region 並限定哪些 master domain 可讀寫；violation log 會印出違規位址與**來源 master**，直接指出「是誰」踩到記憶體 | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
+| **三層觀測法** | Ftrace 答「時間花在哪」→ PMU 答「這些 cycle 是有效工作還是 stall」→ EMI 答「這是我的問題還是鄰居的問題」。避免拿著 `perf` 死盯 CPU 而瓶頸在別的 master | [pmu-ftrace-emi](../pmu-ftrace-emi.md) |
+
+### Hibernation 與電源管理
+
+> 出自 [Hibernation：一份可以寫回 kernel 記憶體的快照](../hibernation.md)。
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **S3 / S4** | S3 = suspend to RAM（記憶體持續供電）；S4 = suspend to disk / hibernation（記憶體內容寫到儲存裝置後完全斷電） | [hibernation](../hibernation.md) |
+| **swsusp** | Linux 的 hibernation 實作，負責凍結系統、做出記憶體 snapshot 並寫進 swap | [hibernation](../hibernation.md) |
+| **hibernation image** | 寫進 swap 的記憶體快照。本篇的核心視角：**它是一份可以被完整寫回 kernel 記憶體的資料**——所以它同時是一個攻擊面，而不只是省電機制 | [hibernation](../hibernation.md) |
+| **兩個 kernel** | Hibernation 最反直覺之處：做 snapshot 的 kernel 與 resume 時被載入的 kernel 是不同的執行實例，中間隔著一次完整開機 | [hibernation](../hibernation.md) |
+| **`dev_pm_ops`** | Driver 的電源管理 callback 表；`suspend`／`freeze`／`poweroff`／`restore` 四組語意不同，混用是最常見的 bug 模式 | [hibernation](../hibernation.md) |
+| **freezer** | 凍結行程的機制，是**協作式而非搶佔式**——需要各方配合到達可凍結點，不配合的行程會讓 hibernation 卡住 | [hibernation](../hibernation.md) |
+| **信任鏈斷開** | Secure boot 驗的是開機映像，但 resume 是把一份存在 swap 的 image 寫回記憶體；若這份 image 未經驗證，等於繞過整條開機信任鏈 | [hibernation](../hibernation.md) |
+| **`pm_trace`** | 完全沒有輸出時的除錯手段，把 suspend/resume 進度寫進 RTC，重開機後讀回來定位卡在哪個 device | [hibernation](../hibernation.md) |
+| **Android App Hibernation** | 同名不同物：Android 的 App Hibernation 是「長期未使用的 App 撤銷權限並釋放空間」的框架功能，與 kernel 的 S4 無關 | [hibernation](../hibernation.md) |
+
+---
+
+## 八、DMA-BUF Heaps
+
+> 出自 [DMA-BUF Heaps 完整導覽](../dma-heap-guide.md)。
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **dma-buf** | Linux 3.3 引入的**跨 driver buffer 共享框架**。它只定義「怎麼共享」，不定義「從哪裡配置」——配置那一半是後來 ION／dma-heap 在補 | [dma-heap 導覽](../dma-heap-guide.md) |
+| **Exporter / Importer** | 擁有並管理記憶體、實作 `struct dma_buf_ops` 的一方是 exporter；透過 fd 拿到 buffer 再 attach/map 進自己位址空間的是 importer | [dma-heap 導覽](../dma-heap-guide.md) |
+| **PMEM** | ION 之前各家自幹的 physical memory allocator，每家介面都不同，是「群雄割據時期」的代表 | [dma-heap 導覽](../dma-heap-guide.md) |
+| **ION** | Android 從 2011 用到 2021 的統一配置器。致命設計是**所有 heap 共用同一個 `/dev/ion` node**，無法用檔案權限或 SELinux 區分誰能配置一般記憶體、誰能配置 secure 記憶體 | [dma-heap 導覽](../dma-heap-guide.md) |
+| **dma-heap** | Linux 5.6 上游接班 ION 的機制。關鍵改進：**每個 heap 各自一個 `/dev/dma_heap/<name>` node**，權限與 SELinux label 可以逐 heap 分開設 | [dma-heap 導覽](../dma-heap-guide.md) |
+| **System heap / CMA heap** | 兩個上游內建 heap。System heap 從一般 page allocator 拿（可不連續，需 IOMMU）；CMA heap 從 CMA 保留區拿實體連續記憶體，供沒有 IOMMU 的 IP 使用 | [dma-heap 導覽](../dma-heap-guide.md) |
+| **`dma_heap_add()`** | Heap 向框架註冊自己的入口，註冊後產生對應的 `/dev/dma_heap/<name>` 字元裝置 | [dma-heap 導覽](../dma-heap-guide.md) |
+| **`dma_resv` / `dma_fence` / `sync_file`** | 同步三件套：`dma_resv` 是掛在 dmabuf 上的 fence 容器（管讀寫依賴），`dma_fence` 是跨 driver 的非同步完成通知，`sync_file` 把 fence 包成 fd 給 userspace（即 Android 的 acquire/release fence） | [dma-heap 導覽](../dma-heap-guide.md) |
+| **Page pool / deferred free** | 效能最佳化：釋放的 page 不立刻還給系統而是留在 pool 裡重用，避免高頻配置釋放時反覆做 zeroing 與 cache 維護 | [dma-heap 導覽](../dma-heap-guide.md) |
+| **`dmabuf_dump`** | Android 的 dma-buf 觀測工具（`system/memory/libmeminfo` 下的 libdmabufinfo），列出誰持有哪些 buffer | [dma-heap 導覽](../dma-heap-guide.md) |
+| **dma-buf 洩漏「隱形」** | dma-buf 佔的記憶體不計入一般 process RSS 統計，洩漏時 `dumpsys meminfo` 看起來很正常，記憶體卻一直少——要靠 `dmabuf_dump` 或 debugfs 才抓得到 | [dma-heap 導覽](../dma-heap-guide.md) |
+| **heap 名稱不可攜** | heap 名稱是各平台自訂字串（`system`、`system-uncached`、`vendor-secure`…），寫死在 userspace 會綁死平台 | [dma-heap 導覽](../dma-heap-guide.md) |
+
+---
+
+## 九、MTK Preloader 與 DRAM Init
+
+> 出自 [MTK Boot 深入筆記](../mtk-boot-deep-dive.md)。該文以 [規範]／[社群]／[推論] 標記各段依據強度，Preloader 部分多為社群逆向與工程推論。
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **Preloader** | MTK 特有的 BL2，由 BootROM 從 eMMC `boot0`／UFS boot LU 載入並驗簽。**跑在只有幾百 KB 的 SRAM**（DRAM 還沒起來），所以幾乎不用 malloc 與大型 library；任務是把 DRAM 弄起來後載入並驗證 `lk`／`tee`／`gz` | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **PMIC 上電 / DRAM init** | BL2 階段最容易出事的兩步（PMIC 上電順序與各 rail 電壓、DRAM calibration），bring-up 階段絕大多數問題來自這裡 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **DRAM discovery（MR5／MR6／MR8）** | 先用低速保守時序把 DRAM 叫醒讀 mode register：MR5 = 廠商 ID、MR6/MR7 = revision、MR8 = density 與 IO width，據此選對應的 EMI/DRAMC 參數表 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **ZQ calibration** | 校準 driver strength 與 ODT 阻抗，對抗製程與溫度漂移 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **CA training** | 校 command/address bus 對 CK 的時序。CA 錯了後面全錯，所以排在最前面 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **Write leveling** | 校 DQS 對 CK 的相位。fly-by 走線讓每個 byte lane 的到達時間不同，需逐 lane 補償 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **DQS gating window** | 讀取時 controller 何時打開 DQS 接收窗。**最容易因 layout 不良而失敗的項目之一** | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **RX/TX eye、DATLAT** | 掃描讀／寫的 data eye 逐 bit 調 delay 找眼圖中心；DATLAT 決定 read data 回來要等幾個 cycle 取樣 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **Full-K vs Fast-K** | Full-K 第一次開機跑完整校正並把結果序列化寫進 flash 保留區；Fast-K 之後開機直接讀回套用。**「改了 DRAM code 卻沒看到行為改變」的頭號原因就是走了 Fast-K 吃到舊資料** | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **window 寬度 = margin** | 判讀 calibration log 的關鍵：不是看 pass/fail，而是看每個 lane 找到的 window 有多寬。過了但只剩幾個 delay step 等於不定時炸彈 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **Shmoo test** | 掃電壓（Vcore／VDDQ／VDD2）× 頻率畫出 pass/fail 圖，從形狀判斷是電壓不足、時序偏移還是雜訊 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **Golden board** | 永遠留一片已知良好的板子當基準，新板 window 明顯較窄即代表硬體差異而非軟體 bug | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+| **coreboot MediaTek DRAM code** | 公開世界裡最接近真實 MTK DRAM init 的東西——MT8173/8183/8186（Chromebook SoC）因 coreboot 須開源，MediaTek 把 `dramc_pi_calibration_api.c` 等貢獻進上游，可直接對照學習 | [MTK Boot 深入筆記](../mtk-boot-deep-dive.md) |
+
+---
+
+## 十、異構 SoC 的 IPC 與三種 Domain
+
+> 出自 [異構 SoC 的 IPC 與三種 Domain](../til-heterogeneous-ipc-and-domains.md)（素材為 mainline kernel、TF-A 與兩塊開發板）。
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **三種 domain** | 「domain」在不同文件指不同東西，拆成三個獨立面向才學得下去：**lifecycle**（這顆核活著嗎？掛了誰救？→ `remoteproc`）、**power**（有沒有電？refcount 多少？→ `genpd`）、**memory/access**（能存取哪段記憶體？位址怎麼翻譯？→ IOMMU／carveout） | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **device tree 是交會點** | `power-domains`、`iommus`、`mboxes`、`memory-region` 四個 property 一起讀，才是一顆 IP 的完整身分 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **`remoteproc`** | 管協處理器生命週期的框架：`/sys/class/remoteproc/remoteprocN/state` 寫 start/stop，firmware 放 `/lib/firmware` | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **`genpd`（generic power domain）** | Linux 的電源域框架，管 IP 的上下電與 refcount；哪些 IP 共用同一個 domain 決定了「關掉會一起掉的有哪些」 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **異構 IPC 的四個零件** | 不管叫 RPMsg、IPI、mailbox 還是 SCPI，拆開都是：**共享記憶體 + vring**（資料）、**mailbox / doorbell**（通知對方的中斷）、**resource table**（韌體宣告它要多少記憶體、幾組 vring）、**name service**（endpoint 協商）。RPMsg 只是把這四樣包成標準 API | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **resource table** | 韌體 ELF 裡的一張表，宣告它需要的 carveout 與 vring 位址。把它跟 `dmesg`／`/proc/iomem` 對起來，「韌體怎麼跟 kernel 講好記憶體怎麼分」就具體了 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **carveout** | 從系統記憶體切出來保留給某顆 IP 或協處理器專用的實體區塊（相對於走 IOMMU 動態對映） | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **往返延遲的大頭在排程** | 拆解一次 IPC 往返（遠端數指令週期、Linux 端 ftrace 抓 mailbox IRQ → vring callback → user space wakeup）通常會發現：延遲主要不在 IPC 本身而在**排程喚醒**。這個結論在任何 NPU/DSP 的 command submission 上都成立 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **PRU（Programmable Real-time Unit）** | AM3358（BeagleBone Black）上的兩顆 200 MHz 協處理器，無 cache、無 pipeline stall，所以**指令數就是時間**，很適合拿來量測 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **有 SCP vs 無 SCP** | 同一件事的兩種架構：有 SCP（工作外包給管理處理器，代價是要處理 IPC、生命週期、故障恢復）vs 無 SCP（EL3 自己下場寫 power sequence 暫存器，簡單但 CPU 得醒著才能決策）。Allwinner A64/H5 屬前者（ARISC，社群有 crust 這套開源 SCP 韌體），H6/H616 拿掉 ARISC 改由 BL31 直接控制，是很好的對照組 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+| **從故障回頭讀** | 正常運作時學不到東西——**只有壞掉時才會暴露誰依賴誰**。讓遠端進無窮迴圈、寫壞 vring index、傳輸中途 stop，觀察 remoteproc 的偵測與 recovery 路徑 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |

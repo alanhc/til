@@ -1,0 +1,51 @@
+<svg viewBox="0 0 720 420" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',system-ui,sans-serif">
+  <rect width="720" height="420" fill="#ffffff"/>
+  <text x="360" y="36" text-anchor="middle" font-size="22" font-weight="700" fill="#1a1a2e">hello&lt;&lt;&lt;2, 4&gt;&gt;&gt;()  的執行緒階層</text>
+  <text x="360" y="60" text-anchor="middle" font-size="14" fill="#6b7280">2 個 block，每個 block 有 4 條 thread ── 總共 8 條 thread</text>
+
+  <!-- Grid outer -->
+  <rect x="40" y="82" width="640" height="300" rx="14" fill="#f3f4ff" stroke="#c7ccf5" stroke-width="2"/>
+  <text x="60" y="108" font-size="15" font-weight="700" fill="#4b4fce">Grid（整個網格）</text>
+
+  <!-- Block 0 -->
+  <rect x="70" y="128" width="270" height="230" rx="12" fill="#e7ecff" stroke="#7c83ff" stroke-width="2"/>
+  <text x="205" y="154" text-anchor="middle" font-size="16" font-weight="700" fill="#3b3fb5">Block 0  (blockIdx.x = 0)</text>
+
+  <!-- Block 1 -->
+  <rect x="380" y="128" width="270" height="230" rx="12" fill="#e7ecff" stroke="#7c83ff" stroke-width="2"/>
+  <text x="515" y="154" text-anchor="middle" font-size="16" font-weight="700" fill="#3b3fb5">Block 1  (blockIdx.x = 1)</text>
+
+  <!-- Threads block 0 -->
+  <g>
+    <rect x="92"  y="176" width="100" height="72" rx="8" fill="#ffffff" stroke="#7c83ff"/>
+    <rect x="218" y="176" width="100" height="72" rx="8" fill="#ffffff" stroke="#7c83ff"/>
+    <rect x="92"  y="266" width="100" height="72" rx="8" fill="#ffffff" stroke="#7c83ff"/>
+    <rect x="218" y="266" width="100" height="72" rx="8" fill="#ffffff" stroke="#7c83ff"/>
+    <text x="142" y="208" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a2e">thread 0</text>
+    <text x="268" y="208" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a2e">thread 1</text>
+    <text x="142" y="298" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a2e">thread 2</text>
+    <text x="268" y="298" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a2e">thread 3</text>
+    <text x="142" y="226" text-anchor="middle" font-size="10" fill="#6b7280">threadIdx.x=0</text>
+    <text x="268" y="226" text-anchor="middle" font-size="10" fill="#6b7280">threadIdx.x=1</text>
+    <text x="142" y="316" text-anchor="middle" font-size="10" fill="#6b7280">threadIdx.x=2</text>
+    <text x="268" y="316" text-anchor="middle" font-size="10" fill="#6b7280">threadIdx.x=3</text>
+  </g>
+
+  <!-- Threads block 1 -->
+  <g>
+    <rect x="402" y="176" width="100" height="72" rx="8" fill="#ffffff" stroke="#7c83ff"/>
+    <rect x="528" y="176" width="100" height="72" rx="8" fill="#ffffff" stroke="#7c83ff"/>
+    <rect x="402" y="266" width="100" height="72" rx="8" fill="#ffffff" stroke="#7c83ff"/>
+    <rect x="528" y="266" width="100" height="72" rx="8" fill="#ffffff" stroke="#7c83ff"/>
+    <text x="452" y="208" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a2e">thread 0</text>
+    <text x="578" y="208" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a2e">thread 1</text>
+    <text x="452" y="298" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a2e">thread 2</text>
+    <text x="578" y="298" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a2e">thread 3</text>
+    <text x="452" y="226" text-anchor="middle" font-size="10" fill="#6b7280">threadIdx.x=0</text>
+    <text x="578" y="226" text-anchor="middle" font-size="10" fill="#6b7280">threadIdx.x=1</text>
+    <text x="452" y="316" text-anchor="middle" font-size="10" fill="#6b7280">threadIdx.x=2</text>
+    <text x="578" y="316" text-anchor="middle" font-size="10" fill="#6b7280">threadIdx.x=3</text>
+  </g>
+
+  <text x="360" y="404" text-anchor="middle" font-size="12" fill="#9ca3af">每條 thread 都跑同一份程式碼，靠 (blockIdx.x, threadIdx.x) 知道「自己是誰」</text>
+</svg>

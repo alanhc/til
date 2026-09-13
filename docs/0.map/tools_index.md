@@ -1,0 +1,84 @@
+---
+title: 工具 / 其他 文章索引
+sidebar_label: 工具與其他索引
+sidebar_position: 9
+---
+
+# 工具 / 其他 文章索引
+
+這是**雜項分類**：收的是不屬於其他大類的筆記——開發工具速查、雲端服務、自動化、資安、side project 構想。性質偏向速查與隨手紀錄，篇幅落差很大，有幾篇目前仍是佔位頁（下表會逐一註明）。
+
+---
+
+## 一、開發工具與環境
+
+| 文章 | 內容 |
+|---|---|
+| [Git 速查](../git.md) | 極短速查卡：`git diff` 的 `--stat`／`--cached`、`git reset`、`git commit` 的 `-s`（sign off）／`-m`／`--amend`，共約十行 |
+| [Docker 網路除錯](../docker_debug_network.md) | 實戰全紀錄：忘記 ollama 由哪份 docker-compose 啟動，先用 `docker inspect -f '{{json .NetworkSettings.Networks}}'` 比對三個容器的網段，再讀 `com.docker.compose.project.config_files` label 反推專案路徑；接著改用 Caddy 當對外入口做 Bearer token 驗證（`openssl rand -base64 32` 產 token、ollama 本體不開 port），附 401／200 的 curl 驗證輸出 |
+| [Ubuntu 常用指令](../ubuntu_cmds.md) | 速查：`ubuntu-drivers devices`／`autoinstall` 裝顯卡驅動、apt 套件管理（`sudo apt install <package>` 等）、systemctl 啟停服務與 `journalctl -u <service>` 看 log |
+| [Ubuntu PPA 404 錯誤](../ubuntu_ppa_error.md) | 單一問題排除：`apt update` 出現 PPA `404 Not Found` 時，用 `grep -r` 在 `/etc/apt/sources.list.d/` 與 `sources.list` 找出已被移除或更名的 PPA，處理掉再更新 |
+| [Obsidian](../obsidian.md) | local-first 的 markdown 筆記軟體：`[[筆記名稱]]` 雙向連結與反向連結、graph view、plugin 生態（Dataview／Templater／Excalidraw），檔案是本機純文字所以能直接 Git 版控 |
+| [Chrome Extension 清單](../chrome_extension.md) | 純連結收藏，無說明文字：YouTube（DeepSRT、vidiq）、頁面（Smart TOC）、翻譯（Immersive Translate）、開發（Wappalyzer、Cookie-Editor）四類 |
+| [畫圖／白板工具](../tool.md) | **注意與下一篇是不同檔案**。主題是線上白板：Miro（完整團隊協作平台、範本庫、適合 workshop／sprint planning）vs Excalidraw（開源輕量、手繪風、可自架），末尾有兩者取捨的一段比較 |
+| [好用工具清單](../tools.md) | **與上一篇僅檔名相似，內容不重疊**。是一份泛用工具收藏：Screen Studio（螢幕錄影，自動縮放與滑鼠平滑，適合做 demo）、Timelinize（把照片／位置／社群資料匯整成本機時間軸） |
+
+---
+
+## 二、雲端與服務
+
+| 文章 | 內容 |
+|---|---|
+| [Cloudflare Tunnel](../cloudflare.md) | 佔位性質，只有指令片段沒有說明：`cloudflared tunnel create` 建 tunnel → 編 `~/.cloudflared/config.yml` 的 ingress 規則（把網域導到 `localhost:3000`）→ `cloudflared tunnel route dns` 綁 DNS |
+| [Supabase](../supabase.md) | 開源的 Firebase 替代方案：以 PostgreSQL 為核心，含 Row Level Security 控權、Auth（email／OAuth／magic link）、Storage、Realtime 訂閱、Deno 跑的 Edge Functions，並自動依資料表產生 REST／GraphQL API，附 Docker self-host 文件連結 |
+| [Discord Bot 開發](../discord.md) | 開發前置：Developer Portal 建 Application 取 Bot Token、要開哪些 Privileged Gateway Intents（Message Content Intent 才讀得到訊息）、OAuth2 URL Generator 產邀請連結、discord.py／discord.js 選擇，以及現代做法用 Slash Commands 取代前綴指令 |
+| [遠端 Server 控制方式](../remote_server_idea.md) | 四種情境的選型對照表，每種都有實際指令與取捨：`ssh + args`／stdin pipe、`rsync` 只傳差異、**`ControlMaster` 連線重用**（最容易被忽略但收益最大的設定）、`sshfs`（方便但每次操作都是一次網路往返）、`ssh -L` port forward + Redis/SQLite（附 **不要透過 sshfs 多方寫入 SQLite** 的警告）；末段給選擇順序 |
+| [SSH Tunnel：協定機制與共用機器的安全邊界](../ssh-tunnel.md) | 從 RFC 4254 的 channel 機制講起：`-L` 是 `direct-tcpip`（**目標由 server 端解析，所以 `-L 3306:localhost:3306` 的 `localhost` 是跳板那台**）、`-R` 是 `tcpip-forward` 全域請求 + `forwarded-tcpip`（方向相反）、`-D` 只是 client 端多了個 SOCKS 前端。實務面：`ExitOnForwardFailure=yes`（**預設轉發失敗 ssh 不會退出**，配 `-f` 就完全看不到）、`~/.ssh/config` 的 `ProxyJump`／`LocalForward`／`ControlMaster`、`ssh -O forward/cancel` 事後增減、autossh 重連。關鍵對照是 **`-J` 與 `-L` 疊跳板的加密邊界**：後者在跳板上是明文，前者跳板只搬密文。末段是多人機器的威脅模型——**loopback port 沒有 per-user 存取控制**，你開的 forward 全機共用、port squatting 可搶 8080 收你的帳密、`-A` 讓 root 借用 agent 簽章（不需私鑰）、ControlMaster socket 等於免認證入口；緩解是改用 Unix domain socket（靠 0700 目錄權限）或乾脆不要在共用機器上開。另有 server 端 `PermitOpen`／`PermitListen`／`restrict` 強化、TCP-over-TCP 與 channel window 造成的效能問題、錯誤訊息對照表與檢查清單 |
+| [Tailscale + Finder 整合](../tailscale-finder-vnc-taildrive.md) | 把整個 tailnet 接進 macOS Finder 的完整實戰。先釐清根因：**Finder 的「共享」區靠 Bonjour／mDNS 多播，而 Tailscale 是 unicast 的 L3 overlay 不轉發多播**，所以 tailnet 機器永遠不會自動出現。接著三條路——用 `.vncloc`（UTI `com.apple.vnc-internet-location`）做原生螢幕共享捷徑，並用 `tailscale status --json` 的 `Online` 欄位定期重建；Taildrop 配 `osacompile` 產生的 droplet 拖放送檔（`file cp` 不吃資料夾，要先 `ditto` 壓 zip）；Linux 端用 **systemd user unit + linger 免 sudo** 常駐 `file get --loop` 自動收檔。核心在 Taildrive 的 **兩段式授權**：`nodeAttrs` 的 `drive:share`／`drive:access` 只開功能，`grants` 的 `tailscale.com/cap/drive` 才給讀寫；缺後者的症狀極具誤導性——分享看似建立成功、檔案伺服器也在跑，但別台看到的是空目錄，真正線索藏在分享端 journal 的 `peerapi: taildrive: not permitted`。另有一段**誠實記錄的誤判**：另一台 404 時，作者比對 netmap 發現兩台 `Cap` 協議版本不同（138 vs 142），推論「新版 client 不向舊節點查詢」——看似完美，實際上真正原因是 WebDAV 路徑要用**全小寫的 MagicDNS 名稱而非 Hostname**，自己拼錯大小寫而已（**404 是請求沒送出、not permitted 是送到被拒**，兩者要先分清楚；而能三十秒證偽的假設，不該先花力氣建構理論）。末段另記 Finder 側邊欄受 TCC 保護、`sfltool` 只有讀沒有 add，無法程式化寫入 |
+
+---
+
+## 三、自動化與爬蟲
+
+| 文章 | 內容 |
+|---|---|
+| [Automation（n8n 試作）](../automation.md) | 零散實驗筆記：用 n8n 拿財經號角與股癌做摘要測試，摘要用 Claude API、YouTube 直接抓字幕、Apple Podcast 抓音檔後用 whisper 轉文字；誠實記下缺點是「拆不夠細」，另附 Dify 與 Agent Builder 連結 |
+| [用 n8n 自動總結 YouTube 影片](../n8n/youtube總結.md) | 把上篇整理成流程：觸發（手動輸入網址或 Schedule／RSS 監看頻道）→ 取字幕／transcript → 丟 LLM 節點產生摘要 → 輸出到 email／Notion／Discord／Telegram，含一張流程截圖 |
+| [網路爬蟲](../crawler.md) | 概念釐清 crawler（走訪連結、廣度探索）vs scraper（擷取結構化資料）、`robots.txt` 與 rate limit 的分寸、JS 動態網站需 headless browser；工具面介紹 Apify 的 Actor 模式、現成 Actor、proxy／排程／API，以及其維護的開源 Crawlee |
+
+---
+
+## 四、資安
+
+| 文章 | 內容 |
+|---|---|
+| [promptfoo（LLM 測試工具）](../security.md) | 單一工具筆記：開源的 LLM 應用評測與紅隊測試工具——用 YAML 定義測試案例與 assertion 對多組 prompt／模型／參數做批次比較並接 CI 做回歸，紅隊面則自動產生對抗性輸入測 prompt injection、jailbreak、資料外洩 |
+| [CausalArmor 論文導讀](../security_paper_CausalArmor.md) | **長篇深入導讀，寫給主管／決策者**：間接提示注入（IPI）為何是「AI 忠實執行讀到的指令」而非被駭、防禦本身造成的「過度防禦困境」；CausalArmor 用 Leave-One-Out 消融量測「主導權翻轉」（Dominance Shift）、可調門檻 `τ` 作為風險旋鈕、針對性清洗與回溯式思維鏈遮蔽（不抹掉推理軌跡會讓模型把攻擊再幻覺一次）；含 DoomArena 數據表（不防禦時攻擊成功率 88.9%、分類器把正常任務成功率砍到 55.1%、CausalArmor 為 3.7%／71.0%），並誠實列出 split-context 拆分攻擊等自承弱點與最小權限建議 |
+
+---
+
+## 五、Side Projects
+
+| 文章 | 內容 |
+|---|---|
+| [用問卷找回你的時間精力](../side-projects/用問卷找回你的時間精力.md) | 已有 demo：用簡短問卷收集各活動的時間投入與精力感受（充電／耗電），視覺化後看出哪些活動 CP 值低，目標是把「感覺很忙但沒成就感」轉成可行動的調整建議 |
+| [緩解焦慮 App（呼吸日記）](../side-projects/緩解焦慮app.md) | 已有 demo：2／5／8 分鐘三種放鬆時長、圓圈呼吸動畫與語音引導，結束後替情緒命名、寫下感受與一個願意走的小步驟；紀錄只存本機、不需帳號不上雲，可回顧哪個日期／每週區間較焦慮，含三張介面截圖 |
+| [評論音樂段落](../side-projects/評論音樂段落.md) | **僅構想稿**（三行概念，尚未實作）：讓使用者針對歌曲特定 timestamp 區間（如 1:20–1:45）留言而非只給整首評分，累積後看出最打動人的段落，類似 SoundCloud 波形留言但聚焦段落級分析 |
+| [device-loop：裝置預約系統](../side-projects/device-loop-裝置預約系統.md) | 已有實作（Phase 1 真機跑通）：把散落的 Android／RISC-V／BMC 開發板與多台主機，透過 Tailscale mesh 變成可預約的裝置 farm。記錄「lease 而非 scheduler」的分類依據、coordinator↔exporter 走 reconcile 而非 push 的取捨、發現不等於擁有、以及真機才抓得到的兩個測試盲點 |
+
+---
+
+## 六、其他
+
+| 文章 | 內容 |
+|---|---|
+| [Data Viz](../data_viz.md) | 三種圖表的零散筆記：Sankey diagram 的節點／流結構與 plotly `go.Sankey` 能源流向範例（並提醒不適用於沒有「守恆」概念的資料）、Chord diagram 強調雙向關係與 Sankey 的差異、Treemap 僅一張截圖 |
+| [軟體工程隨筆](../software_engineering.md) | 隨手速記（原文有錯字未修）：sustainability 與 scale 是核心議題、海勒姆法則（被觀察到的行為終將被依賴成為系統的一部分）、「Because I said so」是萬惡之源、公車指數，以及 CI 的 Beyoncé rule |
+| [Preflight Check](../preflight.md) | **佔位頁**：同一段 preflight check 的定義被 LLM 以英文／簡體中文／繁體中文各寫一次（航空、軟體開發、韌體開發的類比），尚未整理成自己的筆記 |
+| [CUDA 入門第一步](../cuda-hello-world.md) | 新手向教學：在 Ubuntu／Debian 用 `apt` 裝 CUDA Toolkit（cuda-keyring→`cuda-toolkit-13-0`→設 `PATH`／`LD_LIBRARY_PATH`）、`nvcc --version` 驗裝好，再寫十幾行的 `hello.cu` 帶出 `__global__` kernel、`blockIdx.x`／`threadIdx.x`、`<<<2,4>>>` 執行組態與 `cudaDeviceSynchronize()`，最後 `nvcc -arch=native` 編譯執行；附 build pipeline／執行緒階層／CPU-GPU 流程三張 SVG 圖 |
+
+---
+
+## 建議閱讀順序
+
+這一類多半是速查與隨手紀錄，沒有固定順序，各取所需即可。（資料結構與演算法已獨立為 [DSA 系列索引](dsa_index.md)。）

@@ -1,0 +1,390 @@
+{
+  "main": {
+    "id": "a2fa6aa9ef7a9bee",
+    "type": "split",
+    "children": [
+      {
+        "id": "77df9e79e2ac6b2e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "430c55ab35f73562",
+            "type": "leaf",
+            "pinned": true,
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "pixel_study.md",
+                "mode": "source",
+                "source": false
+              },
+              "pinned": true,
+              "icon": "lucide-file",
+              "title": "pixel_study"
+            }
+          },
+          {
+            "id": "446af36b45c35e6c",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "claude_skills.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "claude_skills"
+            }
+          },
+          {
+            "id": "e9e64b6500dc8f67",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "投資.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "投資"
+            }
+          },
+          {
+            "id": "26861497974d6f77",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "power_benchmark.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "power_benchmark"
+            }
+          },
+          {
+            "id": "c56f1a960055b62c",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "aosp_pixel_full_workflow.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "aosp_pixel_full_workflow"
+            }
+          },
+          {
+            "id": "0a0c8d84d8513292",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "android_engineer_skills.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "android_engineer_skills"
+            }
+          },
+          {
+            "id": "5676dbed0cc9ebf9",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "android_engineer_skills.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "android_engineer_skills"
+            }
+          },
+          {
+            "id": "0a6191b900ccd0f2",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "claude_ui.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "claude_ui"
+            }
+          },
+          {
+            "id": "39bec9475fc11de4",
+            "type": "leaf",
+            "state": {
+              "type": "release-notes",
+              "state": {
+                "currentVersion": "1.13.4"
+              },
+              "icon": "lucide-book-up",
+              "title": "發行記錄 1.13.4"
+            }
+          }
+        ],
+        "currentTab": 8
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "f277e04bc8dc44b6",
+    "type": "split",
+    "children": [
+      {
+        "id": "26f28291066f3b53",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a61ee9143cecc3b2",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "檔案瀏覽器"
+            }
+          },
+          {
+            "id": "54e012a5818832ba",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "aosp",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜尋"
+            }
+          },
+          {
+            "id": "47ed7e51f3de865f",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "d41c0adb14d6cb8e",
+    "type": "split",
+    "children": [
+      {
+        "id": "a70ae224b52c6a7d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "52feb49f6fab35ab",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "obsidian.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for obsidian"
+            }
+          },
+          {
+            "id": "730adb463870f3d8",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "obsidian.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from obsidian"
+            }
+          },
+          {
+            "id": "aedec2490b50f45f",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "232d94531f0575bf",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "d3ea100c996f38f2",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "大綱"
+            }
+          },
+          {
+            "id": "85c502044f535c40",
+            "type": "leaf",
+            "state": {
+              "type": "advanced-tables-toolbar",
+              "state": {},
+              "icon": "lucide-ghost",
+              "title": "advanced-tables-toolbar"
+            }
+          },
+          {
+            "id": "ebdf2c5aab557472",
+            "type": "leaf",
+            "state": {
+              "type": "smart-connections-view",
+              "state": {},
+              "icon": "lucide-ghost",
+              "title": "smart-connections-view"
+            }
+          },
+          {
+            "id": "3f7f7e998db5eb0e",
+            "type": "leaf",
+            "state": {
+              "type": "smart-lookup-view",
+              "state": {},
+              "icon": "lucide-ghost",
+              "title": "smart-lookup-view"
+            }
+          },
+          {
+            "id": "ee81f558739622be",
+            "type": "leaf",
+            "state": {
+              "type": "copilot-chat-view",
+              "state": {},
+              "icon": "lucide-ghost",
+              "title": "copilot-chat-view"
+            }
+          }
+        ],
+        "currentTab": 4
+      }
+    ],
+    "direction": "horizontal",
+    "width": 312.5
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:開啟快速切換": false,
+      "graph:查看關聯圖": false,
+      "canvas:建立新畫布": false,
+      "daily-notes:開啟今天的每日筆記": false,
+      "templates:插入模板": false,
+      "command-palette:開啟命令面板": false,
+      "bases:建立新的 base": false
+    }
+  },
+  "active": "39bec9475fc11de4",
+  "lastOpenFiles": [
+    "BMC/device_driver/device_driver.md",
+    "0.map/android_glossary.md.tmp.19753.8d5d33ad80ee",
+    "qualcomm-vs-mediatek-android-boot-flow.md.tmp.19753.a2ca38d38c59",
+    "qualcomm-vs-mediatek-android-boot-flow.md",
+    "dma-heap-guide.md",
+    "mtk-boot-deep-dive.md",
+    "assets/image-3.png",
+    "mobile-trust-boundaries.md",
+    "dirty-sepolicy-detection.md",
+    "pixel8-gxp-dsp-exploit.md",
+    "assets/claude_ui/file-20260510192046695.png",
+    "assets/claude_ui/file-20260507230810819.png",
+    "assets/claude_ui/file-20260507230751952.png",
+    "assets/claude_ui",
+    "android_engineer_skills.md",
+    "claude_ui.md",
+    "aosp_pixel_full_workflow.md",
+    "aosp_pixel_full_workflow_EN.md",
+    "pixel_img.md",
+    "pixel_flash_debug.md",
+    "android_firmware_development_and_agentic_ai.md",
+    "android_firmware_development_and_agentic_ai.mc",
+    "claude_skills.md",
+    "skills",
+    "android_boot_flow.md",
+    "pixel_flash_another_version.md",
+    "pixel_fastboot_deepdive.md",
+    "pixel_can_not_run_as_root.md",
+    "pixel_driver.md",
+    "pixel_hardware.md",
+    "Android_build_number.md",
+    "power_benchmark.md",
+    "pixel_study.md",
+    "pixel_root.md",
+    "claude_use_ollama.md",
+    "assets/vercel_skills/file-20260406151002920.png",
+    "assets/vercel_skills",
+    "ai-articles",
+    "assets/claude/file-20260405203359007.png",
+    "assets/claude",
+    "分析",
+    "英文",
+    "assets/openclaw/file-20260316205958715.png",
+    "assets/pixel_flash_another_version/file-20260307152717311.png",
+    "assets/pixel_flash_another_version/file-20260307152715776.png",
+    "assets/pixel_study/file-20260208182535001.png",
+    "Untitled.canvas"
+  ]
+}

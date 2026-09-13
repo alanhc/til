@@ -1,0 +1,33 @@
+name: Test deployment
+
+on:
+  pull_request:
+    branches:
+      - main
+    # Review gh actions docs if you want to further define triggers, paths, etc
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
+
+# Cancel superseded runs when a PR is updated.
+concurrency:
+  group: test-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-deploy:
+    name: Test deployment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Lint Markdown
+        run: yarn lint:md
+      - name: Test build website
+        run: yarn build

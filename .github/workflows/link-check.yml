@@ -1,0 +1,60 @@
+name: Link Check
+
+# Checks external links in the built site. Internal links are already
+# validated at build time (onBrokenLinks / onBrokenMarkdownLinks: throw),
+# so this focuses on catching rotted external URLs in the notes.
+on:
+  schedule:
+    - cron: "0 3 * * 1" # Every Monday 03:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  link-check:
+    name: Check links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build website
+        run: yarn build
+
+      - name: Check links with lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # This check is only for external dead links; internal links are
+          # already validated at build time. --base resolves the site's
+          # root-relative /til links to full URLs so they don't error as
+          # "unresolvable", and the alanhc.github.io exclude then skips them
+          # (no need to re-check internal links over the network).
+          #   --exclude-all-private: skip localhost / private IPs pasted in notes
+          #   --accept 403: academic/publisher sites (doi.org, medium, ACM,
+          #     researchgate, arm developer...) return 403 to bots, not real 404s
+          #   --accept 429: rate limited, treated as alive
+          #   --accept 202: IEEE Xplore answers bot requests with 202 + a JS
+          #     challenge; verified alive in a normal browser
+          #   exclude gitbooks.io: serves 401 to non-browser UAs (0xax
+          #     linux-insides is alive; confirmed 200 with a browser UA)
+          #   exclude edn.com: refuses connections from CI runners entirely
+          #     (HTTP/2 protocol error), not a dead page
+          #   exclude gemini.google.com: private chat links kept as source
+          #     provenance; only openable by the author, never by a reader
+          args: >-
+            --base https://alanhc.github.io
+            --exclude "alanhc\.github\.io"
+            --exclude "gitbooks\.io"
+            --exclude "edn\.com"
+            --exclude "gemini\.google\.com"
+            --exclude-all-private
+            --no-progress
+            --max-concurrency 8
+            --max-retries 2
+            --timeout 30
+            --accept 200,202,206,403,429
+            "build/**/*.html"
+          fail: true
