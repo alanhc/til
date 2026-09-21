@@ -27,6 +27,10 @@ sidebar_position: 0
 
 篇數量級（有索引的分類直接取索引收錄數，跨分類文章會在兩邊各算一次）：Android ≈ 81、AI ≈ 44、BMC ≈ 42、Embedded ≈ 41、工具其他 ≈ 25、DSA ≈ 19、職涯生活 ≈ 19、Linux ≈ 13、投資 ≈ 9、效能 ≈ 7。
 
+## 關於作者
+
+[關於我](about.md)——工作範圍、技術主軸、代表性筆記與聯絡方式。
+
 ## 開源貢獻
 
 [開源貢獻紀錄](contributions.md)——GitHub PR、AOSP Gerrit、OpenBMC Gerrit 三邊的貢獻與合入狀態，
