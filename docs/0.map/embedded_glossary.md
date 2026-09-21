@@ -420,3 +420,18 @@ sidebar_position: 7
 | **PRU（Programmable Real-time Unit）** | AM3358（BeagleBone Black）上的兩顆 200 MHz 協處理器，無 cache、無 pipeline stall，所以**指令數就是時間**，很適合拿來量測 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
 | **有 SCP vs 無 SCP** | 同一件事的兩種架構：有 SCP（工作外包給管理處理器，代價是要處理 IPC、生命週期、故障恢復）vs 無 SCP（EL3 自己下場寫 power sequence 暫存器，簡單但 CPU 得醒著才能決策）。Allwinner A64/H5 屬前者（ARISC，社群有 crust 這套開源 SCP 韌體），H6/H616 拿掉 ARISC 改由 BL31 直接控制，是很好的對照組 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
 | **從故障回頭讀** | 正常運作時學不到東西——**只有壞掉時才會暴露誰依賴誰**。讓遠端進無窮迴圈、寫壞 vring index、傳輸中途 stop，觀察 remoteproc 的偵測與 recovery 路徑 | [異構 IPC 與 domain](../til-heterogeneous-ipc-and-domains.md) |
+
+---
+
+## 十一、Tegra / Jetson BSP
+
+> 出自 [Tegra BSP 學習地圖](../tegra-bsp-learning-map.md)。
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **L4T（Linux for Tegra）** | NVIDIA 為 Tegra 平台提供的 BSP 與工具鏈：kernel source、DTB、bootloader 與燒錄腳本的集合，是 Jetson 上對應 Yocto 的「官方那條路」 | [Tegra BSP 學習地圖](../tegra-bsp-learning-map.md) |
+| **MB1 / MB2** | Jetson Orin 開機鏈中 Boot ROM 之後的前兩段，角色相當於其他 ARM 平台的 TF-A BL2；之後才輪到 BL31、OP-TEE 與 UEFI | [Tegra BSP 學習地圖](../tegra-bsp-learning-map.md) |
+| **UEFI（EDK2）當 bootloader** | Jetson Orin 用 UEFI 取代 U-Boot 這一格，所以「改 bootloader」在 Tegra 上是改 EDK2 而不是改 U-Boot 的 `bootcmd` | [Tegra BSP 學習地圖](../tegra-bsp-learning-map.md) |
+| **`flash.sh` / `l4t_initrd_flash.sh`** | L4T 的燒錄入口腳本，取代 STM32CubeProgrammer + `.tsv` 那一類流程；讀懂它做了哪些事（分區、簽章、recovery mode）是 Tegra 燒錄的第一課 | [Tegra BSP 學習地圖](../tegra-bsp-learning-map.md) |
+| **meta-tegra（OE4T）** | 社群維護的 Yocto layer，讓 Tegra 平台能走 Yocto 而非只能用 L4T 工具鏈；把 driver 與 DT 改動收斂成自己的 layer 就是在這裡做 | [Tegra BSP 學習地圖](../tegra-bsp-learning-map.md) |
+| **`make dt_binding_check`** | 驗證 device tree binding 的 YAML schema 是否合規；替自己的 driver 寫 binding 文件並通過這關，是上游化的基本門檻 | [Tegra BSP 學習地圖](../tegra-bsp-learning-map.md) |

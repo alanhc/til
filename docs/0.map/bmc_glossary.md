@@ -543,3 +543,6 @@ sidebar_position: 5
 | **lease epoch** | 每次發租約單調 `+1`，agent 只認最新；時鐘不同步或 token 重放時的最後防線 | [device-lease-design](../BMC/device-lease-design.md) |
 | **USB/IP** | `usbip bind`／`attach` 把 USB 裝置搬到遠端主機，工具免改；但每個 USB transfer 都要過一次 RTT，跨網段 JTAG 會掉速 | [device-lease-design](../BMC/device-lease-design.md) |
 | **`ADB_SERVER_SOCKET`** | 讓 adb client 改連指定的 server（如本地 proxy）；adb protocol 無認證，proxy 可過濾 `host:devices`／`host:transport`／`host:kill` | [device-lease-design](../BMC/device-lease-design.md) |
+| **selector 租用** | 用條件（arch、具備哪些 capability、tag）租設備而不是寫死機器編號；agent 註冊時上報自己的 capability，由 lease service 匹配，排隊效率遠優於 CI 硬編 `dut-233` | [device-lease-design](../BMC/device-lease-design.md) |
+| **TTL 雙邊生效 + 寬限期** | agent 自己倒數 TTL（建議 120s / heartbeat 30s / 寬限 30s），不等中央來叫它放；斷線先進寬限期讓人帶同一 `lease_id` 重連，逾時才回收並跑 `Release()` + `Reset()` | [device-lease-design](../BMC/device-lease-design.md) |
+| **`ConflictsWith()`** | driver 宣告「這個 capability 不能和誰同時被別人持有」——JTAG halt 住 CPU 時別人斷電會卡死、FPGA 的 flash 與 jtag 共用同一顆 probe；核心不可能知道這些，只能放 driver | [device-lease-design](../BMC/device-lease-design.md) |

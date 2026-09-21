@@ -16,6 +16,7 @@ sidebar_position: 6
 |---|---|
 | [嵌入式系統背景知識](../embedded.md) | 嵌入式 Linux 四大組成：Bootloader → Kernel → rootfs → Driver，含 Device Tree、cross-compile、`defconfig`、BusyBox/systemd 等關鍵字 |
 | [State Machine](../Embedded/state_machine.md) | 狀態機在嵌入式的用途與實作四步驟（定義狀態／事件／轉換規則／實作），附一支 C 寫的 LED 控制器範例（OFF／ON／BLINKING 三態） |
+| [Tegra BSP 學習地圖](../tegra-bsp-learning-map.md) | 從 Yocto／開機鏈 → driver + device tree → Jetson Orin 實作 → 深度補強的四階段路線圖。核心是一張**開機鏈對照表**：把 STM32MP1 的 TF-A BL2／BL31／OP-TEE／U-Boot 逐格對到 Jetson Orin 的 MB1-MB2／BL31／OP-TEE／UEFI(EDK2)，建構與燒錄則是 Yocto vs L4T 工具鏈、`flash.sh`／`l4t_initrd_flash.sh`。附每階段的完成條件與練習（QEMU out-of-tree platform driver、I2C 感測器 driver + `make dt_binding_check`、meta-tegra 自建 layer）|
 
 ---
 
