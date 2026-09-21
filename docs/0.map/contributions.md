@@ -34,6 +34,78 @@ sidebar_position: 10
 
 ---
 
+## 依領域分類
+
+同一筆會出現在多個領域（例如 llama.cpp 的 SpacemiT kernel 同時是 RISC-V 和 LLM），
+這裡不做互斥切分。
+
+| 領域 | ✅ 已合入 | 🔄 review 中 |
+|---|---|---|
+| 資料中心 / 伺服器 | 3 | 6 |
+| RISC-V | 3 | 6 |
+| Compiler / 工具鏈 / 執行環境 | 12 | 8 |
+| LLM / AI | 8 | 1 |
+| Android | 5 | 18 |
+| 韌體 / 開機 | 3 | 6 |
+
+### 資料中心 / 伺服器
+
+| 貢獻 | 狀態 | 為什麼算這一類 |
+|---|---|---|
+| [u-root](https://github.com/u-root/u-root) #3733、#3735、#3750 | ✅ | u-root 是 **LinuxBoot** 的 userland，拿 Linux 取代 UEFI DXE 的那套做法，主要使用者就是 OCP 系的伺服器韌體 |
+| [DMTF/libspdm #3816](https://github.com/DMTF/libspdm/pull/3816) | 🔄 | SPDM 是 PCIe／CXL 裝置認證與量測的協定，用在伺服器內部元件的信任建立 |
+| [OpenPRoT/pldm-lib #21](https://github.com/OpenPRoT/pldm-lib/pull/21) | 🔄 | PRoT（Platform Root of Trust）＋ PLDM，伺服器主板上的信任根 |
+| [openbmc/libpldm](https://gerrit.openbmc.org/q/project:openbmc/libpldm) ×4 | 🔄 | BMC 就是伺服器的管理控制器，PLDM 是它對外的協定之一 |
+
+### RISC-V
+
+| 貢獻 | 狀態 | 為什麼算這一類 |
+|---|---|---|
+| [llama.cpp #27961](https://github.com/ggml-org/llama.cpp/pull/27961)、[#28479](https://github.com/ggml-org/llama.cpp/pull/28479) | ✅ / 🔄 | SpacemiT X60 的 IME 矩陣加速路徑，RISC-V 向量／矩陣擴充的實際應用 |
+| [u-root #3733](https://github.com/u-root/u-root/pull/3733) | ✅ | riscv64 的 kexec 支援 |
+| [rv32emu](https://github.com/sysprog21/rv32emu) ×5 | 🔄 | RVV（向量擴充）指令實作與 cross-EEW overlap 規則 |
+| [os-in-1000-lines #101](https://github.com/nuta/operating-system-in-1000-lines/pull/101) | ✅ | 這本教材的目標平台就是 RISC-V（`qemu-system-riscv32`）；[繁體中文版](https://1000os.seiya.me/tw/)在上游 README 掛名 |
+
+### Compiler / 工具鏈 / 執行環境
+
+| 貢獻 | 狀態 | 為什麼算這一類 |
+|---|---|---|
+| [shecc #339](https://github.com/sysprog21/shecc/pull/339) | ✅ | 自我編譯的教學用 C 最佳化編譯器，補的是暫存器配置相關的測試 |
+| [sse2neon #774](https://github.com/DLTcollab/sse2neon/pull/774)、[#773](https://github.com/DLTcollab/sse2neon/pull/773) | ✅ / 🔄 | SSE intrinsics 轉 NEON/SVE2，是編譯器 intrinsics 層的工作 |
+| [ARM optimized-routines #97](https://github.com/ARM-software/optimized-routines/pull/97) | 🔄 | libc 例程的最佳化實作與量測 |
+| [frama-c-mcp](https://github.com/sysprog21/frama-c-mcp) ×3 | ✅ | Frama-C 的靜態分析／形式驗證（EVA、WP）工具鏈 |
+| [rv32emu](https://github.com/sysprog21/rv32emu) ×5 | 🔄 | 指令集模擬器，本身帶 JIT |
+| [elfuse](https://github.com/sysprog21/elfuse) ×8 | ✅ ×7 / 🔄 ×1 | 嚴格說是**執行環境**不是編譯器：在 macOS 上跑 Linux ELF，做的是 ELF 載入與 syscall 語意轉譯 |
+
+### LLM / AI
+
+| 貢獻 | 狀態 | 為什麼算這一類 |
+|---|---|---|
+| [llama.cpp #27961](https://github.com/ggml-org/llama.cpp/pull/27961)、[#28479](https://github.com/ggml-org/llama.cpp/pull/28479) | ✅ / 🔄 | 推論引擎的 CPU kernel（Q8_0 量化矩陣乘） |
+| [frama-c-mcp](https://github.com/sysprog21/frama-c-mcp) ×3 | ✅ | MCP server，把形式驗證工具接給 AI agent 用 |
+| [codetrial](https://github.com/sysprog21/codetrial) ×4 | ✅ | Gemini 驅動的即時技術面試模擬器 |
+
+### Android
+
+| 貢獻 | 狀態 | 為什麼算這一類 |
+|---|---|---|
+| `kernel/common` ×5（dma-heap、dma-buf、binder、scsi/ufs） | ✅ | Android Common Kernel（ACK） |
+| `platform/hardware/interfaces` ×12 | 🔄 | HAL 範例實作的 service fuzzer 與生命週期修補 |
+| `platform/hardware/libhardware` ×5 | 🔄 | HID report descriptor 解析的邊界問題 |
+| [`android17-6.18` 的 scsi/ufs 重送](https://android-review.googlesource.com/c/kernel/common/+/4268863) | 🔄 | 同一個 change 往穩定分支的 backport |
+
+### 韌體 / 開機
+
+| 貢獻 | 狀態 | 為什麼算這一類 |
+|---|---|---|
+| [u-root](https://github.com/u-root/u-root) #3733、#3735、#3750 | ✅ | kexec、zimage 解析、reboot——都在「把下一個 kernel 帶起來」這條路徑上 |
+| [DMTF/libspdm #3816](https://github.com/DMTF/libspdm/pull/3816) | 🔄 | 裝置韌體的認證與 session key 管理 |
+| [OpenPRoT/pldm-lib #21](https://github.com/OpenPRoT/pldm-lib/pull/21)、[openbmc/libpldm](https://gerrit.openbmc.org/q/project:openbmc/libpldm) ×4 | 🔄 | PLDM 是韌體之間（BMC ↔ 裝置）的管理協定 |
+
+> 不屬於上述任一類：[cert-tools #55](https://github.com/blockchain-certificates/cert-tools/pull/55)（區塊鏈證書工具的日期解析修正）。
+
+---
+
 ## 依影響力排序
 
 「影響力」沒有客觀分數，這裡用三個軸排，**並在每一列寫出它為什麼在這個位置**，
