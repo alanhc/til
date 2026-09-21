@@ -8,7 +8,7 @@ sidebar_position: 0
 
 整個知識庫的入口。文章依主題分成九類，每類會逐步長出自己的**文章索引**與**名詞表**。
 
-四個技術大類（Android、AI、BMC、Embedded）已有索引或名詞表，其餘標「待建」——等該類文章累積到「靠側邊欄找不到東西」的程度再補，不預先建空殼。
+六個分類（Android、AI、BMC、Embedded、效能 Benchmark、職涯生活）已有索引與名詞表，其餘標「待建」——等該類文章累積到「靠側邊欄找不到東西」的程度再補，不預先建空殼。
 
 ## 分類總表
 
@@ -20,9 +20,9 @@ sidebar_position: 0
 | **Linux / 系統** | Kernel、kernel 除錯（Oops／crash dump）、device tree / driver、systemd、memory、Ubuntu 指令、GRUB、Docker | [Linux/Linux.md](../Linux/Linux.md) | 走 `Linux/` 資料夾側邊欄 | 待建 |
 | **Embedded / 韌體 / 硬體** | Bootloader、firmware testing / image management、Raspberry Pi、晶片與半導體、矽後驗證與半導體量產測試 | [embedded.md](../embedded.md) | [Embedded 系列索引](embedded_index.md) | [Embedded 名詞表](embedded_glossary.md) |
 | **DSA / 演算法** | Linked List、hash / LRU、樹與堆積、圖與 BFS/DFS、二分與排序、DP／回溯、雙指標／單調堆疊、位元與環形緩衝 | [DSA/Linked_List/0.linked_list.md](../DSA/Linked_List/0.linked_list.md) | [DSA 系列索引](dsa_index.md) | — |
-| **效能 / Benchmark** | CPU DVFS、power / browser benchmark、codec 判讀 | [benchmark.md](../benchmark.md) | 待建 | — |
+| **效能 / Benchmark** | CPU DVFS、power / browser benchmark、codec 判讀、PMU/Ftrace/EMI 三層觀測 | [benchmark.md](../benchmark.md) | [效能 Benchmark 索引](perf_index.md) | [效能 Benchmark 名詞表](perf_glossary.md) |
 | **投資 / 理財** | 投資計劃、個股風險、程式交易、酒田戰法、房、銀行操作 | [投資.md](../投資.md) | 待建 | — |
-| **職涯 / 生活 / 學習** | 面試、當責、說不、人際、健康、簡報、英文、書與電影 | [career.md](../career.md) | 待建 | — |
+| **職涯 / 生活 / 學習** | 組織與問責、面試、學習方法、說不、人際、健康、簡報、英文、書與電影 | [career.md](../career.md) | [職涯生活索引](career_index.md) | [職涯生活名詞表](career_glossary.md) |
 | **工具 / 其他** | Obsidian、Supabase、Cloudflare、n8n、爬蟲、資安、side projects | [tools.md](../tools.md) | [工具與其他索引](tools_index.md) | — |
 
 篇數量級（有索引的分類直接取索引收錄數，跨分類文章會在兩邊各算一次）：Android ≈ 81、AI ≈ 44、BMC ≈ 42、Embedded ≈ 41、工具其他 ≈ 25、DSA ≈ 19、職涯生活 ≈ 19、Linux ≈ 13、投資 ≈ 9、效能 ≈ 7。

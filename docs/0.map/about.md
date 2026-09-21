@@ -1,7 +1,7 @@
 ---
 title: 關於我
 sidebar_label: 關於我
-sidebar_position: 11
+sidebar_position: 15
 ---
 
 # 關於我
@@ -16,21 +16,21 @@ sidebar_position: 11
 
 ## 現在在做什麼
 
-**MediaTek，嵌入式軟體工程師（2025 – 至今）**
+**MediaTek，嵌入式軟體工程師**
 
 Android 平台整合與自動化，主要在 build、log triage 與跨團隊整合這幾段，
 並把 AI agent 實際放進日常流程裡（不是 demo，是要能重跑的那種）。
 
 ## 經歷
 
-| 期間 | 單位 | 做什麼 |
-|---|---|---|
-| 2025 – 至今 | **MediaTek** | Android 平台整合與自動化，AI agent 導入韌體開發流程 |
-| 2024/12 – 2025/09 | **Wiwynn** | 伺服器平台的 **OpenBMC** 韌體開發與除錯 |
-| 2024/09 – 2024/12 | **Pegatron** | 以 Kubernetes 做 rack-scale 伺服器的驗證自動化 |
-| 2022/07 – 2022/11 | **LINE**（實習） | API 開發用的內部工具 |
+| 單位 | 做什麼 |
+|---|---|
+| **MediaTek**（現職） | Android 平台整合與自動化，AI agent 導入韌體開發流程 |
+| **Wiwynn** | 伺服器平台的 **OpenBMC** 韌體開發與除錯 |
+| **Pegatron** | 以 Kubernetes 做 rack-scale 伺服器的驗證自動化 |
+| **LINE**（實習） | API 開發用的內部工具 |
 
-**學歷**：國立臺灣大學 資訊工程 碩士（2024）
+**學歷**：國立臺灣大學 資訊工程 碩士
 
 ---
 
