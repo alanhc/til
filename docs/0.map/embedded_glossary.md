@@ -435,3 +435,28 @@ sidebar_position: 7
 | **`flash.sh` / `l4t_initrd_flash.sh`** | L4T 的燒錄入口腳本，取代 STM32CubeProgrammer + `.tsv` 那一類流程；讀懂它做了哪些事（分區、簽章、recovery mode）是 Tegra 燒錄的第一課 | [Tegra BSP 學習地圖](../tegra-bsp-learning-map.md) |
 | **meta-tegra（OE4T）** | 社群維護的 Yocto layer，讓 Tegra 平台能走 Yocto 而非只能用 L4T 工具鏈；把 driver 與 DT 改動收斂成自己的 layer 就是在這裡做 | [Tegra BSP 學習地圖](../tegra-bsp-learning-map.md) |
 | **`make dt_binding_check`** | 驗證 device tree binding 的 YAML schema 是否合規；替自己的 driver 寫 binding 文件並通過這關，是上游化的基本門檻 | [Tegra BSP 學習地圖](../tegra-bsp-learning-map.md) |
+
+---
+
+## 十二、ARMv8 開機鏈三部曲（TF-A / OP-TEE / U-Boot）
+
+> 出自 [（一）TF-A](../tf-a.md)、[（二）OP-TEE](../optee.md)、[（三）U-Boot](../u-boot.md)。BL1~BL33、EL0~EL3、TrustZone 等基礎名詞見 [Android 名詞表](android_glossary.md) 第五節。
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **FIP / `fiptool`** | TF-A 的映像打包格式：一張 ToC 加上以 UUID 識別的 payload（BL2、BL31、BL32、BL33、憑證），用 `fiptool` 產生 | [（一）TF-A](../tf-a.md) |
+| **TBB / TBBR、ROTPK** | Trusted Board Boot：以 ROTPK（Root of Trust Public Key）為根，用 X.509 憑證把 BL2 到 BL33 串成一條 Chain of Trust | [（一）TF-A](../tf-a.md) |
+| **SMCCC / Function ID / OEN** | SMC 呼叫慣例。BL31 依 Function ID 的 OEN 分派：OEN 4 是 Arm 定義的 Standard Service（PSCI），OEN 2 是留給 SoC 廠自訂 EL3 服務的 SiP service | [（一）TF-A](../tf-a.md) |
+| **SPD（Secure Payload Dispatcher）／`opteed`** | BL31 裡負責帶起 BL32 並在兩個 world 之間切 context 的模組；OP-TEE 對應的就是 `opteed` | [（一）TF-A](../tf-a.md) |
+| **SPMD + SPMC（FF-A）** | 取代「一個 Trusted OS 配一個專用 SPD」的新架構，SPMC 可放在 S-EL1、S-EL2（如 Hafnium）或 EL3 | [（一）TF-A](../tf-a.md) |
+| **PSCI 從 Linux 走到 BL31** | Linux 的 CPU hotplug、suspend、reboot 最後都是 PSCI SMC；靠 DT 的 `psci` node（`method = "smc"`）與每顆 CPU 的 `enable-method = "psci"` 決定走這條路 | [（一）TF-A](../tf-a.md) |
+| **OP-TEE 四塊分工** | `optee_os`（S-EL1 核心 + S-EL0 的 TA）、Linux 的 TEE subsystem + OP-TEE driver、userspace 的 `libteec`（GP TEE Client API）、`tee-supplicant`（幫 secure world 存取 Linux 資源的 daemon） | [（二）OP-TEE](../optee.md) |
+| **RPC（secure → normal）** | Secure world 需要記憶體、檔案系統、載入 TA 或遇到 normal world 中斷時，用特殊 SMC 回傳值「暫停」呼叫請 normal world 幫忙，再用 `OPTEE_SMC_CALL_RETURN_FROM_RPC` 回去 | [（二）OP-TEE](../optee.md) |
+| **pseudo TA vs user TA** | pseudo TA 跑在 OP-TEE core 內部、只能用 core 內部函式；user TA 跑在 S-EL0、用 GP Internal Core API（libutee） | [（二）OP-TEE](../optee.md) |
+| **`symbolize.py`** | TA crash 時把 abort dump 的位址還原成函式與行號的 OP-TEE 腳本 | [（二）OP-TEE](../optee.md) |
+| **TPL / VPL / SPL / U-Boot proper** | U-Boot 的多段切分。SRAM 小到塞不下完整 U-Boot 時先用小程式把 DRAM 初始化起來；Rockchip、Allwinner 等平台的 SPL 本身就扮演 BL2 | [（三）U-Boot](../u-boot.md) |
+| **`CONFIG_SPL_ATF`** | 讓 SPL 從 FIT 載入 BL31（及可選的 OP-TEE），再由 BL31 把 U-Boot proper 當 BL33 帶起來 | [（三）U-Boot](../u-boot.md) |
+| **`board_init_f` → relocation → `board_init_r`** | U-Boot proper 的骨幹（`_main` 起於 `crt0_64.S`），全程靠 `gd`（AArch64 放在 `x18`）傳狀態。**relocation 前記下的指標 relocation 後還用，是移植新板子的經典 bug** | [（三）U-Boot](../u-boot.md) |
+| **Driver Model（uclass / udevice / `U_BOOT_DRIVER`）** | U-Boot 的統一驅動框架，硬體描述來自 Device Tree（`OF_CONTROL`） | [（三）U-Boot](../u-boot.md) |
+| **Standard Boot（bootdev / bootmeth / bootflow）** | 取代 `distro_bootcmd` 腳本的開機機制；開 `BOOTSTD_DEFAULTS` 的板子預設 `bootcmd` 就是 `bootflow scan -lb` | [（三）U-Boot](../u-boot.md) |
+| **arm64 Linux booting 協定** | 交棒時 **x0 = DTB 實體位址、x1~x3 = 0、MMU off**，建議在 EL2 進入；交棒前 U-Boot 會 fixup DT（`/chosen` bootargs、memory、OP-TEE node 與 reserved-memory） | [（三）U-Boot](../u-boot.md) |
