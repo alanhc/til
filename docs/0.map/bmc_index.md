@@ -112,6 +112,7 @@ sidebar_position: 4
 
 | 文章 | 內容 |
 |---|---|
+| [LinuxBoot 與 u-root](../linuxboot-u-root.md) | **韌體側的鄰居**：把 UEFI 的 DXE 之後換成放在 SPI flash 裡的 Linux + u-root initramfs，再用 `kexec` 跳進正式 OS。與 BMC 的分工是——BMC 管上電、power cycle 與更新 host SPI flash，LinuxBoot 管 host 自己開機那一段。概論版見 [LinuxBoot](../linuxboot.md) |
 | [資料中心叢集架構](../BMC/data_center.md) | cluster 節點角色分工（headnode／compute node／storage node、job scheduler 如 Slurm/PBS）與 BMC 的關係：每個節點內建 BMC，經 out-of-band 管理網路（IPMI／Redfish）遠端開關機、監控、更新韌體 |
 
 ---
