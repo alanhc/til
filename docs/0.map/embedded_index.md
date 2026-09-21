@@ -36,6 +36,7 @@ sidebar_position: 6
 | [LinuxBoot：用 Linux 取代韌體的開機流程](../linuxboot.md) | **概論**：LinuxBoot 是什麼、2017 年由 Google／Meta 等發起、源頭是 Ron Minnich 1999 年的 LinuxBIOS（後來變成 coreboot）；它只取代 UEFI「平台初始化完成之後」那一段，SEC/PEI 仍保留。含核心元件、採用現況（Google 的 NERF、OCP Open System Firmware）與和 OpenBMC 的關係 |
 | [LinuxBoot 與 u-root：用 Linux 取代 UEFI DXE 的伺服器韌體架構](../linuxboot-u-root.md) | **深入版**：逐段對照 SEC/PEI/DXE/BDS 的職責、兩種實作方式（coreboot + LinuxBoot payload vs 保留廠商 SEC/PEI）、u-root 用 Go 寫 initramfs 的設計取捨與開機相關指令、`kexec` 怎麼繞過韌體直接換 kernel、為什麼只在資料中心流行、**為什麼 Android 用不到它**，以及和 OpenBMC 的分工 |
 | [Arm SystemReady：讓 Arm 平台做到「裝了就能開機」](../arm-systemready.md) | Arm 對抗生態碎片化（「一板一 image」）的標準與認證計畫：從 2018 ServerReady → 2020 SystemReady 四個 band → **2024 年底重整成兩個 band**（SystemReady Band 走 UEFI+ACPI、Devicetree Band 走 UEFI+DT，LS/LinuxBoot band 退場）；底層規範（BSA／BBR 等）認證的是什麼、ACS 測試怎麼跑、對產業的意義與現實面的限制 |
+| [Android Generic Bootloader（GBL）介紹](../android-gbl-intro.md) | **同一條 UEFI 線在 Android 上的落點**：Google 用 Rust 寫的 UEFI application 取代各家 vendor bootloader 的 Android 專屬邏輯，理由之一正是「與 Arm SystemReady 方向一致」。想看 UEFI protocol 當成廠商擴充點怎麼用，這篇是具體案例。Android 視角見 [Android 系列索引](android_index.md) |
 
 ---
 

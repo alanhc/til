@@ -726,6 +726,11 @@ sidebar_position: 1
 | **AOP（Always-On Processor）** | 高通的常駐小核（取代舊平台的 `rpm`），管電源域、時脈投票與低功耗狀態機，在 XBL 階段就被載入。**AOP 沒起來的症狀是 kernel log 裡一堆莫名其妙的 device probe timeout——根因卻在 XBL 階段**，是跨階段追根因的經典案例 |
 | **Gunyah** | 高通已開源的 hypervisor（前身 QHEE），跑 EL2 做 Stage-2 記憶體隔離，例如把某段記憶體從 Non-secure kernel 視野中移除交給安全服務獨占 |
 | **GBL（Generic Bootloader）** | Google 主導、跨廠商通用的 UEFI application，把「載入 kernel + 驗證 + 傳參數」從各家 vendor bootloader 抽出來標準化。使高通 BL33 變成**兩段式**：ABL（vendor 專屬）→ GBL（通用）。通用啟示：**每多一個 bootloader 交接點，就多一個必須在設計階段講清楚「誰負責驗誰」的介面合約** |
+| **GBL 的四塊** | core Android boot logic（主迴圈、boot mode、載 kernel）、fastboot、vendor extensions、UEFI protocol handlers。用 no_std Rust 寫成 `.efi`，Bazel 建置，原始碼在 AOSP `bootable/libbootloader` 的 `gbl/`，支援 x86_64／x86_32／aarch64／riscv64。詳見 [GBL 介紹](../android-gbl-intro.md) |
+| **政策在 GBL、機制在韌體** | GBL 分工的核心句：AVB 驗證流程由 GBL 的 libavb 執行，但 public key 放哪、rollback index 存 RPMB 還是 fuse，由韌體透過 `GBL_EFI_AVB_PROTOCOL` 回答。韌體另需提供 `EFI_BLOCK_IO`、`EFI_RNG`、`GBL_EFI_BOOT_CONTROL`（slot metadata）、`GBL_EFI_AVF`（從 DICE chain 產 AVF 設定）等。詳見 [GBL 介紹](../android-gbl-intro.md) |
+| **`android_esp_a` / `android_esp_b`** | GBL 的部署需求：兩個各至少 8 MB 的 FAT 分割區（標準 ESP type GUID），EFI 放在 `/EFI/BOOT/BOOTAA64.EFI`；兩個都要有才支援 OTA 與 rollback，且 OTA 只能整個分割區更新。詳見 [GBL 介紹](../android-gbl-intro.md) |
+| **`gbl_fw_api_level`** | 韌體要提供的 UEFI 變數，值須與 `ro.board.api_level` 一致。詳見 [GBL 介紹](../android-gbl-intro.md) |
+| **Bootloader 的 GKI 化（推論）** | GBL 之於 bootloader，像 GKI 之於 kernel：把 Android 專屬政策收回 Google 手上、廠商只留硬體相關部分，開機端的新功能（AVF/pvmfw、DICE）就不必再等各家 bootloader 的釋出週期。詳見 [GBL 介紹](../android-gbl-intro.md) |
 | **UEFI vs LK 的取捨** | 高通自 SDM845 起 XBL_Core 與 ABL 全面 UEFI 化，換得 DXE driver model、UEFI protocol/variable 與成熟工具生態，代價是體積與開機時間；MTK 維持 LK，換得開機快、程式碼直觀，代價是缺少標準介面。**是「標準化 vs 輕量化」的取捨，沒有絕對優劣** |
 | **DDR training vs EMI calibration** | 同一件事在兩家的不同名字與不同落點：高通在 **XBL_Loader**、MTK 在 **Preloader**。「螢幕不亮、無限重開」時該挖哪份 UART log 完全取決於平台，**是跨平台 debug 最需要換腦袋的一點** |
 | **DTBO 匹配鍵** | 高通用 `qcom,msm-id`（SoC ID + revision）配 `qcom,board-id`（platform ID + subtype），ABL runtime 掃整個 `dtbo` 分割區挑匹配度最高的；MTK 用 `mediatek,mtXXXX` compatible 加專案 board 資訊。**新板 board-id 沒填對會直接卡在 bootloader 找不到 DTB**，是 bring-up 初期高頻踩雷 |
