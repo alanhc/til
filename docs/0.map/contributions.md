@@ -34,6 +34,46 @@ sidebar_position: 10
 
 ---
 
+## 依影響力排序
+
+「影響力」沒有客觀分數，這裡用三個軸排，**並在每一列寫出它為什麼在這個位置**，
+好讓排序可以被質疑而不是只能被接受：
+
+1. **觸及範圍**——這段程式碼最後會跑在多少裝置、多少人手上（專案規模只是代理指標）。
+2. **變更性質**——新功能／效能路徑 ＞ 正確性與邊界修補 ＞ 文件與測試補強。
+3. **狀態**——已合入 ＞ review 中 ＞ 已關閉。
+
+### 已合入
+
+| # | 貢獻 | 專案規模 | 為什麼排在這裡 |
+|---|---|---|---|
+| 1 | [llama.cpp #27961](https://github.com/ggml-org/llama.cpp/pull/27961) — 條件式納入 SpacemiT IME kernel sources | 129k ★ | 觸及範圍最大的一筆，而且是**讓 RISC-V 加速路徑真的編得進去**的那一步，不是文件 |
+| 2 | [u-root #3733](https://github.com/u-root/u-root/pull/3733) — `pkg/boot` riscv64 kexec support | 3.1k ★ | 新功能，而且落在開機鏈核心：u-root 是 LinuxBoot／firmware 場景的 userland |
+| 3 | [sse2neon #774](https://github.com/DLTcollab/sse2neon/pull/774) — 拿掉 `<fenv.h>` 依賴 | 1.5k ★ | 影響**所有 includer**——header 汙染是會傳染給下游的那種 bug |
+| 4 | [u-root #3750](https://github.com/u-root/u-root/pull/3750)、[#3735](https://github.com/u-root/u-root/pull/3735) — reboot 指令、zimage 長度上限 | 3.1k ★ | 一個新指令、一個邊界修正，同樣在開機路徑上 |
+| 5 | [elfuse](https://github.com/sysprog21/elfuse) ×7 — futex、pty hangup、`AT_EMPTY_PATH`、`CLONE_THREAD` 的 `SIGCHLD`… | 268 ★ | 專案規模小，但**技術深度最高**：syscall 語意層級的行為正確性，錯了不會有人幫你發現 |
+| 6 | AOSP `kernel/common` ×5（dma-heap、dma-buf、binder、scsi/ufs） | Android ACK | **觸及範圍其實最廣**（進 ACK 並 automerge 到 6 條分支，往下就是所有 Android 裝置的 kernel 樹），但性質是 kernel-doc 修補，所以沒有排在功能型變更之前 |
+| 7 | [shecc #339](https://github.com/sysprog21/shecc/pull/339) — 參數 slot 尚未建立前的逃逸讀取測試 | 1.4k ★ | 教學用 C 編譯器，補的是會被後續重構踩到的測試 |
+| 8 | [frama-c-mcp](https://github.com/sysprog21/frama-c-mcp) ×3、[codetrial](https://github.com/sysprog21/codetrial) ×4 | 31 / 62 ★ | 工具鏈與服務端的實用修補，觸及範圍最小 |
+| 9 | [os-in-1000-lines #101](https://github.com/nuta/operating-system-in-1000-lines/pull/101) — 繁體中文翻譯 | 3.6k ★ | 讀者觸及很廣，但不是程式碼，另成一類 |
+| 10 | [cert-tools #55](https://github.com/blockchain-certificates/cert-tools/pull/55) | 42 ★ | 2022 年的單點 bug 修正 |
+
+### Review 中（潛在影響）
+
+同樣三個軸，但狀態全部是 🔄，所以這裡排的是「**如果合入**會有多大影響」。
+
+| # | 貢獻 | 專案規模 | 為什麼排在這裡 |
+|---|---|---|---|
+| 1 | [llama.cpp #28479](https://github.com/ggml-org/llama.cpp/pull/28479) — Q8_0 IME1 matrix kernel for SpacemiT X60 | 129k ★ | 比已合入的 #27961 更進一步：那筆是把路接上，**這筆是 kernel 本身**。合入的話是這份清單裡影響最大的一筆 |
+| 2 | AOSP `hardware/interfaces` ×12、`libhardware` ×5 | Android | 給預設／範例 HAL 補 service fuzzer 並修出生命週期問題。**廠商常以範例實作為起點**，所以修在這裡會往下游擴散 |
+| 3 | [libspdm #3816](https://github.com/DMTF/libspdm/pull/3816) — key update rollback | 189 ★ | star 數不高但身分特殊：**DMTF 的 SPDM 參考實作**，安全協定的正確性問題 |
+| 4 | [sse2neon #773](https://github.com/DLTcollab/sse2neon/pull/773) — SVE2 fast path | 1.5k ★ | 效能路徑，opt-in 所以風險可控 |
+| 5 | [optimized-routines #97](https://github.com/ARM-software/optimized-routines/pull/97) — strcmp benchmark | 711 ★ | Arm 官方倉庫，但性質是 benchmark 而非實作 |
+| 6 | [rv32emu](https://github.com/sysprog21/rv32emu) ×5 — RVV 指令實作 | 590 ★ | 量大且偏功能，但侷限在單一模擬器內 |
+| 7 | [libpldm](https://gerrit.openbmc.org/q/project:openbmc/libpldm) ×4（OpenBMC）、[pldm-lib #21](https://github.com/OpenPRoT/pldm-lib/pull/21) | OpenBMC / 新專案 | 韌體協定的邊界檢查，影響面取決於這兩個 library 被採用的程度 |
+
+---
+
 ## AOSP（android-review.googlesource.com）
 
 ### `kernel/common` — Android Common Kernel
