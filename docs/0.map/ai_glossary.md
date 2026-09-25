@@ -67,6 +67,13 @@ sidebar_position: 3
 | **`openclaw channels status --probe`** | 探測各管道連線狀態 | [openclaw](../openclaw.md) |
 | **`networkingMode=mirrored`** | WSL2 `.wslconfig` 設定，讓 Windows 與 WSL 共用網路，方便互連本機服務 | [openclaw_jan_ai](../openclaw_jan_ai.md) |
 | **Hermes Agent** | Nous Research 基於 Hermes 系列開源模型打造的 agent 系統 | [hermes](../hermes.md) |
+| **Open-weight LLM** | 公開訓練後權重的語言模型，可下載到本機執行、微調、部署；訓練資料與流程通常不公開 | [open-weight-llm](../open-weight-llm.md) |
+| **Closed-weight** | 權重不公開、只能透過 API 或官方產品使用的模型（如 GPT、Claude） | [open-weight-llm](../open-weight-llm.md) |
+| **Open Source AI Definition (OSI)** | OSI 的開源 AI 定義：除權重外還要提供足以重現模型的資訊（訓練資料說明、完整訓練程式碼），且授權允許自由使用與再散布。完整開源例子如 OLMo、Pythia | [open-weight-llm](../open-weight-llm.md) |
+| **MoE (Mixture of Experts)** | 總參數很大、但每個 token 只啟用部分專家（如 2.8T / 50B），推論成本遠低於同規模 dense 模型；目前前段 open-weight 模型的主流架構 | [open-weight-llm](../open-weight-llm.md) |
+| **Artificial Analysis Intelligence Index** | 整合多項 benchmark 的綜合智力分數，可篩選只看 open-weight 模型 | [open-weight-llm](../open-weight-llm.md) |
+| **LMArena** | 依人類盲測投票計算 Elo 的模型排行榜 | [open-weight-llm](../open-weight-llm.md) |
+| **量化記憶體粗估** | FP16 每十億參數約 2 GB；INT8 約減半、INT4 約再減半，另需加上 KV cache | [open-weight-llm](../open-weight-llm.md) |
 
 ### 筆記中出現過的模型
 
@@ -301,7 +308,20 @@ sidebar_position: 3
 
 ---
 
-## 十一、其他工具與指令
+## 十一、Decision model（Jev）
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **Jev** | TypeSafe AI 於 2026-09 推出的 System One Model：不生成文字，只回傳受 schema 約束、帶校準機率的型別化判斷；延遲約 70–500 ms | [jev-decision-model-for-firmware-ci](../jev-decision-model-for-firmware-ci.md) |
+| **System One Model / decision model** | 借用 Kahneman 雙系統理論：System 1 快速直覺判斷（decision model）、System 2 慢速推理與表達（LLM），兩者互補 | [jev-decision-model-for-firmware-ci](../jev-decision-model-for-firmware-ci.md) |
+| **`noul` / `choice` / `score`** | Jev 的三種問題型別：是否（0–1 機率）、多選一（機率分布 + 信心值）、分級評分 | [jev-decision-model-for-firmware-ci](../jev-decision-model-for-firmware-ci.md) |
+| **RLCD** | Reinforcement Learning for Calibrated Decisions，Jev 的訓練方法，以合成資料訓練校準的判斷 | [jev-decision-model-for-firmware-ci](../jev-decision-model-for-firmware-ci.md) |
+| **Shadow mode** | 模型接上真實流程但只記錄不執行，定期與人工判斷比對，驗證後才逐步開放自動化 | [jev-decision-model-for-firmware-ci](../jev-decision-model-for-firmware-ci.md) |
+| **規則先、模型後、人最後** | CI triage 的分層原則：regex 能解的不呼叫模型，模型只處理模糊地帶，信心不足一律轉人工 | [jev-decision-model-for-firmware-ci](../jev-decision-model-for-firmware-ci.md) |
+
+---
+
+## 十二、其他工具與指令
 
 | 名詞 | 說明 | 出處 |
 |---|---|---|

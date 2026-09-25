@@ -60,6 +60,7 @@ sidebar_position: 2
 | [本機 LLM 推論工具](../ai_inference.md) | **選型主線**：lm studio（桌面 GUI）／ollama（CLI + API server，適合當服務）／jan（開源 Apache license）三者比較，底層都是 llama.cpp（負責 GGUF 量化模型的 CPU/GPU 推論）。一句話選型：要 GUI 選 lm studio 或 jan、要開源選 jan、要給多人或程式呼叫選 ollama |
 | [Jan.ai](../ai_jan_ai.md) | Apache 2.0 授權、可完全離線的本機 LLM 桌面應用，底層 llama.cpp，可下載 GGUF 模型也能連遠端 API 供應商；定位類似 LM Studio 但開源 |
 | [讓 Ollama 對區網／VPN 開放](../ollama_export_in_vpn.md) | `export OLLAMA_HOST=0.0.0.0` + `ollama serve` 讓 Ollama 從只聽 127.0.0.1 改為監聽所有介面，附「等於開放給網路上所有可連到的裝置」的安全提醒 |
+| [Open-weight LLM 是什麼？](../open-weight-llm.md) | **概念 + 選型**：open-weight（公開權重）vs closed-weight vs OSI 定義的 open-source AI（binary vs 原始碼的類比）；三種授權類型（Apache/MIT、自訂社群授權、非商用）；常見模型家族；2026-09 的 Artificial Analysis 排名快照與主要模型規格表（MoE 總參數／啟用參數、授權、context）；優缺點、Ollama／llama.cpp／vLLM 執行方式與 FP16／INT8／INT4 記憶體粗估 |
 | [Open WebUI](../openwebui.md) | 用 `curl -N` 打 Open WebUI 的 `/api/chat/completions`（Bearer token、`text/event-stream`、`"stream": true`）測試串流回應的實例 |
 | [OpenClaw](../openclaw.md) | 指令速記：`ssh -N -L` 轉發 18789 port（含 `Address already in use` 錯誤實錄）、`pnpm add -g clawhub` 與 `clawhub search`／`install`、`openclaw skills list`、`openclaw pairing approve telegram`、`openclaw channels status --probe`、`nvidia-smi` 查佔用 |
 | [OpenClaw + Jan.ai](../openclaw_jan_ai.md) | 極短速記：用 `curl` 打 Jan 在 `127.0.0.1:1337` 的 `/v1/models`，以及 WSL2 `.wslconfig` 設 `networkingMode=mirrored` 讓 Windows 連得到 WSL 內服務 |
@@ -103,6 +104,7 @@ sidebar_position: 2
 | [VAD 語音喚醒](../VAD語音喚醒.md) | 瀏覽器端語音活動偵測的評估筆記：效能看 Real-time factor（`RTF < 1` 才能即時）、每秒處理 frame 數（用 `onFrameProcessed` 估算）、CPU 壓力下是否掉 frame；準確度看 false positive／false negative 與起始／結束延遲（直接影響 UX）。含 Sonos torch-to-nnef demo 與自建的 vad-bench 連結 |
 | [Whisper / Breeze ASR](../ai_whisper.md) | 極短：繁體中文語音辨識可用聯發科的 Breeze-ASR-25，附 `snapshot_download('MediaTek-Research/Breeze-ASR-25')` 下載指令 |
 | [AI 輔助 BMC 開發](../ai_bmc.md) | 把 AI 用進 OpenBMC 韌體開發：六個適合場景的工具對照表（查 IPMI/PMBus spec、寫 hwmon driver 骨架、解讀 dmesg、Yocto recipe、D-Bus interface、Redfish 測試腳本）、可直接複製的 prompt 範本、OpenBMC 架構 mermaid 圖與各層對應的 AI 使用場景，以及三點注意事項（kernel API 版本差異、PMBus page/phase 易錯、D-Bus 名稱大小寫敏感） |
+| [Jev 與韌體 CI 自動化](../jev-decision-model-for-firmware-ci.md) | TypeSafe AI 的 **System One / decision model** Jev：不生成文字、只回傳受 schema 約束的型別化判斷（`noul`／`choice`／`score`）與校準機率；與傳統 LLM 的對照、限制與爭議；為何不適合放進裝置韌體，但適合改善 CI——build 失敗分類派單、kernel panic／tombstone 分群、CL 風險評分決定測試範圍的 Python／JSON 範例；「規則先、模型後、人最後」的 mermaid 流程、shadow mode 導入階段與成效指標 |
 
 ---
 
