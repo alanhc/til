@@ -10,7 +10,7 @@ sidebar_position: 14
 **OpenBMC 的 Gerrit**。三邊的狀態字眼還不一樣（merged / MERGED / NEW / ABANDONED），
 所以這頁統一成同一套圖例，並在最後附上重新查詢的指令，讓它可以隨時更新。
 
-> 資料以 **2026-09-21** 查詢結果為準。
+> 資料以 **2026-09-25** 查詢結果為準。
 
 **圖例**：✅ 已合入 ｜ 🔄 review 中 ｜ ⛔ 已關閉（未合入）
 
@@ -23,13 +23,14 @@ sidebar_position: 14
 | AOSP Gerrit | `kernel/common`（Android Common Kernel） | 5 個 change（含 automerge 共 13 筆） | 1 |
 | AOSP Gerrit | `platform/hardware/interfaces` | — | 12 |
 | AOSP Gerrit | `platform/hardware/libhardware` | — | 5 |
+| AOSP Gerrit | `platform/bootable/libbootloader`（GBL） | 2 | 1 |
 | OpenBMC Gerrit | `openbmc/libpldm` | — | 4 |
-| GitHub | sysprog21（elfuse / codetrial / frama-c-mcp / shecc / rv32emu） | 15 | 6 |
+| GitHub | sysprog21（elfuse / codetrial / frama-c-mcp / shecc / rv32emu） | 15 | 9 |
 | GitHub | u-root、llama.cpp、sse2neon | 5 | 2 |
 | GitHub | ARM-software、DMTF、OpenPRoT | — | 3 |
-| GitHub | 其他（cert-tools、os-in-1000-lines） | 2 | — |
+| GitHub | 其他（cert-tools、os-in-1000-lines） | 3 | — |
 
-主題大致分三塊：**Android kernel 與 HAL 的文件／健壯性修補**、**RISC-V 與 SIMD 相關的
+主題大致分三塊：**Android kernel、HAL 與 bootloader 的文件／健壯性修補**、**RISC-V 與 SIMD 相關的
 效能與模擬器工作**、**韌體協定（PLDM、SPDM）的邊界檢查**。
 
 ---
@@ -42,11 +43,11 @@ sidebar_position: 14
 | 領域 | ✅ 已合入 | 🔄 review 中 |
 |---|---|---|
 | 資料中心 / 伺服器 | 3 | 6 |
-| RISC-V | 3 | 6 |
+| RISC-V | 4 | 7 |
 | Compiler / 工具鏈 / 執行環境 | 12 | 8 |
-| LLM / AI | 8 | 1 |
-| Android | 5 | 18 |
-| 韌體 / 開機 | 3 | 6 |
+| LLM / AI | 8 | 4 |
+| Android | 7 | 19 |
+| 韌體 / 開機 | 5 | 7 |
 
 ### 資料中心 / 伺服器
 
@@ -64,7 +65,8 @@ sidebar_position: 14
 | [llama.cpp #27961](https://github.com/ggml-org/llama.cpp/pull/27961)、[#28479](https://github.com/ggml-org/llama.cpp/pull/28479) | ✅ / 🔄 | SpacemiT X60 的 IME 矩陣加速路徑，RISC-V 向量／矩陣擴充的實際應用 |
 | [u-root #3733](https://github.com/u-root/u-root/pull/3733) | ✅ | riscv64 的 kexec 支援 |
 | [rv32emu](https://github.com/sysprog21/rv32emu) ×5 | 🔄 | RVV（向量擴充）指令實作與 cross-EEW overlap 規則 |
-| [os-in-1000-lines #101](https://github.com/nuta/operating-system-in-1000-lines/pull/101) | ✅ | 這本教材的目標平台就是 RISC-V（`qemu-system-riscv32`）；[繁體中文版](https://1000os.seiya.me/tw/)在上游 README 掛名 |
+| [AOSP `libbootloader` 4314126](https://android-review.googlesource.com/c/platform/bootable/libbootloader/+/4314126) | 🔄 | GBL 的 riscv64 QEMU 範例：riscv64 `virt` 機器沒有預設的 block controller，要明確掛 `virtio-blk-device`，U-Boot 才找得到 ESP |
+| [os-in-1000-lines #101](https://github.com/nuta/operating-system-in-1000-lines/pull/101)、[#131](https://github.com/nuta/operating-system-in-1000-lines/pull/131) | ✅ | 這本教材的目標平台就是 RISC-V（`qemu-system-riscv32`）；[繁體中文版](https://1000os.seiya.me/tw/)在上游 README 掛名 |
 
 ### Compiler / 工具鏈 / 執行環境
 
@@ -84,6 +86,7 @@ sidebar_position: 14
 | [llama.cpp #27961](https://github.com/ggml-org/llama.cpp/pull/27961)、[#28479](https://github.com/ggml-org/llama.cpp/pull/28479) | ✅ / 🔄 | 推論引擎的 CPU kernel（Q8_0 量化矩陣乘） |
 | [frama-c-mcp](https://github.com/sysprog21/frama-c-mcp) ×3 | ✅ | MCP server，把形式驗證工具接給 AI agent 用 |
 | [codetrial](https://github.com/sysprog21/codetrial) ×4 | ✅ | Gemini 驅動的即時技術面試模擬器 |
+| [codetrial #98](https://github.com/sysprog21/codetrial/pull/98)、[#99](https://github.com/sysprog21/codetrial/pull/99)、[#104](https://github.com/sysprog21/codetrial/pull/104) | 🔄 | 在瀏覽器讀 JD／履歷 PDF、從中文 JD 擷取需求、讓報告改由本機模型產生 |
 
 ### Android
 
@@ -93,12 +96,14 @@ sidebar_position: 14
 | `platform/hardware/interfaces` ×12 | 🔄 | HAL 範例實作的 service fuzzer 與生命週期修補 |
 | `platform/hardware/libhardware` ×5 | 🔄 | HID report descriptor 解析的邊界問題 |
 | [`android17-6.18` 的 scsi/ufs 重送](https://android-review.googlesource.com/c/kernel/common/+/4268863) | 🔄 | 同一個 change 往穩定分支的 backport |
+| `platform/bootable/libbootloader` ×3 | ✅ ×2 / 🔄 ×1 | GBL（Generic Bootloader）的 QEMU 範例與除錯腳本修正 |
 
 ### 韌體 / 開機
 
 | 貢獻 | 狀態 | 為什麼算這一類 |
 |---|---|---|
 | [u-root](https://github.com/u-root/u-root) #3733、#3735、#3750 | ✅ | kexec、zimage 解析、reboot——都在「把下一個 kernel 帶起來」這條路徑上 |
+| AOSP `libbootloader` ×3 | ✅ ×2 / 🔄 ×1 | GBL 是 Android 的 UEFI app 型 bootloader，修的是它在 QEMU 上的開機與除錯路徑（OVMF 韌體路徑、riscv64 磁碟掛載、rust-gdb 位置） |
 | [DMTF/libspdm #3816](https://github.com/DMTF/libspdm/pull/3816) | 🔄 | 裝置韌體的認證與 session key 管理 |
 | [OpenPRoT/pldm-lib #21](https://github.com/OpenPRoT/pldm-lib/pull/21)、[openbmc/libpldm](https://gerrit.openbmc.org/q/project:openbmc/libpldm) ×4 | 🔄 | PLDM 是韌體之間（BMC ↔ 裝置）的管理協定 |
 
@@ -125,10 +130,11 @@ sidebar_position: 14
 | 4 | [u-root #3750](https://github.com/u-root/u-root/pull/3750)、[#3735](https://github.com/u-root/u-root/pull/3735) — reboot 指令、zimage 長度上限 | 3.1k ★ | 一個新指令、一個邊界修正，同樣在開機路徑上 |
 | 5 | [elfuse](https://github.com/sysprog21/elfuse) ×7 — futex、pty hangup、`AT_EMPTY_PATH`、`CLONE_THREAD` 的 `SIGCHLD`… | 268 ★ | 專案規模小，但**技術深度最高**：syscall 語意層級的行為正確性，錯了不會有人幫你發現 |
 | 6 | AOSP `kernel/common` ×5（dma-heap、dma-buf、binder、scsi/ufs） | Android ACK | **觸及範圍其實最廣**（進 ACK 並 automerge 到 6 條分支，往下就是所有 Android 裝置的 kernel 樹），但性質是 kernel-doc 修補，所以沒有排在功能型變更之前 |
-| 7 | [shecc #339](https://github.com/sysprog21/shecc/pull/339) — 參數 slot 尚未建立前的逃逸讀取測試 | 1.4k ★ | 教學用 C 編譯器，補的是會被後續重構踩到的測試 |
-| 8 | [frama-c-mcp](https://github.com/sysprog21/frama-c-mcp) ×3、[codetrial](https://github.com/sysprog21/codetrial) ×4 | 31 / 62 ★ | 工具鏈與服務端的實用修補，觸及範圍最小 |
-| 9 | [os-in-1000-lines #101](https://github.com/nuta/operating-system-in-1000-lines/pull/101) — 繁體中文翻譯 | 3.6k ★ | 讀者觸及很廣，但不是程式碼，另成一類 |
-| 10 | [cert-tools #55](https://github.com/blockchain-certificates/cert-tools/pull/55) | 42 ★ | 2022 年的單點 bug 修正 |
+| 7 | AOSP `libbootloader` ×2 — OVMF 韌體路徑、`launch_qemu_gdb.sh` 的 rust-gdb 路徑 | Android GBL | 照官方說明跑 QEMU 範例會**直接失敗**的兩個問題，擋住的是每個第一次上手 GBL 的人；但性質是範例與開發腳本，不進產品映像 |
+| 8 | [shecc #339](https://github.com/sysprog21/shecc/pull/339) — 參數 slot 尚未建立前的逃逸讀取測試 | 1.4k ★ | 教學用 C 編譯器，補的是會被後續重構踩到的測試 |
+| 9 | [frama-c-mcp](https://github.com/sysprog21/frama-c-mcp) ×3、[codetrial](https://github.com/sysprog21/codetrial) ×4 | 31 / 62 ★ | 工具鏈與服務端的實用修補，觸及範圍最小 |
+| 10 | [os-in-1000-lines #101](https://github.com/nuta/operating-system-in-1000-lines/pull/101)、[#131](https://github.com/nuta/operating-system-in-1000-lines/pull/131) — 繁體中文翻譯與校稿 | 3.6k ★ | 讀者觸及很廣，但不是程式碼，另成一類 |
+| 11 | [cert-tools #55](https://github.com/blockchain-certificates/cert-tools/pull/55) | 42 ★ | 2022 年的單點 bug 修正 |
 
 ### Review 中（潛在影響）
 
@@ -143,6 +149,8 @@ sidebar_position: 14
 | 5 | [optimized-routines #97](https://github.com/ARM-software/optimized-routines/pull/97) — strcmp benchmark | 711 ★ | Arm 官方倉庫，但性質是 benchmark 而非實作 |
 | 6 | [rv32emu](https://github.com/sysprog21/rv32emu) ×5 — RVV 指令實作 | 590 ★ | 量大且偏功能，但侷限在單一模擬器內 |
 | 7 | [libpldm](https://gerrit.openbmc.org/q/project:openbmc/libpldm) ×4（OpenBMC）、[pldm-lib #21](https://github.com/OpenPRoT/pldm-lib/pull/21) | OpenBMC / 新專案 | 韌體協定的邊界檢查，影響面取決於這兩個 library 被採用的程度 |
+| 8 | [AOSP `libbootloader` 4314126](https://android-review.googlesource.com/c/platform/bootable/libbootloader/+/4314126) — riscv64 QEMU 範例掛上 virtio-blk | Android GBL | 修好後 riscv64 範例才真的能載入 GBL，但只影響範例 |
+| 9 | [codetrial #98](https://github.com/sysprog21/codetrial/pull/98)、[#99](https://github.com/sysprog21/codetrial/pull/99)、[#104](https://github.com/sysprog21/codetrial/pull/104) | 62 ★ | 功能型但侷限在單一小專案 |
 
 ---
 
@@ -159,7 +167,7 @@ change 自動傳播到 `android-mainline-desktop`、`android-mainline-riscv64` �
 | [ANDROID: dma-heap: restore struct dma_heap kernel-doc lost in a merge](https://android-review.googlesource.com/c/kernel/common/+/4200863) | `android-mainline` | ✅ | `-desktop` ✅、`-riscv64` ✅ |
 | [ANDROID: dma-buf: fix kernel-doc for `dma_buf_set_name()`](https://android-review.googlesource.com/c/kernel/common/+/4202123) | `android14-6.1` | ✅ | `android14-kiwi-6.1` ✅ |
 | [ANDROID: binder: fix kernel-doc for struct binder_priority](https://android-review.googlesource.com/c/kernel/common/+/4232024) | `android-mainline` | ✅ | `android17-6.18` ✅、`-desktop` ✅、`-riscv64` ✅ |
-| [ANDROID: scsi: ufs: fix kernel-doc for the UPIU prepare helpers](https://android-review.googlesource.com/c/kernel/common/+/4232023) | `android-mainline` | ✅ | `-desktop` ✅、`-riscv64` ✅、[`android17-6.18`](https://android-review.googlesource.com/c/kernel/common/+/4268863) 🔄 |
+| [ANDROID: scsi: ufs: fix kernel-doc for the UPIU prepare helpers](https://android-review.googlesource.com/c/kernel/common/+/4232023) | `android-mainline` | ✅ | `-desktop` ✅、`-riscv64` ✅、[`android17-6.18`](https://android-review.googlesource.com/c/kernel/common/+/4268863) 🔄（第一次送的 [4267244](https://android-review.googlesource.com/c/kernel/common/+/4267244) 已 abandon 後重送） |
 | [ANDROID: dma-heap: document the return values of the exported helpers](https://android-review.googlesource.com/c/kernel/common/+/4239342) | `android-mainline` | ✅ | `-desktop` ✅、`-riscv64` ✅ |
 
 ### `platform/hardware/interfaces` — HAL 範例實作的 fuzzer 與生命週期修補
@@ -186,6 +194,17 @@ change 自動傳播到 `android-mainline-desktop`、`android-mainline-riscv64` �
 | [HidUtils: reject zero bit reports](https://android-review.googlesource.com/c/platform/hardware/libhardware/+/4243386) |
 | [HidUtils: reject out of range unit exponent](https://android-review.googlesource.com/c/platform/hardware/libhardware/+/4243387) |
 | [HidUtils: bound local item range expansion](https://android-review.googlesource.com/c/platform/hardware/libhardware/+/4243385) |
+
+### `platform/bootable/libbootloader` — GBL 的 QEMU 範例與除錯腳本
+
+GBL（Generic Bootloader）的 `gbl-mainline` 分支，背景見 [Android GBL 介紹](../android-gbl-intro.md)。
+三筆都是「照官方說明做會直接失敗」的問題。
+
+| 變更 | 狀態 | 內容 |
+|---|---|---|
+| [Fix OVMF firmware path in standalone QEMU instructions](https://android-review.googlesource.com/c/platform/bootable/libbootloader/+/4313966) | ✅ | x86_64 範例指向的 `OVMF_CODE.fd` 在現行 Debian/Ubuntu 的 ovmf 套件已不存在（只剩 4M 版本），改指 `OVMF_CODE_4M.fd` |
+| [Fix rust-gdb prebuilt path in launch_qemu_gdb.sh](https://android-review.googlesource.com/c/platform/bootable/libbootloader/+/4313967) | ✅ | 腳本找的 rust-gdb 路徑與 manifest 實際 checkout 的 Rust toolchain 位置不同，腳本一開始就中止 |
+| [Attach virtio-blk in riscv64 QEMU example](https://android-review.googlesource.com/c/platform/bootable/libbootloader/+/4314126) | 🔄 | riscv64 `virt` 機器沒有預設 block controller，只給 `-drive` 不會掛上任何裝置，U-Boot 找不到 ESP 就停在提示字元 |
 
 ---
 
@@ -226,6 +245,7 @@ change 自動傳播到 `android-mainline-desktop`、`android-mainline-riscv64` �
 | [ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp) | [#27961](https://github.com/ggml-org/llama.cpp/pull/27961) | `ggml-cpu`: conditionally add SpacemiT IME kernel sources |
 | [DLTcollab/sse2neon](https://github.com/DLTcollab/sse2neon) | [#774](https://github.com/DLTcollab/sse2neon/pull/774) | Drop the `<fenv.h>` dependency to stop leaking `FE_*` into includers |
 | [nuta/operating-system-in-1000-lines](https://github.com/nuta/operating-system-in-1000-lines) | [#101](https://github.com/nuta/operating-system-in-1000-lines/pull/101) | 繁體中文版翻譯 |
+| | [#131](https://github.com/nuta/operating-system-in-1000-lines/pull/131) | 繁體中文版校稿 |
 | [blockchain-certificates/cert-tools](https://github.com/blockchain-certificates/cert-tools) | [#55](https://github.com/blockchain-certificates/cert-tools/pull/55) | prevent isoformat error |
 
 ### 🔄 Review 中
@@ -239,6 +259,7 @@ change 自動傳播到 `android-mainline-desktop`、`android-mainline-riscv64` �
 | [DMTF/libspdm](https://github.com/DMTF/libspdm) | [#3816](https://github.com/DMTF/libspdm/pull/3816) | Fix key update rollback for Specula cluster A.1 and A.3 |
 | [OpenPRoT/pldm-lib](https://github.com/OpenPRoT/pldm-lib) | [#21](https://github.com/OpenPRoT/pldm-lib/pull/21) | `pldm-common`: bound wire version-string lengths by the destination |
 | [sysprog21/elfuse](https://github.com/sysprog21/elfuse) | [#365](https://github.com/sysprog21/elfuse/pull/365) | Give each restated rule one owner |
+| [sysprog21/codetrial](https://github.com/sysprog21/codetrial) | [#98](https://github.com/sysprog21/codetrial/pull/98)、[#99](https://github.com/sysprog21/codetrial/pull/99)、[#104](https://github.com/sysprog21/codetrial/pull/104) | Read JD and resume PDFs in the browser、Let reports be written by a local model、Read requirements out of a Chinese JD |
 
 ### ⛔ 已關閉（未合入）
 
