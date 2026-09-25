@@ -292,6 +292,13 @@ sidebar_position: 3
 | **onset / offset lag** | 起始／結束延遲：開始講話多久才亮、停講多久才熄，**直接影響 UX** | [VAD語音喚醒](../VAD語音喚醒.md) |
 | **torch-to-nnef** | Sonos 的轉檔工具，其 VAD demo 可在網頁直接體驗 | [VAD語音喚醒](../VAD語音喚醒.md) |
 | **vad-bench** | 自建的 VAD 評測頁面 | [VAD語音喚醒](../VAD語音喚醒.md) |
+| **WebRTC VAD** | 以統計模型（GMM）為基礎的傳統 VAD，很輕但在嘈雜環境準確度差 | [vad-silero-chip-performance](../vad-silero-chip-performance.md) |
+| **Silero VAD** | MIT 授權的開源預訓練 VAD：約 1–2 MB，16 kHz 下每次吃 512 samples（≈32 ms），STFT 特徵 → CNN → 有狀態 LSTM，提供 PyTorch JIT 與 ONNX；faster-whisper、WhisperX 等預設使用 | [vad-silero-chip-performance](../vad-silero-chip-performance.md) |
+| **Always-on workload** | 24 小時不停跑的推論：32 ms 一個 frame，一天約 270 萬次，單次能耗乘上頻率直接反映在待機功耗 | [vad-silero-chip-performance](../vad-silero-chip-performance.md) |
+| **µJ/inference** | 每次推論能耗，always-on 情境比 TOPS 更關鍵的指標 | [vad-silero-chip-performance](../vad-silero-chip-performance.md) |
+| **低功耗島（LPI / always-on domain）** | SoC 中可在 AP 睡眠時繼續運作的 DSP／sensor hub／micro-NPU，通常只有幾百 KB SRAM；把 VAD 放這裡才能讓 AP 進 deep suspend、DRAM 進 self-refresh | [vad-silero-chip-performance](../vad-silero-chip-performance.md) |
+| **Op fallback** | NPU 不支援的運算（如 LSTM、STFT）退回 CPU/DSP 執行，產生跨 core 搬移並可能更耗電 | [vad-silero-chip-performance](../vad-silero-chip-performance.md) |
+| **End-of-turn / barge-in** | 語音 agent 判斷使用者是否說完、是否插話，VAD 的延遲直接影響對話反應速度 | [vad-silero-chip-performance](../vad-silero-chip-performance.md) |
 
 ---
 

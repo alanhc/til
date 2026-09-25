@@ -102,6 +102,7 @@ sidebar_position: 2
 | 文章 | 內容 |
 |---|---|
 | [VAD 語音喚醒](../VAD語音喚醒.md) | 瀏覽器端語音活動偵測的評估筆記：效能看 Real-time factor（`RTF < 1` 才能即時）、每秒處理 frame 數（用 `onFrameProcessed` 估算）、CPU 壓力下是否掉 frame；準確度看 false positive／false negative 與起始／結束延遲（直接影響 UX）。含 Sonos torch-to-nnef demo 與自建的 vad-bench 連結 |
+| [VAD 與 Silero VAD 的晶片效能](../vad-silero-chip-performance.md) | VAD 是語音 pipeline 最前面的守門員（能量閾值 → WebRTC VAD 的 GMM → 小型 NN 的演進）；**Silero VAD** 規格（~1–2 MB、16 kHz 每 512 samples、STFT → CNN → 有狀態 LSTM、ONNX）；為什麼它是 always-on workload（每天約 270 萬次推論），關鍵指標是每次推論能耗、跑在哪個 core、能否讓 AP 睡覺、SRAM 佔用而非 TOPS；LSTM／batch=1／高頻 invoke 對 NPU 不友善之處；晶片廠為何在意與自行量測的方法表 |
 | [Whisper / Breeze ASR](../ai_whisper.md) | 極短：繁體中文語音辨識可用聯發科的 Breeze-ASR-25，附 `snapshot_download('MediaTek-Research/Breeze-ASR-25')` 下載指令 |
 | [AI 輔助 BMC 開發](../ai_bmc.md) | 把 AI 用進 OpenBMC 韌體開發：六個適合場景的工具對照表（查 IPMI/PMBus spec、寫 hwmon driver 骨架、解讀 dmesg、Yocto recipe、D-Bus interface、Redfish 測試腳本）、可直接複製的 prompt 範本、OpenBMC 架構 mermaid 圖與各層對應的 AI 使用場景，以及三點注意事項（kernel API 版本差異、PMBus page/phase 易錯、D-Bus 名稱大小寫敏感） |
 | [Jev 與韌體 CI 自動化](../jev-decision-model-for-firmware-ci.md) | TypeSafe AI 的 **System One / decision model** Jev：不生成文字、只回傳受 schema 約束的型別化判斷（`noul`／`choice`／`score`）與校準機率；與傳統 LLM 的對照、限制與爭議；為何不適合放進裝置韌體，但適合改善 CI——build 失敗分類派單、kernel panic／tombstone 分群、CL 風險評分決定測試範圍的 Python／JSON 範例；「規則先、模型後、人最後」的 mermaid 流程、shadow mode 導入階段與成效指標 |

@@ -83,6 +83,7 @@ sidebar_position: 6
 | [晶片](../晶片.md) | 影片筆記：Apple M5 與 NVIDIA 路線的比較（「Copying Nvidia?」），含三張截圖 |
 | [Chip](../chip.md) | 佔位頁：只有一條**私人 ChatGPT 對話連結**（外人無法開啟），尚無整理內容 |
 | [NVIDIA GPU](../gpu_nvidia.md) | Linux 上確認 NVIDIA 驅動狀態的指令與實測輸出：`lsmod \| grep nvidia` 看 `nvidia`/`nvidia_uvm`/`nvidia_drm`/`nvidia_modeset` 模組相依、`nvidia-smi` 查 RTX 5070 Ti 的驅動版本、CUDA 版本、溫度功耗與佔用 VRAM 的 process |
+| [VAD 與 Silero VAD 的晶片效能](../vad-silero-chip-performance.md) | VAD 是語音 pipeline 最前面的守門員（能量閾值 → WebRTC VAD 的 GMM → 小型 NN 的演進）；**Silero VAD** 規格（~1–2 MB、16 kHz 每 512 samples、STFT → CNN → 有狀態 LSTM、ONNX）；為什麼它是 always-on workload（每天約 270 萬次推論），關鍵指標是每次推論能耗、跑在哪個 core、能否讓 AP 睡覺、SRAM 佔用而非 TOPS；LSTM／batch=1／高頻 invoke 對 NPU 不友善之處；晶片廠為何在意與自行量測的方法表 |
 | [Raspberry Pi](<../raspberry pi.md>) | 單板電腦筆記：用 Raspberry Pi Imager 燒錄 OS 並預先設定 SSH／Wi-Fi／帳號、GPIO 接周邊的應用場景、官方文件與一支影片連結 |
 
 ---
