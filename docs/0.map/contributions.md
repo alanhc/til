@@ -10,7 +10,7 @@ sidebar_position: 14
 **OpenBMC 的 Gerrit**。三邊的狀態字眼還不一樣（merged / MERGED / NEW / ABANDONED），
 所以這頁統一成同一套圖例，並在最後附上重新查詢的指令，讓它可以隨時更新。
 
-> 資料以 **2026-09-25** 查詢結果為準。
+> 資料以 **2026-09-26** 查詢結果為準。
 
 **圖例**：✅ 已合入 ｜ 🔄 review 中 ｜ ⛔ 已關閉（未合入）
 
@@ -20,13 +20,13 @@ sidebar_position: 14
 
 | 平台 | 專案 | ✅ 已合入 | 🔄 review 中 |
 |---|---|---|---|
-| AOSP Gerrit | `kernel/common`（Android Common Kernel） | 5 個 change（含 automerge 共 13 筆） | 1 |
+| AOSP Gerrit | `kernel/common`（Android Common Kernel） | 5 個 change（含 automerge 共 15 筆） | 1 |
 | AOSP Gerrit | `platform/hardware/interfaces` | — | 12 |
 | AOSP Gerrit | `platform/hardware/libhardware` | — | 5 |
 | AOSP Gerrit | `platform/bootable/libbootloader`（GBL） | 2 | 1 |
 | OpenBMC Gerrit | `openbmc/libpldm` | — | 4 |
-| GitHub | sysprog21（elfuse / codetrial / frama-c-mcp / shecc / rv32emu） | 15 | 9 |
-| GitHub | u-root、llama.cpp、sse2neon | 5 | 2 |
+| GitHub | sysprog21（elfuse / codetrial / frama-c-mcp / shecc / rv32emu） | 17 | 7 |
+| GitHub | u-root、llama.cpp、sse2neon | 5 | 4 |
 | GitHub | ARM-software、DMTF、OpenPRoT | — | 3 |
 | GitHub | 其他（cert-tools、os-in-1000-lines） | 3 | — |
 
@@ -42,18 +42,19 @@ sidebar_position: 14
 
 | 領域 | ✅ 已合入 | 🔄 review 中 |
 |---|---|---|
-| 資料中心 / 伺服器 | 3 | 6 |
-| RISC-V | 4 | 7 |
+| 資料中心 / 伺服器 | 3 | 8 |
+| RISC-V | 4 | 9 |
 | Compiler / 工具鏈 / 執行環境 | 12 | 8 |
-| LLM / AI | 8 | 4 |
+| LLM / AI | 10 | 2 |
 | Android | 7 | 19 |
-| 韌體 / 開機 | 5 | 7 |
+| 韌體 / 開機 | 5 | 9 |
 
 ### 資料中心 / 伺服器
 
 | 貢獻 | 狀態 | 為什麼算這一類 |
 |---|---|---|
 | [u-root](https://github.com/u-root/u-root) #3733、#3735、#3750 | ✅ | u-root 是 **LinuxBoot** 的 userland，拿 Linux 取代 UEFI DXE 的那套做法，主要使用者就是 OCP 系的伺服器韌體 |
+| [u-root #3761](https://github.com/u-root/u-root/pull/3761)、[#3762](https://github.com/u-root/u-root/pull/3762) | 🔄 | 同一個 LinuxBoot userland 的 CI：讓整合測試真的在 riscv64 上開機跑 |
 | [DMTF/libspdm #3816](https://github.com/DMTF/libspdm/pull/3816) | 🔄 | SPDM 是 PCIe／CXL 裝置認證與量測的協定，用在伺服器內部元件的信任建立 |
 | [OpenPRoT/pldm-lib #21](https://github.com/OpenPRoT/pldm-lib/pull/21) | 🔄 | PRoT（Platform Root of Trust）＋ PLDM，伺服器主板上的信任根 |
 | [openbmc/libpldm](https://gerrit.openbmc.org/q/project:openbmc/libpldm) ×4 | 🔄 | BMC 就是伺服器的管理控制器，PLDM 是它對外的協定之一 |
@@ -64,6 +65,7 @@ sidebar_position: 14
 |---|---|---|
 | [llama.cpp #27961](https://github.com/ggml-org/llama.cpp/pull/27961)、[#28479](https://github.com/ggml-org/llama.cpp/pull/28479) | ✅ / 🔄 | SpacemiT X60 的 IME 矩陣加速路徑，RISC-V 向量／矩陣擴充的實際應用 |
 | [u-root #3733](https://github.com/u-root/u-root/pull/3733) | ✅ | riscv64 的 kexec 支援 |
+| [u-root #3761](https://github.com/u-root/u-root/pull/3761)、[#3762](https://github.com/u-root/u-root/pull/3762) | 🔄 | #3733 的後續：CI 原本只編 riscv64 不開機，補上 riscv64 的 kexec_load 整合測試，並把 QEMU 網卡改用 `-netdev`/`-device` 讓 riscv64 `virt` 機器真的有 NIC |
 | [rv32emu](https://github.com/sysprog21/rv32emu) ×5 | 🔄 | RVV（向量擴充）指令實作與 cross-EEW overlap 規則 |
 | [AOSP `libbootloader` 4314126](https://android-review.googlesource.com/c/platform/bootable/libbootloader/+/4314126) | 🔄 | GBL 的 riscv64 QEMU 範例：riscv64 `virt` 機器沒有預設的 block controller，要明確掛 `virtio-blk-device`，U-Boot 才找得到 ESP |
 | [os-in-1000-lines #101](https://github.com/nuta/operating-system-in-1000-lines/pull/101)、[#131](https://github.com/nuta/operating-system-in-1000-lines/pull/131) | ✅ | 這本教材的目標平台就是 RISC-V（`qemu-system-riscv32`）；[繁體中文版](https://1000os.seiya.me/tw/)在上游 README 掛名 |
@@ -85,8 +87,8 @@ sidebar_position: 14
 |---|---|---|
 | [llama.cpp #27961](https://github.com/ggml-org/llama.cpp/pull/27961)、[#28479](https://github.com/ggml-org/llama.cpp/pull/28479) | ✅ / 🔄 | 推論引擎的 CPU kernel（Q8_0 量化矩陣乘） |
 | [frama-c-mcp](https://github.com/sysprog21/frama-c-mcp) ×3 | ✅ | MCP server，把形式驗證工具接給 AI agent 用 |
-| [codetrial](https://github.com/sysprog21/codetrial) ×4 | ✅ | Gemini 驅動的即時技術面試模擬器 |
-| [codetrial #98](https://github.com/sysprog21/codetrial/pull/98)、[#99](https://github.com/sysprog21/codetrial/pull/99)、[#104](https://github.com/sysprog21/codetrial/pull/104) | 🔄 | 在瀏覽器讀 JD／履歷 PDF、從中文 JD 擷取需求、讓報告改由本機模型產生 |
+| [codetrial](https://github.com/sysprog21/codetrial) ×6 | ✅ | Gemini 驅動的即時技術面試模擬器；含在瀏覽器讀 JD／履歷 PDF（#98）、讓模型扮演候選人來檢查面試規則（#107） |
+| [codetrial #110](https://github.com/sysprog21/codetrial/pull/110) | 🔄 | 讓報告與行為檢查改由本機模型產生（併入了原本的 #99） |
 
 ### Android
 
@@ -103,6 +105,7 @@ sidebar_position: 14
 | 貢獻 | 狀態 | 為什麼算這一類 |
 |---|---|---|
 | [u-root](https://github.com/u-root/u-root) #3733、#3735、#3750 | ✅ | kexec、zimage 解析、reboot——都在「把下一個 kernel 帶起來」這條路徑上 |
+| [u-root #3761](https://github.com/u-root/u-root/pull/3761)、[#3762](https://github.com/u-root/u-root/pull/3762) | 🔄 | riscv64 kexec 路徑的整合測試 |
 | AOSP `libbootloader` ×3 | ✅ ×2 / 🔄 ×1 | GBL 是 Android 的 UEFI app 型 bootloader，修的是它在 QEMU 上的開機與除錯路徑（OVMF 韌體路徑、riscv64 磁碟掛載、rust-gdb 位置） |
 | [DMTF/libspdm #3816](https://github.com/DMTF/libspdm/pull/3816) | 🔄 | 裝置韌體的認證與 session key 管理 |
 | [OpenPRoT/pldm-lib #21](https://github.com/OpenPRoT/pldm-lib/pull/21)、[openbmc/libpldm](https://gerrit.openbmc.org/q/project:openbmc/libpldm) ×4 | 🔄 | PLDM 是韌體之間（BMC ↔ 裝置）的管理協定 |
@@ -132,7 +135,7 @@ sidebar_position: 14
 | 6 | AOSP `kernel/common` ×5（dma-heap、dma-buf、binder、scsi/ufs） | Android ACK | **觸及範圍其實最廣**（進 ACK 並 automerge 到 6 條分支，往下就是所有 Android 裝置的 kernel 樹），但性質是 kernel-doc 修補，所以沒有排在功能型變更之前 |
 | 7 | AOSP `libbootloader` ×2 — OVMF 韌體路徑、`launch_qemu_gdb.sh` 的 rust-gdb 路徑 | Android GBL | 照官方說明跑 QEMU 範例會**直接失敗**的兩個問題，擋住的是每個第一次上手 GBL 的人；但性質是範例與開發腳本，不進產品映像 |
 | 8 | [shecc #339](https://github.com/sysprog21/shecc/pull/339) — 參數 slot 尚未建立前的逃逸讀取測試 | 1.4k ★ | 教學用 C 編譯器，補的是會被後續重構踩到的測試 |
-| 9 | [frama-c-mcp](https://github.com/sysprog21/frama-c-mcp) ×3、[codetrial](https://github.com/sysprog21/codetrial) ×4 | 31 / 62 ★ | 工具鏈與服務端的實用修補，觸及範圍最小 |
+| 9 | [frama-c-mcp](https://github.com/sysprog21/frama-c-mcp) ×3、[codetrial](https://github.com/sysprog21/codetrial) ×6 | 31 / 62 ★ | 工具鏈與服務端的實用修補，觸及範圍最小 |
 | 10 | [os-in-1000-lines #101](https://github.com/nuta/operating-system-in-1000-lines/pull/101)、[#131](https://github.com/nuta/operating-system-in-1000-lines/pull/131) — 繁體中文翻譯與校稿 | 3.6k ★ | 讀者觸及很廣，但不是程式碼，另成一類 |
 | 11 | [cert-tools #55](https://github.com/blockchain-certificates/cert-tools/pull/55) | 42 ★ | 2022 年的單點 bug 修正 |
 
@@ -148,9 +151,10 @@ sidebar_position: 14
 | 4 | [sse2neon #773](https://github.com/DLTcollab/sse2neon/pull/773) — SVE2 fast path | 1.5k ★ | 效能路徑，opt-in 所以風險可控 |
 | 5 | [optimized-routines #97](https://github.com/ARM-software/optimized-routines/pull/97) — strcmp benchmark | 711 ★ | Arm 官方倉庫，但性質是 benchmark 而非實作 |
 | 6 | [rv32emu](https://github.com/sysprog21/rv32emu) ×5 — RVV 指令實作 | 590 ★ | 量大且偏功能，但侷限在單一模擬器內 |
-| 7 | [libpldm](https://gerrit.openbmc.org/q/project:openbmc/libpldm) ×4（OpenBMC）、[pldm-lib #21](https://github.com/OpenPRoT/pldm-lib/pull/21) | OpenBMC / 新專案 | 韌體協定的邊界檢查，影響面取決於這兩個 library 被採用的程度 |
-| 8 | [AOSP `libbootloader` 4314126](https://android-review.googlesource.com/c/platform/bootable/libbootloader/+/4314126) — riscv64 QEMU 範例掛上 virtio-blk | Android GBL | 修好後 riscv64 範例才真的能載入 GBL，但只影響範例 |
-| 9 | [codetrial #98](https://github.com/sysprog21/codetrial/pull/98)、[#99](https://github.com/sysprog21/codetrial/pull/99)、[#104](https://github.com/sysprog21/codetrial/pull/104) | 62 ★ | 功能型但侷限在單一小專案 |
+| 7 | [u-root #3761](https://github.com/u-root/u-root/pull/3761)、[#3762](https://github.com/u-root/u-root/pull/3762) — riscv64 的 kexec 整合測試 | 3.1k ★ | 替已合入的 #3733 補上真正會開機的測試，而且第一次跑就抓到測試本身的問題；性質是 CI，不改產品程式碼 |
+| 8 | [libpldm](https://gerrit.openbmc.org/q/project:openbmc/libpldm) ×4（OpenBMC）、[pldm-lib #21](https://github.com/OpenPRoT/pldm-lib/pull/21) | OpenBMC / 新專案 | 韌體協定的邊界檢查，影響面取決於這兩個 library 被採用的程度 |
+| 9 | [AOSP `libbootloader` 4314126](https://android-review.googlesource.com/c/platform/bootable/libbootloader/+/4314126) — riscv64 QEMU 範例掛上 virtio-blk | Android GBL | 修好後 riscv64 範例才真的能載入 GBL，但只影響範例 |
+| 10 | [codetrial #110](https://github.com/sysprog21/codetrial/pull/110) | 62 ★ | 功能型但侷限在單一小專案 |
 
 ---
 
@@ -238,6 +242,8 @@ GBL（Generic Bootloader）的 `gbl-mainline` 分支，背景見 [Android GBL �
 | | [#29](https://github.com/sysprog21/frama-c-mcp/pull/29) | Count a timeout retry's flips instead of forbidding them |
 | | [#32](https://github.com/sysprog21/frama-c-mcp/pull/32) | Key the opam cache on the opam that reads it |
 | [sysprog21/codetrial](https://github.com/sysprog21/codetrial) | [#3](https://github.com/sysprog21/codetrial/pull/3)、[#5](https://github.com/sysprog21/codetrial/pull/5)、[#17](https://github.com/sysprog21/codetrial/pull/17)、[#21](https://github.com/sysprog21/codetrial/pull/21) | 連線中斷後續跑、prelude 缺的 header、錄影長度上限、把長度傳給頁面 |
+| | [#98](https://github.com/sysprog21/codetrial/pull/98) | Read JD and resume PDFs in the browser |
+| | [#107](https://github.com/sysprog21/codetrial/pull/107) | Hold played candidates to the interview rules |
 | [sysprog21/shecc](https://github.com/sysprog21/shecc) | [#339](https://github.com/sysprog21/shecc/pull/339) | Test an escaped parameter read before its slot exists |
 | [u-root/u-root](https://github.com/u-root/u-root) | [#3733](https://github.com/u-root/u-root/pull/3733) | `pkg/boot`: add riscv64 kexec support |
 | | [#3735](https://github.com/u-root/u-root/pull/3735) | `pkg/boot/zimage`: accept a longer kernel size entry |
@@ -259,7 +265,9 @@ GBL（Generic Bootloader）的 `gbl-mainline` 分支，背景見 [Android GBL �
 | [DMTF/libspdm](https://github.com/DMTF/libspdm) | [#3816](https://github.com/DMTF/libspdm/pull/3816) | Fix key update rollback for Specula cluster A.1 and A.3 |
 | [OpenPRoT/pldm-lib](https://github.com/OpenPRoT/pldm-lib) | [#21](https://github.com/OpenPRoT/pldm-lib/pull/21) | `pldm-common`: bound wire version-string lengths by the destination |
 | [sysprog21/elfuse](https://github.com/sysprog21/elfuse) | [#365](https://github.com/sysprog21/elfuse/pull/365) | Give each restated rule one owner |
-| [sysprog21/codetrial](https://github.com/sysprog21/codetrial) | [#98](https://github.com/sysprog21/codetrial/pull/98)、[#99](https://github.com/sysprog21/codetrial/pull/99)、[#104](https://github.com/sysprog21/codetrial/pull/104) | Read JD and resume PDFs in the browser、Let reports be written by a local model、Read requirements out of a Chinese JD |
+| [u-root/u-root](https://github.com/u-root/u-root) | [#3761](https://github.com/u-root/u-root/pull/3761) | `integration`: run kexec_load tests on riscv64 |
+| | [#3762](https://github.com/u-root/u-root/pull/3762) | `integration`: attach socket NICs with `-netdev`/`-device` |
+| [sysprog21/codetrial](https://github.com/sysprog21/codetrial) | [#110](https://github.com/sysprog21/codetrial/pull/110) | Let the behaviour check run against a local model |
 
 ### ⛔ 已關閉（未合入）
 
@@ -272,6 +280,8 @@ GBL（Generic Bootloader）的 `gbl-mainline` 分支，背景見 [Android GBL �
 | sysprog21/rv32emu | [#769](https://github.com/sysprog21/rv32emu/pull/769)、[#771](https://github.com/sysprog21/rv32emu/pull/771)、[#772](https://github.com/sysprog21/rv32emu/pull/772)、[#773](https://github.com/sysprog21/rv32emu/pull/773) | RVV 浮點系列，改以其他 PR 重整 |
 | sysprog21/elfuse | [#362](https://github.com/sysprog21/elfuse/pull/362) | AGENTS.md 的組織方式，維護者另有想法 |
 | sysprog21/codetrial | [#4](https://github.com/sysprog21/codetrial/pull/4) | lobby 控制項位置 |
+| | [#99](https://github.com/sysprog21/codetrial/pull/99) | 本機模型寫報告，維護者要求併入 [#110](https://github.com/sysprog21/codetrial/pull/110) 一起審 |
+| | [#104](https://github.com/sysprog21/codetrial/pull/104) | 中文 JD 的需求擷取，維護者表示目前不考慮中文 JD |
 
 ---
 
@@ -293,9 +303,12 @@ gh search prs --author alanhc --merged --limit 100 \
   --json repository,title,number,url,createdAt
 gh search prs --author alanhc --state open --limit 50 \
   --json repository,title,number,url,createdAt
+# closed 同時包含已合入的，要扣掉上面 --merged 的結果才是「已關閉未合入」
+gh search prs --author alanhc --state closed --limit 100 \
+  --json repository,title,number,url,closedAt
 
 # Gerrit REST API（回傳開頭有 )]}' 前綴，要先去掉才能餵給 JSON parser）
-curl -s 'https://android-review.googlesource.com/changes/?q=author:"Alan Tseng"&n=100'
+curl -s 'https://android-review.googlesource.com/changes/?q=author:%22Alan%20Tseng%22&n=100'  # 引號與空白要 URL 編碼，否則可能回空
 curl -s 'https://gerrit.openbmc.org/changes/?q=owner:alanhc&n=100'
 ```
 
