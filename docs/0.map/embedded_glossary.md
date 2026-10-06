@@ -465,7 +465,7 @@ sidebar_position: 7
 
 ## 十三、LinuxBoot / u-root 與 Arm SystemReady
 
-> 出自 [開機流程由淺入深](../boot-flow-intro.md)、[LinuxBoot](../linuxboot.md)、[LinuxBoot 與 u-root](../linuxboot-u-root.md)、[Arm SystemReady](../arm-systemready.md)。UEFI 的 SEC/PEI/DXE/BDS 見本表第一節。
+> 出自 [開機流程由淺入深](../boot-flow-intro.md)、[LinuxBoot](../linuxboot.md)、[LinuxBoot 與 u-root](../linuxboot-u-root.md)、[kexec](../kexec.md)、[Arm SystemReady](../arm-systemready.md)。UEFI 的 SEC/PEI/DXE/BDS 見本表第一節。
 
 | 名詞 | 說明 | 出處 |
 |---|---|---|
@@ -474,7 +474,10 @@ sidebar_position: 7
 | **NERF（Non-Extensible Reduced Firmware）** | Google 對應 LinuxBoot 想法的自家做法；Meta 也在自家伺服器部署 LinuxBoot | [LinuxBoot](../linuxboot.md) |
 | **OCP Open System Firmware** | Open Compute Project 的開放韌體計畫，與 LinuxBoot 關係密切——讓伺服器韌體可稽核是共同目標 | [LinuxBoot](../linuxboot.md) |
 | **u-root** | 用 Go 寫的 initramfs／userland，LinuxBoot 的「第二段」。找到真正要開機的 OS 後用 `kexec` 跳過去 | [LinuxBoot 與 u-root](../linuxboot-u-root.md) |
-| **`kexec`** | 不經過韌體直接載入並跳進另一個 kernel，是 LinuxBoot 能成立的關鍵機制——省掉第二次硬體初始化 | [LinuxBoot 與 u-root](../linuxboot-u-root.md) |
+| **`kexec`** | 不經過韌體直接載入並跳進另一個 kernel，是 LinuxBoot 能成立的關鍵機制——省掉第二次硬體初始化 | [LinuxBoot 與 u-root](../linuxboot-u-root.md)、[kexec](../kexec.md) |
+| **`kexec_file_load()`** | 改由 kernel 自己讀檔、解析 image 的 kexec syscall（Linux 3.17）；舊的 `kexec_load()` 由 userspace 擺好記憶體內容，kernel 無從驗證，所以簽章驗證與 lockdown 只能靠前者 | [kexec](../kexec.md) |
+| **purgatory** | kexec 切換時夾在兩個 kernel 之間的一小段程式：檢查各 segment 的 SHA-256，設好新 kernel 期望的暫存器狀態再跳進去 | [kexec](../kexec.md) |
+| **kdump** | kexec 最主要的用途：開機時用 `crashkernel=` 預留記憶體，panic 時 kexec 進 capture kernel，從 `/proc/vmcore` 取出主 kernel 的記憶體內容 | [kexec](../kexec.md) |
 | **為什麼 Android 用不到 LinuxBoot** | 嵌入式本來就是「韌體只做最少的事、driver 全交給 kernel」，已經是 LinuxBoot 想達成的樣子；而 `first_stage_init` 綁著 AVB／dm-verity／fstab／A/B slot，換不成 u-root 的 init | [開機流程由淺入深](../boot-flow-intro.md) |
 | **Arm SystemReady** | Arm 的標準＋認證計畫，目標是「未經修改的通用 OS 映像檔可直接在符合規範的 Arm 硬體開機」，用來對抗「一板一 image」的碎片化 | [Arm SystemReady](../arm-systemready.md) |
 | **SystemReady 的兩個 band** | 2024 年底從四個 band 重整成兩個：**SystemReady Band**（UEFI + ACPI）與 **SystemReady Devicetree Band**（UEFI + Devicetree）。原本的 SR/ES 合併、IR 改名、**LS（LinuxBoot）band 退場** | [Arm SystemReady](../arm-systemready.md) |
