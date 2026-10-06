@@ -485,6 +485,10 @@ sidebar_position: 5
 | **storage node（儲存節點）** | 提供共享儲存，常搭配分散式/平行檔案系統（Ceph、Lustre、NFS），讓各 compute node 共用同一份資料 | [data_center](../BMC/data_center.md) |
 | **job scheduler** | headnode 上的作業排程器，如 Slurm、PBS | [data_center](../BMC/data_center.md) |
 | **out-of-band 管理** | 每個節點內建 BMC，透過獨立的管理網路（IPMI/Redfish）遠端開關機、監控感測器、更新韌體，**不必實體接觸機器** | [data_center](../BMC/data_center.md) |
+| **in-band vs out-of-band telemetry** | in-band 是 host 端自己回報（OTel SDK、node_exporter），host 當機就斷；out-of-band 由 BMC 經獨立管理網路回報溫度、電源、風扇與硬體錯誤，host 當機時仍可用 | [telemetry-otel-bmc-grafana](../telemetry-otel-bmc-grafana.md) |
+| **OpenTelemetry（OTel）** | CNCF 專案，2019 年由 OpenTracing 與 OpenCensus 合併；定義 telemetry 的 SDK、OTLP 協定與 Collector，**不負責儲存與視覺化** | [telemetry-otel-bmc-grafana](../telemetry-otel-bmc-grafana.md) |
+| **Redfish TelemetryService** | Redfish 的 metric 報表機制：MetricDefinitions（能收什麼）、MetricReportDefinitions（收哪些、多久收）、MetricReports（實際報表）、Triggers（越限觸發）；OpenBMC 由 telemetry daemon 提供、bmcweb 對外 | [telemetry-otel-bmc-grafana](../telemetry-otel-bmc-grafana.md) |
+| **LGTM stack** | Grafana Labs 的 Loki（logs）、Grafana（UI）、Tempo（traces）、Mimir（metrics）；Loki 不索引 log 內容、只索引 label，所以高基數欄位不要放進 label | [telemetry-otel-bmc-grafana](../telemetry-otel-bmc-grafana.md) |
 
 ---
 

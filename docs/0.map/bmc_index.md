@@ -114,6 +114,7 @@ sidebar_position: 4
 |---|---|
 | [LinuxBoot 與 u-root](../linuxboot-u-root.md) | **韌體側的鄰居**：把 UEFI 的 DXE 之後換成放在 SPI flash 裡的 Linux + u-root initramfs，再用 `kexec` 跳進正式 OS。與 BMC 的分工是——BMC 管上電、power cycle 與更新 host SPI flash，LinuxBoot 管 host 自己開機那一段。概論版見 [LinuxBoot](../linuxboot.md) |
 | [資料中心叢集架構](../BMC/data_center.md) | cluster 節點角色分工（headnode／compute node／storage node、job scheduler 如 Slurm/PBS）與 BMC 的關係：每個節點內建 BMC，經 out-of-band 管理網路（IPMI／Redfish）遠端開關機、監控、更新韌體 |
+| [Telemetry、OpenTelemetry、BMC 與 Grafana/Loki 的關係](../telemetry-otel-bmc-grafana.md) | **把 BMC 放進整套 observability 架構裡看**：telemetry 的四類訊號、OpenTelemetry 管的是產生與傳輸（SDK／OTLP／Collector）而不管儲存、BMC 作為 out-of-band 來源（OpenBMC 內 dbus-sensors → telemetry daemon → bmcweb 的資料流、Redfish TelemetryService 的四種資源、pull 與 push 兩種取法）、LGTM stack 的分工與 Loki 只索引 label 的取捨；最後用「風扇故障 → 降頻 → 服務變慢」示範跨層找根因。實作層面的 PoC 見 [Shell Collector / VictoriaMetrics / Grafana](../BMC/metrics-stack-notes.md) |
 
 ---
 
