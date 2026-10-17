@@ -11,7 +11,7 @@ sidebar_position: 14
 各邊的狀態字眼還不一樣（merged / MERGED / NEW / ABANDONED / New / RFC），
 所以這頁統一成同一套圖例，並在最後附上重新查詢的指令，讓它可以隨時更新。
 
-> 資料以 **2026-10-14** 查詢結果為準。
+> 資料以 **2026-10-17** 查詢結果為準。
 
 **圖例**：✅ 已合入 ｜ 🔄 review 中 ｜ ⏸ 暫停（等前置條件或併入別的討論） ｜ ⛔ 已關閉（未合入）
 
@@ -21,7 +21,7 @@ sidebar_position: 14
 
 | 平台 | 專案 | ✅ 已合入 | 🔄 review 中 |
 |---|---|---|---|
-| AOSP Gerrit | `kernel/common`（Android Common Kernel） | 5 個 change（含 automerge 共 15 筆） | 1 |
+| AOSP Gerrit | `kernel/common`（Android Common Kernel） | 5 個 change ＋ 1 筆 backport（含 automerge 共 16 筆） | — |
 | AOSP Gerrit | `platform/hardware/interfaces` | — | 12 |
 | AOSP Gerrit | `platform/hardware/libhardware` | — | 5 |
 | AOSP Gerrit | `platform/bootable/libbootloader`（GBL） | 3 | — |
@@ -32,7 +32,7 @@ sidebar_position: 14
 | GitHub | triton-cpu、spine-triton、UCAgent | 3 | 3 |
 | GitHub | 其他（cert-tools、os-in-1000-lines） | 3 | — |
 | Mailing list | Linux（dma-buf、SpacemiT K1 DT） | — | 3 |
-| Mailing list | U-Boot（SpacemiT K1） | — | —（⏸ 2） |
+| Mailing list | U-Boot（virtio RTC、QEMU RISC-V、TPM、SpacemiT K1） | — | 8（另 ⏸ 1） |
 
 主題大致分四塊：**Android kernel、HAL 與 bootloader 的文件／健壯性修補**、**RISC-V 與 SIMD 相關的
 效能與模擬器工作**、**韌體協定（PLDM、SPDM）的邊界檢查**，以及新開的 **Triton CPU backend**。
@@ -47,11 +47,11 @@ sidebar_position: 14
 | 領域 | ✅ 已合入 | 🔄 review 中 |
 |---|---|---|
 | 資料中心 / 伺服器 | 8 | 11 |
-| RISC-V | 7 | 10 |
+| RISC-V | 7 | 11 |
 | Compiler / 工具鏈 / 執行環境 | 15 | 9 |
 | LLM / AI | 14 | 4 |
-| Android | 8 | 18 |
-| 韌體 / 開機 | 11 | 14 |
+| Android | 9 | 17 |
+| 韌體 / 開機 | 11 | 16 |
 
 ### 資料中心 / 伺服器
 
@@ -79,7 +79,8 @@ sidebar_position: 14
 | [os-in-1000-lines #101](https://github.com/nuta/operating-system-in-1000-lines/pull/101)、[#131](https://github.com/nuta/operating-system-in-1000-lines/pull/131) | ✅ | 這本教材的目標平台就是 RISC-V（`qemu-system-riscv32`）；[繁體中文版](https://1000os.seiya.me/tw/)在上游 README 掛名 |
 | [spine-triton #38](https://github.com/spacemit-com/spine-triton/pull/38) | 🔄 | SpacemiT 的 Triton backend：X60 的 `xsmtvdot` 擴充名稱寫錯，在 K1 上實測才發現 |
 | [Linux：K1 DT 標 `bootph-pre-ram`](https://patchwork.kernel.org/project/linux-riscv/patch/20261012235624.77993-2-alan.tseng.cs@gmail.com/) ×2 | 🔄 | 讓 SpacemiT K1 的 SPL 需要的節點直接寫在 Linux 的 device tree 裡，U-Boot 不必再自己補 |
-| U-Boot：[Milk-V Jupiter](https://patchwork.ozlabs.org/project/uboot/patch/20261012151530.1564771-1-alan.tseng.cs@gmail.com/)、[SDHCI 不再依賴 `max-frequency`](https://patchwork.ozlabs.org/project/uboot/patch/20261013084448.433298-2-alan.tseng.cs@gmail.com/) | ⏸ | 把 Jupiter 板子加進 mainline U-Boot；前者等上面的 Linux DT 先進，後者併入既有的 mmc 討論 |
+| U-Boot：[Milk-V Jupiter](https://patchwork.ozlabs.org/project/uboot/patch/20261012151530.1564771-1-alan.tseng.cs@gmail.com/) | ⏸ | 把 Jupiter 板子加進 mainline U-Boot，等上面的 Linux DT 先進 |
+| [U-Boot：QEMU RISC-V 用 fw_cfg 開 `-kernel`](https://patchwork.ozlabs.org/project/uboot/patch/20261014144724.1763675-2-alan.tseng.cs@gmail.com/) ×4 | 🔄 | 讓 `qemu-riscv64` 的 U-Boot 預設開 QFW、改用 standard boot，`-kernel` 給的 kernel 不用再手動載 |
 
 ### Compiler / 工具鏈 / 執行環境
 
@@ -113,7 +114,7 @@ sidebar_position: 14
 | `kernel/common` ×5（dma-heap、dma-buf、binder、scsi/ufs） | ✅ | Android Common Kernel（ACK） |
 | `platform/hardware/interfaces` ×12 | 🔄 | HAL 範例實作的 service fuzzer 與生命週期修補 |
 | `platform/hardware/libhardware` ×5 | 🔄 | HID report descriptor 解析的邊界問題 |
-| [`android17-6.18` 的 scsi/ufs 重送](https://android-review.googlesource.com/c/kernel/common/+/4268863) | 🔄 | 同一個 change 往穩定分支的 backport |
+| [`android17-6.18` 的 scsi/ufs 重送](https://android-review.googlesource.com/c/kernel/common/+/4268863) | ✅ | 同一個 change 往穩定分支的 backport |
 | `platform/bootable/libbootloader` ×3 | ✅ | GBL（Generic Bootloader）的 QEMU 範例與除錯腳本修正 |
 
 ### 韌體 / 開機
@@ -129,7 +130,10 @@ sidebar_position: 14
 | [OpenPRoT/pldm-lib #21](https://github.com/OpenPRoT/pldm-lib/pull/21) | ✅ | PLDM 是韌體之間（BMC ↔ 裝置）的管理協定 |
 | [OpenPRoT/pldm-lib #32](https://github.com/OpenPRoT/pldm-lib/pull/32)、[#33](https://github.com/OpenPRoT/pldm-lib/pull/33)、[openbmc/libpldm](https://gerrit.openbmc.org/q/project:openbmc/libpldm) ×4 | 🔄 | 同上 |
 | [Linux：K1 DT 標 `bootph-pre-ram`](https://patchwork.kernel.org/project/linux-riscv/patch/20261012235624.77993-2-alan.tseng.cs@gmail.com/) ×2 | 🔄 | 標出 SPL 階段就要用到的節點（時脈、UART、SD／eMMC、SPI NOR），讓 U-Boot 直接沿用 Linux 的 DT |
-| U-Boot：Milk-V Jupiter、SDHCI `max-frequency` RFC | ⏸ | 見下方 [Mailing list](#mailing-list) |
+| [U-Boot：virtio RTC driver](https://patchwork.ozlabs.org/project/uboot/patch/20261014190631.2232208-2-alan.tseng.cs@gmail.com/) ×3 | 🔄 | 新 driver：讓 U-Boot 從 QEMU 的 virtio-rtc 裝置讀時間，並在 MAINTAINERS 加上 VIRTIO RTC 這一項 |
+| [U-Boot：`tpm2_get_random()` 的長度欄位](https://patchwork.ozlabs.org/project/uboot/patch/20261014190605.2229511-1-alan.tseng.cs@gmail.com/) | 🔄 | TPM2 回應裡亂數長度是 16 位元，卻被當 32 位元讀；用 gdb 在 QEMU＋swtpm 上追到 |
+| [U-Boot：QEMU RISC-V standard boot](https://patchwork.ozlabs.org/project/uboot/patch/20261014144724.1763675-2-alan.tseng.cs@gmail.com/) ×4 | 🔄 | 開機流程從 distro boot 換成 standard boot，並支援 fw_cfg 傳入的 kernel |
+| U-Boot：Milk-V Jupiter | ⏸ | 見下方 [Mailing list](#mailing-list) |
 
 > 不屬於上述任一類：[cert-tools #55](https://github.com/blockchain-certificates/cert-tools/pull/55)（區塊鏈證書工具的日期解析修正）、
 > [Linux dma-buf 的 kernel-doc](https://patchwork.kernel.org/project/dri-devel/patch/20260902135923.3599022-1-alan.tseng.cs@gmail.com/)（和 AOSP 那筆修同一段文件）。
@@ -172,17 +176,18 @@ sidebar_position: 14
 |---|---|---|---|
 | 1 | AOSP `hardware/interfaces` ×12、`libhardware` ×5 | Android | 給預設／範例 HAL 補 service fuzzer 並修出生命週期問題。**廠商常以範例實作為起點**，所以修在這裡會往下游擴散 |
 | 2 | [Linux：K1 DT 標 `bootph-pre-ram`](https://patchwork.kernel.org/project/linux-riscv/patch/20261012235624.77993-2-alan.tseng.cs@gmail.com/) ×2 | Linux mainline | 進了就是 mainline kernel 的 DT，所有 K1 板子的 U-Boot SPL 都會沿用；也是 U-Boot 那邊 Jupiter patch 的前置條件 |
-| 3 | [libspdm #4088](https://github.com/DMTF/libspdm/pull/4088)、[#4122](https://github.com/DMTF/libspdm/pull/4122) — NEGOTIATE_ALGORITHMS 失敗時還原已協商的演算法 | 191 ★ | SPDM 參考實作的狀態一致性；#4122 是維護者在 #4088 review 時指出 Requester 端也有同樣問題後補的 |
-| 4 | [u-root #3775](https://github.com/u-root/u-root/pull/3775)、[#3776](https://github.com/u-root/u-root/pull/3776) — boot menu 的 shell、universal payload 的回傳值 | 3.1k ★ | 都在開機路徑上：#3775 修的是進 shell 後 boot 程序還留在底下、離開 shell 被當成錯誤；#3776 是 API 整理 |
-| 5 | [sse2neon #773](https://github.com/DLTcollab/sse2neon/pull/773) — SVE2 fast path | 1.5k ★ | 效能路徑，opt-in 所以風險可控 |
-| 6 | [optimized-routines #97](https://github.com/ARM-software/optimized-routines/pull/97) — strcmp benchmark | 711 ★ | Arm 官方倉庫，但性質是 benchmark 而非實作 |
-| 7 | [rv32emu](https://github.com/sysprog21/rv32emu) ×5 — RVV 指令實作 | 590 ★ | 量大且偏功能，但侷限在單一模擬器內 |
-| 8 | [u-root #3761](https://github.com/u-root/u-root/pull/3761)、[vmtest #132](https://github.com/hugelgupf/vmtest/pull/132) — riscv64 的 kexec 整合測試與測試 kernel | 3.1k / 42 ★ | 替已合入的 #3733 補上真正會開機的測試；維護者希望升級 vmtest 的 riscv64 kernel，而不是在 u-root 繞過 v6.6 的限制，所以拆出 vmtest #132。性質是 CI，不改產品程式碼 |
-| 9 | [libpldm](https://gerrit.openbmc.org/q/project:openbmc/libpldm) ×4（OpenBMC）、[pldm-lib #32](https://github.com/OpenPRoT/pldm-lib/pull/32)、[#33](https://github.com/OpenPRoT/pldm-lib/pull/33) | OpenBMC / 新專案 | 韌體協定的邊界檢查，影響面取決於這兩個 library 被採用的程度 |
-| 10 | [UCAgent #140](https://github.com/XS-MLVP/UCAgent/pull/140)、[#141](https://github.com/XS-MLVP/UCAgent/pull/141) — PR 跑測試的 CI、skill script 用對 Python | 230 ★ | 晶片驗證 agent；#140 順手修了 main 上兩個已經壞掉的測試 |
-| 11 | [spine-triton #38](https://github.com/spacemit-com/spine-triton/pull/38) — `xsmtvdot` 名稱與範例的 import | 15 ★ | 修的是 X60 矩陣擴充根本開不起來的問題，但專案剛開源、使用者少 |
-| 12 | [Linux dma-buf kernel-doc](https://patchwork.kernel.org/project/dri-devel/patch/20260902135923.3599022-1-alan.tseng.cs@gmail.com/) | Linux mainline | 和 AOSP 已合入那筆修同一段文件；性質是文件修補，至今沒有回應 |
-| 13 | [codetrial #110](https://github.com/sysprog21/codetrial/pull/110) | 62 ★ | 功能型但侷限在單一小專案 |
+| 3 | [U-Boot virtio RTC](https://patchwork.ozlabs.org/project/uboot/patch/20261014190631.2232208-2-alan.tseng.cs@gmail.com/) ×3、[QEMU RISC-V standard boot](https://patchwork.ozlabs.org/project/uboot/patch/20261014144724.1763675-2-alan.tseng.cs@gmail.com/) ×4、[`tpm2_get_random()`](https://patchwork.ozlabs.org/project/uboot/patch/20261014190605.2229511-1-alan.tseng.cs@gmail.com/) | U-Boot mainline | virtio RTC 是新 driver，VirtIO 維護者已經對 doc 與 MAINTAINERS 給了 Reviewed-by；QEMU RISC-V 那組改的是所有人跑 `qemu-riscv64` U-Boot 的預設開機流程；TPM 那筆是會讀錯長度的正確性 bug |
+| 4 | [libspdm #4088](https://github.com/DMTF/libspdm/pull/4088)、[#4122](https://github.com/DMTF/libspdm/pull/4122) — NEGOTIATE_ALGORITHMS 失敗時還原已協商的演算法 | 191 ★ | SPDM 參考實作的狀態一致性；#4122 是維護者在 #4088 review 時指出 Requester 端也有同樣問題後補的 |
+| 5 | [u-root #3775](https://github.com/u-root/u-root/pull/3775)、[#3776](https://github.com/u-root/u-root/pull/3776) — boot menu 的 shell、universal payload 的回傳值 | 3.1k ★ | 都在開機路徑上：#3775 修的是進 shell 後 boot 程序還留在底下、離開 shell 被當成錯誤；#3776 是 API 整理 |
+| 6 | [sse2neon #773](https://github.com/DLTcollab/sse2neon/pull/773) — SVE2 fast path | 1.5k ★ | 效能路徑，opt-in 所以風險可控 |
+| 7 | [optimized-routines #97](https://github.com/ARM-software/optimized-routines/pull/97) — strcmp benchmark | 711 ★ | Arm 官方倉庫，但性質是 benchmark 而非實作 |
+| 8 | [rv32emu](https://github.com/sysprog21/rv32emu) ×5 — RVV 指令實作 | 590 ★ | 量大且偏功能，但侷限在單一模擬器內 |
+| 9 | [u-root #3761](https://github.com/u-root/u-root/pull/3761)、[vmtest #132](https://github.com/hugelgupf/vmtest/pull/132) — riscv64 的 kexec 整合測試與測試 kernel | 3.1k / 42 ★ | 替已合入的 #3733 補上真正會開機的測試；維護者希望升級 vmtest 的 riscv64 kernel，而不是在 u-root 繞過 v6.6 的限制，所以拆出 vmtest #132。性質是 CI，不改產品程式碼 |
+| 10 | [libpldm](https://gerrit.openbmc.org/q/project:openbmc/libpldm) ×4（OpenBMC）、[pldm-lib #32](https://github.com/OpenPRoT/pldm-lib/pull/32)、[#33](https://github.com/OpenPRoT/pldm-lib/pull/33) | OpenBMC / 新專案 | 韌體協定的邊界檢查，影響面取決於這兩個 library 被採用的程度 |
+| 11 | [UCAgent #140](https://github.com/XS-MLVP/UCAgent/pull/140)、[#141](https://github.com/XS-MLVP/UCAgent/pull/141) — PR 跑測試的 CI、skill script 用對 Python | 230 ★ | 晶片驗證 agent；#140 順手修了 main 上兩個已經壞掉的測試 |
+| 12 | [spine-triton #38](https://github.com/spacemit-com/spine-triton/pull/38) — `xsmtvdot` 名稱與範例的 import | 15 ★ | 修的是 X60 矩陣擴充根本開不起來的問題，但專案剛開源、使用者少 |
+| 13 | [Linux dma-buf kernel-doc](https://patchwork.kernel.org/project/dri-devel/patch/20260902135923.3599022-1-alan.tseng.cs@gmail.com/) | Linux mainline | 和 AOSP 已合入那筆修同一段文件；性質是文件修補，至今沒有回應 |
+| 14 | [codetrial #110](https://github.com/sysprog21/codetrial/pull/110) | 62 ★ | 功能型但侷限在單一小專案 |
 
 ---
 
@@ -199,7 +204,7 @@ change 自動傳播到 `android-mainline-desktop`、`android-mainline-riscv64` �
 | [ANDROID: dma-heap: restore struct dma_heap kernel-doc lost in a merge](https://android-review.googlesource.com/c/kernel/common/+/4200863) | `android-mainline` | ✅ | `-desktop` ✅、`-riscv64` ✅ |
 | [ANDROID: dma-buf: fix kernel-doc for `dma_buf_set_name()`](https://android-review.googlesource.com/c/kernel/common/+/4202123) | `android14-6.1` | ✅ | `android14-kiwi-6.1` ✅ |
 | [ANDROID: binder: fix kernel-doc for struct binder_priority](https://android-review.googlesource.com/c/kernel/common/+/4232024) | `android-mainline` | ✅ | `android17-6.18` ✅、`-desktop` ✅、`-riscv64` ✅ |
-| [ANDROID: scsi: ufs: fix kernel-doc for the UPIU prepare helpers](https://android-review.googlesource.com/c/kernel/common/+/4232023) | `android-mainline` | ✅ | `-desktop` ✅、`-riscv64` ✅、[`android17-6.18`](https://android-review.googlesource.com/c/kernel/common/+/4268863) 🔄（第一次送的 [4267244](https://android-review.googlesource.com/c/kernel/common/+/4267244) 已 abandon 後重送） |
+| [ANDROID: scsi: ufs: fix kernel-doc for the UPIU prepare helpers](https://android-review.googlesource.com/c/kernel/common/+/4232023) | `android-mainline` | ✅ | `-desktop` ✅、`-riscv64` ✅、[`android17-6.18`](https://android-review.googlesource.com/c/kernel/common/+/4268863) ✅（第一次送的 [4267244](https://android-review.googlesource.com/c/kernel/common/+/4267244) 已 abandon 後重送） |
 | [ANDROID: dma-heap: document the return values of the exported helpers](https://android-review.googlesource.com/c/kernel/common/+/4239342) | `android-mainline` | ✅ | `-desktop` ✅、`-riscv64` ✅ |
 
 ### `platform/hardware/interfaces` — HAL 範例實作的 fuzzer 與生命週期修補
@@ -263,8 +268,11 @@ patchwork 的 `New` 只代表「還沒有人改狀態」，不等於有人在看
 |---|---|---|---|
 | Linux（riscv / devicetree） | [riscv: dts: spacemit: k1: mark boot-critical SoC nodes bootph-pre-ram](https://patchwork.kernel.org/project/linux-riscv/patch/20261012235624.77993-2-alan.tseng.cs@gmail.com/)、[mark K1 board boot devices bootph-pre-ram](https://patchwork.kernel.org/project/linux-riscv/patch/20261012235624.77993-3-alan.tseng.cs@gmail.com/) | 🔄 | U-Boot reviewer 希望 SPL 用的 `bootph-pre-ram` 先進 Linux 的 DT，再讓 U-Boot 沿用，所以先送這組 |
 | Linux（dma-buf） | [dma-buf: fix stale return value documentation for dma_buf_set_name()](https://patchwork.kernel.org/project/dri-devel/patch/20260902135923.3599022-1-alan.tseng.cs@gmail.com/) | 🔄 | 與 AOSP 已合入的那筆修的是同一段 kernel-doc；linux-media 的 patchwork 標成 Not Applicable（dma-buf 走 drm-misc），dri-devel 上還沒有回應 |
-| U-Boot（SpacemiT K1） | [spacemit: k1: add Milk-V Jupiter](https://patchwork.ozlabs.org/project/uboot/patch/20261012151530.1564771-1-alan.tseng.cs@gmail.com/) | ⏸ | 等上面的 Linux DT 進了再送 v2。實機測試時發現 SPL 認不得板上的 GigaDevice SPI NOR，v2 要一起修 |
-| U-Boot（SpacemiT K1） | [RFC: mmc: k1: do not require max-frequency in the device tree](https://patchwork.ozlabs.org/project/uboot/patch/20261013084448.433298-2-alan.tseng.cs@gmail.com/) ×2 | ⏸ | 維護者指出已經有一串討論在處理同一件事，請改到那邊繼續，不要另開 thread |
+| U-Boot（virtio） | [virtio: rtc: Add virtio RTC driver](https://patchwork.ozlabs.org/project/uboot/patch/20261014190631.2232208-2-alan.tseng.cs@gmail.com/) v2 ×3 | 🔄 | v1 的 review 指出 probe 時還不能碰 virtqueue（要等 DRIVER_OK），v2 改成第一次讀時間才查 UTC clock；doc 與 MAINTAINERS 兩筆已有 VirtIO 維護者的 Reviewed-by。寫 QEMU virtio-rtc 裝置的人也在 review，v3 等他看完再送 |
+| U-Boot（QEMU RISC-V） | [riscv: qemu: Boot a kernel passed with -kernel](https://patchwork.ozlabs.org/project/uboot/patch/20261014144724.1763675-2-alan.tseng.cs@gmail.com/) ×4 | 🔄 | QEMU 只有在 U-Boot 從 pflash 開機時才會用 fw_cfg 交出 `-kernel`；這組讓 U-Boot 預設就去 fw_cfg 找 |
+| U-Boot（TPM） | [tpm: v2: Fix the size of the random data in tpm2_get_random()](https://patchwork.ozlabs.org/project/uboot/patch/20261014190605.2229511-1-alan.tseng.cs@gmail.com/) | 🔄 | 回應裡的長度欄位是 u16，舊程式當成 u32 讀 |
+| U-Boot（SpacemiT K1） | [spacemit: k1: add Milk-V Jupiter](https://patchwork.ozlabs.org/project/uboot/patch/20261012151530.1564771-1-alan.tseng.cs@gmail.com/) | ⏸ | 等上面的 Linux DT 進了再送 v2。實機上 mainline SPL＋U-Boot 已經能從 SD 開到提示字元；過程中找到的 SPI NOR、DRAM 容量等問題會另外送修正 |
+| U-Boot（SpacemiT K1） | [RFC: mmc: k1: do not require max-frequency in the device tree](https://patchwork.ozlabs.org/project/uboot/patch/20261013084448.433298-2-alan.tseng.cs@gmail.com/) ×2 | ⛔ | 已撤回：同一件事改用 DT 的 `assigned-clock-*` 處理，併入既有的 MMC 討論；在那串回報了 Jupiter 上 SD 訊號電壓設成 1.8 V 導致多區塊讀取失敗的問題 |
 
 ---
 
