@@ -485,3 +485,17 @@ sidebar_position: 7
 | **SystemReady 的兩個 band** | 2024 年底從四個 band 重整成兩個：**SystemReady Band**（UEFI + ACPI）與 **SystemReady Devicetree Band**（UEFI + Devicetree）。原本的 SR/ES 合併、IR 改名、**LS（LinuxBoot）band 退場** | [Arm SystemReady](../arm-systemready.md) |
 | **ACS（Architecture Compliance Suite）** | SystemReady 的認證測試套件，跑過才拿得到認證 | [Arm SystemReady](../arm-systemready.md) |
 | **平台型態決定開機流程** | 本系列的核心論點：開放通用平台（PC／ARM server）需要 UEFI＋ACPI 這種「任意 OS 都能開」的抽象；垂直整合平台（手機／嵌入式）只跑一個 OS，鏈越短越好驗證。**不是 x86 vs ARM 的差別** | [開機流程由淺入深](../boot-flow-intro.md) |
+
+---
+
+## 十四、RTOS 與 MCU（Zephyr）
+
+> 出自 [在 Arduino 101 上跑 Zephyr](../Embedded/zephyr-arduino-101.md)。
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **Zephyr** | Linux Foundation 底下的開源 RTOS，用 Kconfig + device tree + CMake 建置，與 Linux kernel 的設定方式相似 | [Arduino 101 跑 Zephyr](../Embedded/zephyr-arduino-101.md) |
+| **Intel Curie / Quark SE C1000** | Arduino 101 的 SoC：32 MHz x86（Quark）核心加一顆 ARC EM 感測器子系統核心，共用記憶體。Zephyr 的 board 名稱分別是 `arduino_101` 與 `arduino_101_sss`，**只支援到 1.14 LTS** | [Arduino 101 跑 Zephyr](../Embedded/zephyr-arduino-101.md) |
+| **`CONFIG_ARC_INIT`** | x86 端開機時要不要喚醒 ARC 核心；只用 x86 時設成 `n` | [Arduino 101 跑 Zephyr](../Embedded/zephyr-arduino-101.md) |
+| **DFU（Device Firmware Upgrade）** | USB 標準的韌體更新協定。裝置以 DFU 模式出現後，用 `dfu-util -a <alt>` 指定分區寫入；Arduino 101 的分區有 `x86_app` 與 `sensor_core` | [Arduino 101 跑 Zephyr](../Embedded/zephyr-arduino-101.md) |
+| **Zadig / WinUSB** | Windows 上 libusb 系工具（如 dfu-util）需要裝置綁定 WinUSB 驅動才存取得到；Zadig 是產生並安裝這類驅動的工具，**要確認綁的是正確的 VID:PID** | [Arduino 101 跑 Zephyr](../Embedded/zephyr-arduino-101.md) |

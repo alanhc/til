@@ -124,6 +124,16 @@ sidebar_position: 6
 
 ---
 
+## 九、RTOS 與 MCU
+
+> 前面幾節幾乎都是「板子上跑 Linux」；這一節是不跑 Linux 的那一側——MCU 等級的即時作業系統。
+
+| 文章 | 內容 |
+|---|---|
+| [在 Arduino 101 上跑 Zephyr（Windows + WSL）](../Embedded/zephyr-arduino-101.md) | 實作紀錄：Intel Curie（Quark SE C1000，x86 + ARC 雙核）**只有 Zephyr 1.14 LTS 支援，v2.0 起整個移除**，所以要配 SDK 0.10.3。WSL 裡用 uv 建 Python 3.8 venv、`apt-get download` 解開 gperf，全程不用 sudo；`-DCONFIG_ARC_INIT=n` 只跑 x86 核心的 `blinky`。Windows 端用 dfu-util 在按 reset 後的 **5 秒 DFU 視窗**內寫入 `x86_app` 分區。最大的坑是 Zadig：Create New Device 會預填目前選到的序列埠 ID（`0AB6`），WinUSB 很容易裝錯裝置，要裝的是 DFU 的 `8087:0ABA` |
+
+---
+
 ## 建議閱讀順序
 
 **想理解一塊板子怎麼從上電跑到 Linux：**
@@ -183,4 +193,4 @@ IC 設計的前段／中段／後段        ← 上游：矽是怎麼被做出�
 | **JTAG / OpenOCD / gdb 硬體除錯** | [TF-A 解析](../ARM_Trusted_Firmware_解析.md) 提到「最難的 bug 靠 JTAG」，但沒有一篇講怎麼實際接 JTAG、用 OpenOCD + gdb 單步跟 bootloader／kernel。printk 救不了時的最後一哩 | 待補 |
 | **Flash 儲存（eMMC / UFS / SPI-NOR / MTD / UBIFS）** | image 最終要落到儲存裝置上。raw flash 與 managed flash 的差異、MTD 分割、UBI/UBIFS 對 NAND 的磨損平衡，是選型與開機失敗排查的常見來源 | 待補 |
 | **Clock / Regulator / Power management** | SoC 上每個 IP 都要供電與時脈才會動，bring-up 時「裝置沒反應」常常是 clock／regulator 沒開。runtime PM、suspend/resume 路徑也是耗電與喚不醒問題的核心 | 待補 |
-| **RTOS（FreeRTOS / Zephyr）** | 不是所有嵌入式都跑 Linux。MCU 等級的即時系統、task/scheduler/IPC 與 [State Machine](../Embedded/state_machine.md) 的 bare-metal 手法互補，目前完全沒有 RTOS 視角 | 待補 |
+| **RTOS（FreeRTOS / Zephyr）** | 不是所有嵌入式都跑 Linux。MCU 等級的即時系統、task/scheduler/IPC 與 [State Machine](../Embedded/state_machine.md) 的 bare-metal 手法互補，目前只有一篇上手實作（[Arduino 101 跑 Zephyr](../Embedded/zephyr-arduino-101.md)），還缺 RTOS 本身的概念篇 | 起步 |
