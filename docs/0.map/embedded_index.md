@@ -130,7 +130,7 @@ sidebar_position: 6
 
 | 文章 | 內容 |
 |---|---|
-| [在 Arduino 101 上跑 Zephyr（Windows + WSL）](../Embedded/zephyr-arduino-101.md) | 實作紀錄：Intel Curie（Quark SE C1000，x86 + ARC 雙核）**只有 Zephyr 1.14 LTS 支援，v2.0 起整個移除**，所以要配 SDK 0.10.3。WSL 裡用 uv 建 Python 3.8 venv、`apt-get download` 解開 gperf，全程不用 sudo；`-DCONFIG_ARC_INIT=n` 只跑 x86 核心的 `blinky`。Windows 端用 dfu-util 在按 reset 後的 **5 秒 DFU 視窗**內寫入 `x86_app` 分區。最大的坑是 Zadig：Create New Device 會預填目前選到的序列埠 ID（`0AB6`），WinUSB 很容易裝錯裝置，要裝的是 DFU 的 `8087:0ABA` |
+| [在 Arduino 101 上跑 Zephyr（Windows + WSL）](../Embedded/zephyr-arduino-101.md) | 實作紀錄：Intel Curie（Quark SE C1000，x86 + ARC 雙核）**只有 Zephyr 1.14 LTS 支援，v2.0 起整個移除**，所以要配 SDK 0.10.3。WSL 裡用 uv 建 Python 3.8 venv、`apt-get download` 解開 gperf，全程不用 sudo；`-DCONFIG_ARC_INIT=n` 只跑 x86 核心的 `blinky`。Windows 端用 dfu-util 在按 reset 後的 **5 秒 DFU 視窗**內寫入 `x86_app` 分區。最大的坑是 Zadig：Create New Device 會預填目前選到的序列埠 ID（`0AB6`），WinUSB 很容易裝錯裝置，要裝的是 DFU 的 `8087:0ABA`。後半**拆解原廠 bootloader**：用 DFU upload 唯讀讀回 9 個分區（`x86_rom`／`x86_boot`／`x86_app`／…／`sensor_core`／`ble_core`），對出內部 flash 位址與「入口在 +0x30」的約定；從 `arduino101load` 原始碼看出 **Arduino sketch 其實跑在 ARC**，x86 跑的是 Intel 提供 USB 序列埠與藍牙的 RTOS 韌體，所以燒 Zephyr 進 `x86_app` 會讓 COM port 消失，IDE 的 Burn Bootloader 實際上寫的是 alt 2 與 alt 8 |
 
 ---
 

@@ -498,4 +498,7 @@ sidebar_position: 7
 | **Intel Curie / Quark SE C1000** | Arduino 101 的 SoC：32 MHz x86（Quark）核心加一顆 ARC EM 感測器子系統核心，共用記憶體。Zephyr 的 board 名稱分別是 `arduino_101` 與 `arduino_101_sss`，**只支援到 1.14 LTS** | [Arduino 101 跑 Zephyr](../Embedded/zephyr-arduino-101.md) |
 | **`CONFIG_ARC_INIT`** | x86 端開機時要不要喚醒 ARC 核心；只用 x86 時設成 `n` | [Arduino 101 跑 Zephyr](../Embedded/zephyr-arduino-101.md) |
 | **DFU（Device Firmware Upgrade）** | USB 標準的韌體更新協定。裝置以 DFU 模式出現後，用 `dfu-util -a <alt>` 指定分區寫入；Arduino 101 的分區有 `x86_app` 與 `sensor_core` | [Arduino 101 跑 Zephyr](../Embedded/zephyr-arduino-101.md) |
+| **Arduino 101 DFU 分區** | 原廠 x86 bootloader 提供的 9 個 alt：`x86_rom`、`x86_boot`（bootloader 本體）、`x86_app`（x86 程式，0x40010000）、`config`、`panic`、`events`、`logs`、`sensor_core`（ARC 程式，0x40034000）、`ble_core`（nRF51822 藍牙韌體，經 UART 轉送） | [Arduino 101 跑 Zephyr](../Embedded/zephyr-arduino-101.md) |
+| **`CONFIG_TEXT_SECTION_OFFSET=0x30`** | Arduino 101 原廠 bootloader 的約定：程式入口在載入位址 +0x30，前面留給標頭；讀回的映像開頭是 0x30 bytes 的 NOP 填充 | [Arduino 101 跑 Zephyr](../Embedded/zephyr-arduino-101.md) |
+| **Arduino/Genuino 101 Firmware Updater** | IDE 的 Burn Bootloader 選這個 programmer 時，**不燒 bootloader**，而是把 Intel 的 x86 韌體 `quark.bin` 寫進 alt 2、藍牙韌體 `ble_core.bin` 寫進 alt 8 | [Arduino 101 跑 Zephyr](../Embedded/zephyr-arduino-101.md) |
 | **Zadig / WinUSB** | Windows 上 libusb 系工具（如 dfu-util）需要裝置綁定 WinUSB 驅動才存取得到；Zadig 是產生並安裝這類驅動的工具，**要確認綁的是正確的 VID:PID** | [Arduino 101 跑 Zephyr](../Embedded/zephyr-arduino-101.md) |
