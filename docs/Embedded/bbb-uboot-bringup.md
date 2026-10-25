@@ -132,7 +132,7 @@ U-Boot `ping` 失敗、`tftp` 一直印 `T`（timeout）。在 PC 上 `tcpdump -
 
 ```text
 $ ip route get 192.168.10.242
-192.168.10.242 dev tailscale0 table 52 src 100.69.80.97
+192.168.10.242 dev tailscale0 table 52 src 100.x.y.z
 ```
 
 tailnet 裡有節點宣告了 `192.168.10.0/24` 的 subnet route，而 Tailscale 的 policy rule（priority 5270，`lookup 52`）排在 main table（32766）前面，所以回給板子的封包全被送進 `tailscale0`。修法是加一條更前面的 rule，讓本地 LAN 走 main table：
