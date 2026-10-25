@@ -1,6 +1,6 @@
 # 在 Arduino 101 上跑 Zephyr（Windows + WSL）
 
-Arduino 101（海外版叫 Genuino 101）用的是 Intel Curie 模組，裡面是 Quark SE C1000：一顆 32 MHz 的 x86（Quark）核心加一顆 ARC EM 感測器子系統核心，兩顆共用記憶體、同時運作。這篇記錄在 Windows 11 上用 WSL 編譯 Zephyr、從 Windows 用 DFU 燒進板子、讓板上 LED 閃起來的完整步驟。
+Arduino 101（海外版叫 Genuino 101）用的是 Intel Curie 模組，裡面是 Quark SE C1000：一顆 32 MHz 的 x86（Quark）核心加一顆 ARC EM 感測器子系統核心，兩顆共用記憶體、同時運作。這篇記錄在 Windows 11 上用 WSL 編譯 Zephyr、從 Windows 用 DFU 燒進板子、讓板上 LED 閃起來的完整步驟，接著拆解原廠 bootloader，最後讓 Zephyr 的藍牙（BLE）跑起來，從電腦連線控制 LED。
 
 ## 先講結論：踩坑重點
 
@@ -8,7 +8,8 @@ Arduino 101（海外版叫 Genuino 101）用的是 Intel Curie 模組，裡面�
 - **原廠 bootloader 不用動**。Zephyr 從 1.4 起就不再用 QMSI bootloader，原廠 boot ROM 直接支援 DFU 燒錄。
 - **DFU 模式只有 5 秒**。按 MASTER_RESET 後板子會以另一個 USB ID 出現約 5 秒，dfu-util 必須在這段時間內開始寫入。
 - **Windows 上最卡的是驅動**。DFU 模式的 USB ID 預設沒有驅動，要用 Zadig 裝 WinUSB，而且很容易裝錯裝置（見下文）。
-- **console 不走 USB**。Zephyr 的 `printk` 從 pin 0/1 的 UART 輸出（115200），要看 log 得另接 USB 轉 TTL 線。所以第一支程式選 `blinky`，用 LED 確認有跑起來最直接。
+- **console 預設不走 USB**。Zephyr 的 `printk` 從 pin 0/1 的 UART 輸出（115200），要看 log 得另接 USB 轉 TTL 線。所以第一支程式選 `blinky`，用 LED 確認有跑起來最直接。真的需要 log 時，可以把 console 改成 USB CDC 序列埠（見第六節）。
+- **藍牙要兩顆晶片一起改**。nRF51 要換成 Zephyr 的 `hci_uart`，x86 跑藍牙協定堆疊。照官方預設（1 Mbaud、RTS/CTS 流量控制）完全不會動，要改成 **250 kbaud + 只用 RTS 的半邊流量控制**，並拿掉 `CONFIG_BT_NRF51_PM`（見第六節）。
 
 ## 兩個 USB ID
 
@@ -174,6 +175,157 @@ while (-not ((& $dfu -l 2>&1 | Out-String) -match '8087:0aba')) { Start-Sleep -M
 - **不要寫 `x86_boot`／`x86_rom`**。Arduino 官方明確警告燒錯 bootloader 會變磚，只能靠 JTAG 救。若要還原原廠 boot ROM，Zephyr 文件指向 Intel 的 Flashpack Utility。
 - **版本 ID 的格式**：bootloader 的 `ATP1LAKBLR-1541C5640` 與藍牙韌體的 `ATP1BLE00R-1631C4439` 格式相同。我猜中間的 `1541`、`1631` 是「年份加週數」的 build 日期碼，但沒有找到來源。
 
+## 六、藍牙（BLE）：讓 Zephyr 驅動板上的 nRF51
+
+目標是一支 x86 端的 BLE peripheral：廣播名稱 `A101 Zephyr`，提供一個自訂 GATT 服務，裡面有兩個特性——**LED**（可讀寫，寫 `01` 開燈、`00` 關燈）和 **Counter**（可讀、可訂閱通知，每秒加 1）。從 Windows 連上去讀寫，最後成功。
+
+### 架構
+
+| 晶片 | 跑什麼 | 燒到 |
+|---|---|---|
+| nRF51822 | Zephyr `samples/bluetooth/hci_uart`（board `curie_ble`），只當藍牙**控制器** | alt `ble_core` |
+| x86（Quark） | 應用程式 + Zephyr 藍牙**協定堆疊**（host），用 H:4 透過 UART0 驅動 nRF51 | alt `x86_app` |
+
+官方文件的做法就是這樣：nRF51 原廠的藍牙韌體 Zephyr 不支援，要換成 `hci_uart`。換掉之後 Arduino 的 CurieBLE 就不能用了，要回 Arduino 得用 IDE 的 Firmware Updater 把 `ble_core.bin` 燒回去。
+
+### 照官方預設會卡在哪
+
+照文件編好 `hci_uart`（`curie_ble`）和一支 peripheral，燒進去之後，**藍牙初始化永遠不會完成**：`bt_enable()` 的回呼一直沒被呼叫，也沒有廣播。從這裡一路往下拆，總共疊了四個問題：
+
+| 問題 | 症狀 | 怎麼確認的 | 解法 |
+|---|---|---|---|
+| **1. nRF51 的 CTS 永遠不成立** | 開著 RTS/CTS 時 nRF51 完全不回應 | 見下方「診斷手法」 | 只用 RTS 那半邊的流量控制 |
+| **2. 沒有流量控制時，1 Mbaud 會掉資料** | 前幾個 HCI 指令正常，68 bytes 的 Read Supported Commands 回應少了最後 8 bytes，初始化以 `-35`（`ENOTSUP`）失敗 | USB log | 兩邊降到 250 kbaud |
+| **3. nRF51 reset 後立刻送 HCI 指令** | 第一個 HCI_Reset 被正在重開的 nRF51 丟掉，主機等不到 Command Complete，之後所有指令卡住 | 和診斷程式比對時序 | 拿掉 `CONFIG_BT_NRF51_PM` |
+| **4. 連線後 x86 → nRF51 掉 byte** | 能廣播、能被連上，但 ATT 往返兩次就卡住，對方約 25 秒後斷線（reason `0x13`） | USB log 的時間點 | 就是問題 1 的「半邊流量控制」：保護 nRF51 只有 6 bytes 的接收 FIFO |
+
+### 診斷手法：用 LED 和 UART 一步一步切
+
+x86 端沒有 console 可看，所以先寫了幾支**不用藍牙協定堆疊**的小程式，結果用 LED 閃幾下回報：
+
+1. **讀回 `ble_core`**：用 DFU upload 讀回 nRF51 的 flash，和 `hci_uart` 映像逐位元組比對，確定韌體真的寫進去了。
+2. **`hci_probe`（x86）**：照驅動的方式 reset nRF51，直接對 UART0 送 `01 03 0C 00`（HCI_Reset），看有沒有收到 `04 0E 04 01 03 0C 00`。
+   - 開著流量控制：x86 送得出去，但完全沒有回應。
+   - 兩邊都關掉流量控制：**收到正確的 Command Complete**。
+3. **`uart_beacon`（nRF51）+ `uart_listen`（x86）**：nRF51 一開機就不停送 `A101`、x86 只聽。收得到，代表 nRF51 有在跑、nRF51 → x86 的線路是好的。
+4. **把 nRF51 的 RTS/CTS 對調再測**：x86 反而送不出去了。
+
+綜合 2 和 4，兩條握手線的狀況是：
+
+| 線 | nRF51 腳位 | 狀況 |
+|---|---|---|
+| nRF51 RTS → x86 CTS（nRF51 叫 x86 停） | pin 12 | ✅ 正常 |
+| x86 RTS → nRF51 CTS（x86 叫 nRF51 停） | pin 10 | ❌ nRF51 一直看不到「可以送」 |
+
+我只能確認現象，無法確定是模組上的接線，還是 x86 那支 RTS 的設定問題。腳位定義在 v1.9.0 和 v1.14 完全一樣，而 Zephyr 的 GitHub issue 裡，維護者在 v1.10 前後確實用 Arduino 101 連成功過，所以不排除跟板子批次或原廠 bootloader 版本有關。
+
+### 開 USB log：Quark 的 USB 可以當 console
+
+到後來 LED 已經不夠用了。Zephyr 1.14 的 `samples/subsys/usb/console` 在 `arduino_101` 上可用，所以做了一個除錯版，把 console 和藍牙 log 都改走 USB CDC 序列埠：
+
+```ini
+# usb_debug.conf（只用在除錯版）
+CONFIG_USB=y
+CONFIG_USB_DEVICE_STACK=y
+CONFIG_USB_UART_CONSOLE=y
+CONFIG_UART_INTERRUPT_DRIVEN=y
+CONFIG_UART_LINE_CTRL=y
+CONFIG_UART_CONSOLE_ON_DEV_NAME="CDC_ACM_0"
+# Windows 的 usbser 要 IAD 才認得 CDC，1.14 只有 composite 模式會送 IAD
+CONFIG_USB_COMPOSITE_DEVICE=y
+CONFIG_LOG=y
+CONFIG_BT_DEBUG_LOG=y
+CONFIG_BT_DEBUG_HCI_CORE=y
+CONFIG_BT_DEBUG_HCI_DRIVER=y
+```
+
+```dts
+/* usb_debug.overlay */
+/ {
+	chosen {
+		zephyr,console = &usb_cdc;
+	};
+};
+```
+
+兩個要注意的地方：
+
+- **少了 `CONFIG_USB_COMPOSITE_DEVICE`，Windows 上序列埠會顯示錯誤（Code 10）**：資料介面被當成獨立的裝置。改完描述元後最好換一個 PID，避免 Windows 沿用快取的舊設定。
+- **程式要等序列埠被打開（DTR）才開始初始化藍牙**，不然開機那段 log 會漏掉。反過來說，錄 log 的程式一關，log 就會塞住、連帶卡住藍牙執行緒，所以除錯版只在錄 log 時用。
+
+有了 log，問題 2 和問題 4 都是直接從 HCI 封包的內容和時間點看出來的。例如一個 13 bytes 的 ATT 回應送出 5 秒後，nRF51 才回報完成，剛好是下一個指令的 byte 進來把它「湊滿」的時候。
+
+### 最後的設定
+
+**nRF51（`hci_uart` 改版）**：把 `samples/bluetooth/hci_uart` 複製一份，`prj.conf` 沿用範例的 `nrf5.conf`，另外加三樣東西：
+
+```ini
+# prj.conf 追加
+CONFIG_CLOCK_CONTROL_NRF_K32SRC_RC=y      # 不依賴模組上有沒有 32 kHz 石英
+CONFIG_CLOCK_CONTROL_NRF_K32SRC_500PPM=y
+# CONFIG_UART_0_NRF_FLOW_CONTROL=y 保留
+```
+
+```dts
+/* curie_ble.overlay */
+&uart0 {
+	current-speed = <250000>;
+};
+```
+
+```c
+/* src/curie_cts.c：UART 驅動在 PRE_KERNEL_1 把 CTS 設成浮接輸入，
+ * 這裡在 POST_KERNEL 改成下拉 = 永遠成立，只留下 RTS 那半邊 */
+static int curie_cts_pulldown(struct device *unused)
+{
+	ARG_UNUSED(unused);
+	nrf_gpio_cfg_input(DT_NORDIC_NRF_UART_0_CTS_PIN, NRF_GPIO_PIN_PULLDOWN);
+	return 0;
+}
+SYS_INIT(curie_cts_pulldown, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE);
+```
+
+**x86（應用程式）**：
+
+```ini
+# prj.conf
+CONFIG_ARC_INIT=n
+CONFIG_GPIO=y
+CONFIG_BT=y
+CONFIG_BT_PERIPHERAL=y
+CONFIG_BT_DEVICE_NAME="A101 Zephyr"
+CONFIG_BT_H4=y
+# 不開 CONFIG_BT_NRF51_PM；UART0 的硬體流量控制維持板子預設（開）
+```
+
+```dts
+/* arduino_101.overlay：放在應用程式目錄，Zephyr 1.14 會自動套用 */
+&uart0 {
+	current-speed = <250000>;
+};
+```
+
+250 kbaud 的好處是兩邊都沒有誤差：x86 是 32 MHz ÷ (16 × 250000) = 8，nRF51 也原生支援 250000。每個 byte 是 40 µs，x86 的 16 bytes FIFO 能容忍 640 µs 的中斷延遲，沒有保護的那個方向（nRF51 → x86）也撐得住。
+
+GATT 服務本身照 1.14 的寫法：`BT_GATT_PRIMARY_SERVICE` + `BT_GATT_CHARACTERISTIC` + `BT_GATT_CCC` 組成 `bt_gatt_attr` 陣列，再用 `bt_gatt_service_register()` 註冊；通知用 `bt_gatt_notify()`，傳入的是特性的宣告屬性。
+
+### 從 Windows 測試的坑
+
+手邊沒有手機的話，可以直接用 PowerShell 5.1 呼叫 WinRT 的 BLE API 測，但有一堆坑：
+
+- **位址每次開機都會變**：控制器沒有公開位址，也沒開 settings 子系統，Zephyr 每次開機都產生新的靜態隨機位址（最高兩個 bit 為 1）。要用名稱或服務 UUID 找。
+- **Windows 會主動斷線**：沒配對過的裝置，如果沒有用 `GattSession` 設 `MaintainConnection = true`，幾秒後就被 Windows 斷線（HCI reason `0x13`），進行中的呼叫會回 `0x800704C7`（已取消）。
+- **讀取預設會拿快取**：`ReadValueAsync()` 要傳 `BluetoothCacheMode.Uncached`，不然計數器永遠是同一個值。
+- **PowerShell 5.1 的 WinRT 投射很殘缺**：
+  - 集合的 `Count` 和索引拿不到，要用 `ForEach-Object` 走訪。
+  - 回傳的 `IBuffer` 不能直接丟給 `DataReader`，要用反射呼叫 `WindowsRuntimeBufferExtensions.ToArray(IBuffer)`。
+  - 寫入要用 `AsBuffer(byte[])` 產生 buffer。
+- **PowerShell 的小陷阱**：
+  - 變數不分大小寫，`$led` 和參數 `$Led` 是同一個。
+  - `Rd` 是 `Remove-Item` 的別名，不要拿來當函式名稱。
+
+最後的測試結果：連上、找到服務、讀到 LED 和計數器，寫入 `0`／`1` 板上 LED 跟著熄滅／亮起，計數器 3 秒後加 3。
+
 ## 參考
 
 - [Zephyr v1.14 的 arduino_101 board 目錄與文件](https://github.com/zephyrproject-rtos/zephyr/tree/v1.14-branch/boards/x86/arduino_101)
@@ -182,3 +334,5 @@ while (-not ((& $dfu -l 2>&1 | Out-String) -match '8087:0aba')) { Start-Sleep -M
 - [Arduino blog：Intel releases the Arduino 101 firmware source code](https://blog.arduino.cc/2016/04/21/intel-releases-the-arduino-101-firmware-source-code/)（燒錯 bootloader 需 JTAG 救的警告）
 - [Zephyr SDK 0.10.3 release](https://github.com/zephyrproject-rtos/sdk-ng/releases/tag/v0.10.3)
 - [dfu-util](https://dfu-util.sourceforge.net/)、[Zadig](https://zadig.akeo.ie)
+- [Zephyr issue #5145：Arduino 101 上 peripheral CSC 連線失敗](https://github.com/zephyrproject-rtos/zephyr/issues/5145)（維護者在 v1.10 前後用 Arduino 101 連成功的紀錄）、[issue #3812：Arduino 101 藍牙 init failed (err -19)](https://github.com/zephyrproject-rtos/zephyr/issues/3812)
+- [Zephyr HCI UART 範例說明](https://docs.zephyrproject.org/latest/samples/bluetooth/hci_uart/README.html)（預設 1 Mbaud + RTS/CTS）
