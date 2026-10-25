@@ -32,7 +32,7 @@
 
 ## 中斷 autoboot
 
-這塊板子 `bootdelay=0`，`Press SPACE to abort autoboot in 0 seconds` 幾乎沒時間按。解法是上電前就開始每 20ms 送一個空白，看到 `=> ` 才停。U-Boot 在 `bootdelay=0` 時仍會檢查一次 UART 有沒有輸入。
+這塊板子 `bootdelay=0`，`Press SPACE to abort autoboot in 0 seconds` 幾乎沒時間按。解法是上電前就開始每 20ms 送一個空白，看到 `=>` 提示符才停。U-Boot 在 `bootdelay=0` 時仍會檢查一次 UART 有沒有輸入。
 
 ## bdinfo / printenv 看到的東西
 

@@ -17,3 +17,23 @@ hola:
   label: Hola
   permalink: /hola
   description: Hola tag description
+
+beaglebone:
+  label: BeagleBone
+  permalink: /beaglebone
+  description: BeagleBone Black 等 TI AM335x 板子的實作紀錄
+
+u-boot:
+  label: U-Boot
+  permalink: /u-boot
+  description: U-Boot bootloader
+
+linux-kernel:
+  label: Linux kernel
+  permalink: /linux-kernel
+  description: Linux kernel 編譯、設定與除錯
+
+bring-up:
+  label: Bring-up
+  permalink: /bring-up
+  description: 板級 bring-up 與開機流程除錯
