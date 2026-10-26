@@ -201,6 +201,7 @@ cpsw-switch 4a100000.switch end0: renamed from eth0
 
 ## 下一步
 
+- 已完成的後續：[驗證 arm32 kexec 並修掉 cpsw 的 kexec bug](./bbb-kexec-cpts.md)、[寫一個最小的 platform driver](./bbb-platform-driver.md)。
 - 追原廠 6.12 軟重開卡死：`systemctl reboot` 後停在 `Stopped serial-getty@ttyGS0` 就沒有輸出，網路還活著，可重現。從 `journalctl -b -1` 或 `systemd.log_level=debug` 下手。
 - 刻意弄壞：拿掉 dtb、改壞 `console=`、`root=` 指錯，看各自停在哪。
 - 按住 S2 開機，驗證目前的 U-Boot 2019.04 是不是來自 eMMC。
