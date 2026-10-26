@@ -17,6 +17,33 @@
 
 踩到的坑：CP2102 和 BBB 插在同一顆 USB hub 上，BBB 上電瞬間整顆 hub 重新列舉，`ttyUSB0` 掉線約 2 秒，SPL 那段 log 剛好就在這 2 秒內印完而漏錄。錄 log 的程式要能斷線自動重連；想錄到 SPL，UART 轉接器要插主機板直連埠，或 BBB 改用 DC 供電。
 
+### 先確認是哪個裝置、線有沒有通
+
+```bash
+udevadm info /dev/ttyUSB0 | grep -E 'ID_MODEL=|ID_VENDOR_ID|ID_MODEL_ID'   # CP2102_USB_to_UART_Bridge_Controller
+udevadm info /dev/ttyACM0 | grep ID_MODEL=                                 # TI_AM335x_BeagleBone_Black
+id | grep -o dialout                                                       # 自己要在 dialout 群組
+# 送一個 Enter，4 秒內有回應就代表雙向都通
+stty -F /dev/ttyUSB0 115200 cs8 -cstopb -parenb -crtscts raw -echo
+(timeout 4 cat /dev/ttyUSB0 > probe.txt &); sleep 0.5; printf '\r' > /dev/ttyUSB0; sleep 4; cat -v probe.txt
+```
+
+### 錄 log 和送指令的工具
+
+minicom 是給人看的，要讓程式（和 Claude Code）讀得到、也能代打指令，我另外寫了兩支小工具：
+
+- [`serial_console.py`](https://github.com/alanhc/til/blob/main/static/bbb/serial_console.py)：每行加主機時間戳寫進 log；寫進 `logs/tx.fifo` 的東西會送給板子；`logs/break.flag` 存在時負責攔 autoboot（見下一節）；USB 斷線會自動重連。
+- [`ub.sh`](https://github.com/alanhc/til/blob/main/static/bbb/ub.sh)：送一條 U-Boot 指令，等到下一個 `=>` 再把輸出印出來。
+
+```bash
+mkdir -p ~/bbb-bringup/logs && cd ~/bbb-bringup
+python3 serial_console.py /dev/ttyUSB0 logs/current.log &     # pyserial 要用系統的 python3
+printf 'bdinfo\r' > logs/tx.fifo                              # 直接送
+./ub.sh 'printenv bootcmd'                                     # 送並等 =>
+```
+
+注意 logger 開著時 `/dev/ttyUSB0` 被它佔住，要自己開 minicom 前先把它停掉。
+
 ## 正常開機長什麼樣
 
 先錄一份原廠完整開機 log 當對照組，之後弄壞東西時才知道哪裡不一樣。
@@ -40,6 +67,40 @@
 ## 中斷 autoboot
 
 這塊板子 `bootdelay=0`，`Press SPACE to abort autoboot in 0 seconds` 幾乎沒時間按。解法是上電前就開始每 20ms 送一個空白，看到 `=>` 提示符才停。U-Boot 在 `bootdelay=0` 時仍會檢查一次 UART 有沒有輸入。
+
+```bash
+touch logs/break.flag    # 上電前先打開；攔到 => 之後 serial_console.py 會自己刪掉它
+# 然後拔電再插回去
+grep -n 'autoboot interrupted' logs/current.log | tail -1
+```
+
+這個「攔 autoboot」的邏輯改了四版才穩，每一版都是被實際上電打臉：
+
+| 版本 | 做法 | 出了什麼事 |
+|---|---|---|
+| 1 | flag 存在就一直每 20ms 送空白 | 攔得到，但空白也灌進了 Linux：login prompt 收到一長串空白，那次軟重開還卡在關機（後來證實卡住另有原因） |
+| 2 | 只在看到 `U-Boot 20xx` banner 之後、`Starting kernel` 之前送 | 沒攔到：只在最後 64 bytes 裡找 banner，但 CP2102 一次丟進幾百 bytes，banner 還沒檢查就被擠出去了 |
+| 3 | 每收到一塊資料就整塊掃描 `U-Boot 20` / `Board:` / `DRAM:` / `Starting kernel` | 又漏一次：USB hub 重新列舉花了 4 秒，port 回來時 U-Boot 已經印到 `Board:` 之後 |
+| 4 | port 重新打開時，只要 flag 還在，先**盲送 4 秒**，再接標記判斷 | 之後就穩了；但 hub 慢到 3 秒以上、資料一次湧進來時還是可能漏 |
+
+改版時先用 pty 當假 serial port 模擬，不必每次都請人插拔一次：
+
+```python
+import os, pty, subprocess, time, tty
+m, s = pty.openpty(); tty.setraw(s)
+open("logs/break.flag", "w").close()
+p = subprocess.Popen(["python3", "serial_console.py", os.ttyname(s), "logs/t.log"])
+time.sleep(0.3)
+os.write(m, b"[  1.0] systemd stuff\r\n")                    # Linux 階段：不該收到空白
+os.write(m, b"U-Boot 2019.04 banner\r\n" + b"x" * 500 + b"\r\nPress SPACE\r\n")
+time.sleep(0.3); os.set_blocking(m, False)
+print(os.read(m, 4096).count(b" "), "spaces sent")         # 應該 > 0
+os.write(m, b"=> "); time.sleep(0.5)
+print("flag removed:", not os.path.exists("logs/break.flag"))
+p.terminate()
+```
+
+根本的解法是硬體：UART 轉接器不要和 BBB 共用 USB hub。
 
 ## bdinfo / printenv 看到的東西
 
@@ -143,9 +204,47 @@ Starting kernel ...
 
 PC 端沒有現成 TFTP server，用系統的 dnsmasq 只開 TFTP（`--port=0` 關掉 DNS、不開 DHCP），並用 `--interface` + `--bind-interfaces` 只綁接板子的那張網卡。
 
+PC 這邊的準備：
+
+```bash
+mkdir -p ~/bbb-bringup/tftp && cd ~/bbb-bringup/tftp
+# 先從板子把原廠的 kernel / initrd / dtb 拷回來當對照組
+scp debian@192.168.10.242:/boot/vmlinuz-6.12.45-bone34 zImage
+scp debian@192.168.10.242:/boot/initrd.img-6.12.45-bone34 initrd.img
+scp debian@192.168.10.242:/boot/dtbs/6.12.45-bone34/am335x-boneblack.dtb .
+
+# 有 sudo 的話直接跑 dnsmasq：
+sudo dnsmasq -k --port=0 --enable-tftp --tftp-root=$PWD --tftp-secure \
+     --interface=enp5s0 --bind-interfaces
+# 當時沒有 sudo，改用 docker（使用者在 docker 群組）以 root 身分 chroot 回主機跑同一支 dnsmasq：
+docker run -d --name bbb-tftp --net=host -v /:/host:ro debian:13-slim \
+  chroot /host /usr/sbin/dnsmasq -k --port=0 --enable-tftp --tftp-root=$PWD --tftp-secure \
+  --interface=enp5s0 --bind-interfaces --user=$USER --group=$USER --pid-file= --log-facility=-
+ss -ulnp | grep ':69 '        # 確認綁在 192.168.10.154:69
+```
+
+之後整套「攔 U-Boot → tftp 三個檔 → 設 bootargs → bootz → 等 login」包成 [`tftpboot.sh`](https://github.com/alanhc/til/blob/main/static/bbb/tftpboot.sh)：
+
+```bash
+touch logs/break.flag
+KERNEL=zImage DTB=am335x-boneblack.dtb INITRD=initrd.img ./tftpboot.sh   # 再去拔電插回
+```
+
 ### 踩坑：封包有到，回覆卻從 Tailscale 出去
 
 U-Boot `ping` 失敗、`tftp` 一直印 `T`（timeout）。在 PC 上 `tcpdump -ni enp5s0 host 192.168.10.242` 看得到板子的 ARP、ICMP echo request、TFTP RRQ，但**完全沒有回覆**。
+
+```bash
+sudo tcpdump -vv -ni enp5s0 'host 192.168.10.242'      # 同時在 U-Boot 跑 ping / tftp
+```
+
+```text
+192.168.10.242 > 192.168.10.154: ICMP echo request, id 0, seq 3, length 8
+192.168.10.242.3040 > 192.168.10.154.69: [no cksum] TFTP, length 38, RRQ "zImage" octet timeout 5 blksize 1468
+（重送三次，PC 一個回覆都沒有）
+```
+
+先排除防火牆：`sudo nft list ruleset` 和 `sudo iptables -S INPUT` 的 INPUT 都是 accept。接著看回程：
 
 ```text
 $ ip route get 192.168.10.242

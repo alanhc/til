@@ -15,6 +15,15 @@ DT 的 usr-led node（compatible = "bringup,usr-led"）
 
 U-Boot 那四步（時脈 → pinmux → 方向 → 輸出值），在這裡分別是 PM runtime、pinctrl、gpiolib、gpio-omap 在做。
 
+完整檔案：[`usr_led_sysfs.c`](https://github.com/alanhc/til/blob/main/static/bbb/usr_led_sysfs.c)（第一版）、[`usr_led.c`](https://github.com/alanhc/til/blob/main/static/bbb/usr_led.c)（LED class 版）、[`am335x-boneblack-usrled.dts`](https://github.com/alanhc/til/blob/main/static/bbb/am335x-boneblack-usrled.dts)、[`Makefile`](https://github.com/alanhc/til/blob/main/static/bbb/Makefile)、[`test-on-board.sh`](https://github.com/alanhc/til/blob/main/static/bbb/test-on-board.sh)、讀暫存器用的 [`regs.py`](https://github.com/alanhc/til/blob/main/static/bbb/regs.py)。
+
+先看原本 DT 裡 LED 怎麼寫：
+
+```bash
+grep -n "leds" -A40 arch/arm/boot/dts/ti/omap/am335x-bone-common.dtsi    # led2..led5 = gpio1 21..24
+grep -n "user_leds_s0" -A6 arch/arm/boot/dts/ti/omap/am335x-bone-common.dtsi
+```
+
 ## Device tree：把 USR3 從 gpio-leds 讓出來
 
 USR0–3 原本在 `am335x-bone-common.dtsi` 的 `leds` node 底下，由 `gpio-leds` 控制，四根腳的 pinmux（`user_leds_s0`）也掛在 `leds` node 上。另寫一個 dts include 原本的板子，刪掉 `led5`，給自己的 node：
@@ -34,7 +43,19 @@ USR0–3 原本在 `am335x-bone-common.dtsi` 的 `leds` node 底下，由 `gpio-
 };
 ```
 
-dts 放在 kernel 樹外面，就照 kernel 的方式自己跑 `cpp -nostdinc -I <dts 目錄> -I include -undef -D__DTS__ -x assembler-with-cpp`，再丟給 `scripts/dtc/dtc`。
+dts 放在 kernel 樹外面，就照 kernel 的方式自己跑 `cpp -nostdinc -I <dts 目錄> -I include -undef -D__DTS__ -x assembler-with-cpp`，再丟給 `scripts/dtc/dtc`：
+
+```bash
+K=~/bbb-bringup/linux
+cpp -nostdinc -I $K/arch/arm/boot/dts/ti/omap -I $K/include -undef -D__DTS__ \
+    -x assembler-with-cpp am335x-boneblack-usrled.dts -o usrled.tmp
+~/bbb-bringup/build-arm/scripts/dtc/dtc -I dts -O dtb -i $K/arch/arm/boot/dts/ti/omap \
+    -o am335x-boneblack-usrled.dtb usrled.tmp
+# 反編譯回來確認：usr-led 在、led5 不見了
+dtc -I dtb -O dts am335x-boneblack-usrled.dtb | grep -nE 'usr-led \{|bringup,usr-led|led-gpios|usr3'
+```
+
+dtc 會吐一串 `unit_address_vs_reg`、`simple_bus_reg` 的 warning，那是上游 `am33xx-l4.dtsi` 本來就有的，kernel 自己的 build 會用 `-Wno-...` 關掉。
 
 ## 第一版：自己的 sysfs 屬性
 
@@ -46,6 +67,45 @@ dts 放在 kernel 樹外面，就照 kernel 的方式自己跑 `cpp -nostdinc -I
 - `remove`：把燈關掉；GPIO 和記憶體由 `devm_*` 自動釋放。
 
 out-of-tree module 要對著編好的 kernel 樹建：`make -C <kernel> O=<build> M=$PWD modules`。build 目錄裡要有 `Module.symvers`，所以 kernel 那邊至少要跑過一次 `make modules`；`modinfo` 的 `vermagic` 要和板子上跑的 kernel 完全一樣，否則 `insmod` 會拒絕。
+
+```bash
+# kernel 樹要乾淨：之前為了 debug 加的 Makefile hack 會讓版本變成 -dirty，先還原
+git -C ~/bbb-bringup/linux checkout arch/arm/boot/compressed/Makefile
+cd ~/bbb-bringup/linux
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- O=../build-arm -j28 zImage modules
+cat ../build-arm/include/config/kernel.release              # 7.3.0-rc7-bringup
+grep -E '^CONFIG_(LEDS_GPIO|LEDS_CLASS)=' ../build-arm/.config   # 兩個都是 =m，後面會用到
+
+cd ~/bbb-bringup/drivers/usr-led && make                    # 編 usr_led.ko 和 dtb
+modinfo usr_led.ko | grep -E 'vermagic|alias|depends'
+#   vermagic: 7.3.0-rc7-bringup ...      ← 要和板子上的 uname -r 一致
+#   alias:    of:N*T*Cbringup,usr-led    ← MODULE_DEVICE_TABLE 產生的
+```
+
+上板：用新 dtb TFTP 開機，module 拷到 `/var/tmp`（不是 `/dev/shm`，原因見下面的坑）：
+
+```bash
+cp ../../build-arm/arch/arm/boot/zImage ~/bbb-bringup/tftp/zImage-usrled
+cp am335x-boneblack-usrled.dtb ~/bbb-bringup/tftp/
+touch ~/bbb-bringup/logs/break.flag
+KERNEL=zImage-usrled DTB=am335x-boneblack-usrled.dtb INITRD= \
+  BOOTARGS='console=ttyS0,115200n8 root=/dev/mmcblk0p3 ro rootfstype=ext4 rootwait earlycon net.ifnames=0' \
+  ~/bbb-bringup/tftpboot.sh                          # 然後拔電插回
+scp usr_led.ko debian@192.168.10.242:/var/tmp/
+```
+
+板子上：
+
+```bash
+ls /sys/firmware/devicetree/base/ | grep -E 'usr-led|leds'   # 新 dtb 生效了才看得到 usr-led
+sudo insmod /var/tmp/usr_led.ko
+dmesg | tail -3        # parsed 'led-gpios' property of node '/usr-led[0]' ... probed, LED on
+P=/sys/bus/platform/devices/usr-led
+cat $P/on; echo 0 | sudo tee $P/on; echo 1 | sudo tee $P/on
+echo maybe | sudo tee $P/on            # kstrtobool 拒絕，值不變
+sudo cat /sys/kernel/debug/gpio | grep usr3    # gpio-24 ([usr3 led] | led) out hi
+sudo rmmod usr_led; dmesg | tail -1    # removed, LED off
+```
 
 ## 第二版：改用 LED class
 
@@ -65,13 +125,49 @@ out-of-tree module 要對著編好的 kernel 樹建：`make -C <kernel> O=<build
 - **不用寫 `remove`**：`led_classdev_unregister()` 在沒設 `LED_RETAIN_AT_SHUTDOWN` 時會自己 `led_set_brightness(LED_OFF)`；`devm` 依註冊相反的順序收尾，先 unregister LED 再放掉 GPIO。
 - 名字照 `裝置:顏色:功能` 的慣例，可以用 DT 的 `label` 覆寫。
 
+LED class 版的 `modinfo` 會多出 `depends: led-class`，載入順序要照依賴：
+
+```bash
+scp usr_led.ko ~/bbb-bringup/build-arm/drivers/leds/led-class.ko \
+    ~/bbb-bringup/build-arm/drivers/leds/trigger/ledtrig-heartbeat.ko debian@192.168.10.242:/var/tmp/
+
+# 板子上
+sudo rmmod usr_led                       # 先卸下 sysfs 版
+sudo insmod /var/tmp/led-class.ko
+sudo insmod /var/tmp/usr_led.ko          # registered as bringup:green:usr3
+L=/sys/class/leds/bringup:green:usr3
+cat $L/max_brightness $L/brightness      # 1 / 0
+echo 1 | sudo tee $L/brightness; echo 0 | sudo tee $L/brightness
+cat $L/trigger                           # [none] ... cpu cpu0 mmc0 mmc1（沒有 timer、heartbeat：它們是 module）
+sudo insmod /var/tmp/ledtrig-heartbeat.ko
+echo heartbeat | sudo tee $L/trigger     # 開始心跳
+sudo rmmod usr_led
+ls /sys/class/leds/                      # 空了
+```
+
 `rmmod` 後實測：`/sys/class/leds/` 清空、`GPIO1_OE` bit24 回到 1（輸入）、`/sys/kernel/debug/gpio` 裡 gpio-24 的 consumer 消失。
 
 ## 踩到的坑
 
 - **`CONFIG_LEDS_GPIO=m`、`CONFIG_LEDS_CLASS=m`**：omap2plus 把 `gpio-leds`、LED class、各個 trigger 都編成 module。rootfs 裡沒有對應版本的 modules 時，USR LED 根本沒有 driver 在管，`trigger` 清單裡也只看得到編進 kernel 的（`cpu`、`mmc0`…）。用 `modinfo ... | grep depends` 看依賴，`insmod` 要照順序：`led-class.ko` → 自己的 driver → `ledtrig-heartbeat.ko`。
 - **pinctrl 跟著 device 走**：`user_leds_s0` 掛在 `leds` node 上，要等 `gpio-leds` probe 才會套用。`gpio-leds` 沒載入時，GPIO 還能動只是因為 U-Boot 已經把那幾根腳設成 `0x27`。自己的 node 正確的做法是帶自己的 `pinctrl-0`。
-- **燈沒亮時先讀暫存器**：透過 `/dev/mem` 讀 `conf_gpmc_a8`、`GPIO1_OE`、`GPIO1_DATAOUT`、`GPIO1_DATAIN`。`DATAIN` 跟著翻轉就代表電位真的到了 pad 上，問題不在 driver。那次「燈沒亮」其實有兩個原因疊在一起：第一次 serial 線鬆了，根本沒攔到 U-Boot、測試沒跑；第二次閃爍只排了 30 秒，看的時候已經結束了。之後請人看 LED 都讓目標那顆持續閃，用「會閃的那顆」辨認，不靠描述位置。
+- **燈沒亮時先讀暫存器**：透過 `/dev/mem` 讀 `conf_gpmc_a8`、`GPIO1_OE`、`GPIO1_DATAOUT`、`GPIO1_DATAIN`（`sudo python3 regs.py`，insmod 前後各讀一次）：
+
+  ```text
+                     insmod 前       insmod 後
+  conf_gpmc_a8       0x00000027      0x00000027      mode 7 = GPIO
+  GPIO1_OE   bit24   1（輸入）        0（輸出）
+  GPIO1_DATAOUT bit24 0              1
+  GPIO1_DATAIN bit24  0              1               腳位真的被拉高
+  ```
+
+  `DATAIN` 跟著翻轉就代表電位真的到了 pad 上，問題不在 driver。那次「燈沒亮」其實有兩個原因疊在一起：第一次 serial 線鬆了，根本沒攔到 U-Boot、測試沒跑；第二次閃爍只排了 30 秒，看的時候已經結束了。之後請人看 LED 都讓目標那顆持續閃，用「會閃的那顆」辨認，不靠描述位置：
+
+  ```bash
+  sudo systemd-run --unit=usrled-blink sh -c \
+    'for i in $(seq 1 60); do echo 1 > /sys/bus/platform/devices/usr-led/on; sleep 1;
+                              echo 0 > /sys/bus/platform/devices/usr-led/on; sleep 1; done'
+  ```
 - **板子上 `/dev/shm` 的檔案在 SSH 登出時會被 systemd-logind（`RemoveIPC`）清掉**，跨 session 要用的檔案放 `/var/tmp`；背景長跑的東西用 `sudo systemd-run`。
 
 ## 延伸練習

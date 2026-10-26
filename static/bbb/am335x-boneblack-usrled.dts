@@ -1,0 +1,18 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * BeagleBone Black with USR3 handed from gpio-leds to the usr-led practice
+ * driver. The pinmux for all four USR LEDs stays on the leds node.
+ */
+
+#include "am335x-boneblack.dts"
+
+/ {
+	leds {
+		/delete-node/ led5;
+	};
+
+	usr-led {
+		compatible = "bringup,usr-led";
+		led-gpios = <&gpio1 24 GPIO_ACTIVE_HIGH>;
+	};
+};
