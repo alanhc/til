@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 250" width="680" height="250" role="img" font-family="system-ui, -apple-system, 'Segoe UI', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif">
+<title>讓 GPIO 點亮 LED 的四個步驟</title><desc>時脈、pinmux、方向 OE、輸出值四個步驟，下方是在 U-Boot 實際讀到的數值，其中 OE 一開始全是輸入。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#9C9A92" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect x="40" y="40" width="140" height="56" rx="8" fill="#3C3489" stroke="#AFA9EC" stroke-width="0.75"/>
+<text x="110.0" y="59.0" fill="#EEEDFE" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">時脈</text>
+<text x="110.0" y="78.0" fill="#CECBF6" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">GPIO1_CLKCTRL</text>
+<line x1="110" y1="96" x2="110" y2="140" stroke="#9C9A92" stroke-width="0.75" stroke-dasharray="3 3"/>
+<rect x="40" y="140" width="140" height="56" rx="8" fill="#085041" stroke="#5DCAA5" stroke-width="0.75"/>
+<text x="110.0" y="159.0" fill="#E1F5EE" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">讀到 0x2</text>
+<text x="110.0" y="178.0" fill="#9FE1CB" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">已開啟</text>
+<rect x="193" y="40" width="140" height="56" rx="8" fill="#3C3489" stroke="#AFA9EC" stroke-width="0.75"/>
+<text x="263.0" y="59.0" fill="#EEEDFE" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">Pinmux</text>
+<text x="263.0" y="78.0" fill="#CECBF6" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">conf_gpmc_a5..a8</text>
+<line x1="263" y1="96" x2="263" y2="140" stroke="#9C9A92" stroke-width="0.75" stroke-dasharray="3 3"/>
+<rect x="193" y="140" width="140" height="56" rx="8" fill="#085041" stroke="#5DCAA5" stroke-width="0.75"/>
+<text x="263.0" y="159.0" fill="#E1F5EE" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">讀到 0x27</text>
+<text x="263.0" y="178.0" fill="#9FE1CB" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">mode 7 = GPIO</text>
+<line x1="182" y1="68" x2="191" y2="68" stroke="#9C9A92" stroke-width="1" marker-end="url(#arrow)"/>
+<rect x="346" y="40" width="140" height="56" rx="8" fill="#3C3489" stroke="#AFA9EC" stroke-width="0.75"/>
+<text x="416.0" y="59.0" fill="#EEEDFE" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">方向</text>
+<text x="416.0" y="78.0" fill="#CECBF6" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">GPIO_OE</text>
+<line x1="416" y1="96" x2="416" y2="140" stroke="#9C9A92" stroke-width="0.75" stroke-dasharray="3 3"/>
+<rect x="346" y="140" width="140" height="56" rx="8" fill="#633806" stroke="#EF9F27" stroke-width="0.75"/>
+<text x="416.0" y="159.0" fill="#FAEEDA" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">0xffffffff</text>
+<text x="416.0" y="178.0" fill="#FAC775" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">全是輸入，要清 0</text>
+<line x1="335" y1="68" x2="344" y2="68" stroke="#9C9A92" stroke-width="1" marker-end="url(#arrow)"/>
+<rect x="499" y="40" width="140" height="56" rx="8" fill="#3C3489" stroke="#AFA9EC" stroke-width="0.75"/>
+<text x="569.0" y="59.0" fill="#EEEDFE" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">輸出值</text>
+<text x="569.0" y="78.0" fill="#CECBF6" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">SET/CLEARDATAOUT</text>
+<line x1="569" y1="96" x2="569" y2="140" stroke="#9C9A92" stroke-width="0.75" stroke-dasharray="3 3"/>
+<rect x="499" y="140" width="140" height="56" rx="8" fill="#085041" stroke="#5DCAA5" stroke-width="0.75"/>
+<text x="569.0" y="159.0" fill="#E1F5EE" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">寫 0x01e00000</text>
+<text x="569.0" y="178.0" fill="#9FE1CB" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">bit 21–24，四顆亮</text>
+<line x1="488" y1="68" x2="497" y2="68" stroke="#9C9A92" stroke-width="1" marker-end="url(#arrow)"/>
+<text x="340.0" y="226" fill="#B4B2A9" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">Linux 的 gpio-omap 驅動和 DTS 裡的 pinctrl、gpio-leds，做的就是這四步</text>
+</svg>
