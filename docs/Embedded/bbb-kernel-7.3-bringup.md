@@ -29,6 +29,23 @@ serial_console.py ◄──── UART ───────────── b
                                            └─ 掛 SD 上原本的 rootfs
 ```
 
+開機鏈的每一層，以及這次的坑落在哪一層（橘色）：
+
+```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 400}}}%%
+flowchart TB
+  rom["<b>Boot ROM</b><br/>晶片內建，讀 SYSBOOT 找 MLO<br/>按住 S2 會改變開機順序"]
+  spl["<b>SPL（MLO）</b><br/>在內部 SRAM 跑，初始化 DDR<br/>坑：log 被 USB hub 重新列舉吃掉"]
+  ub["<b>U-Boot</b><br/>env、bootcmd、tftp、bootz<br/>坑：bootdelay=0，要狂送空白才攔得住"]
+  k["<b>Linux kernel</b><br/>解壓、讀 DTB、probe 驅動<br/>驗 Linux version 與 cmdline"]
+  u["<b>systemd 與 userspace</b><br/>掛 rootfs、起網路、login<br/>坑：少了 net.ifnames=0，網卡變 end0"]
+  rom --> spl --> ub --> k --> u
+  classDef ok fill:#EEEDFE,stroke:#534AB7,color:#26215C
+  classDef pit fill:#FAEEDA,stroke:#854F0B,color:#412402
+  class rom,k ok
+  class spl,ub,u pit
+```
+
 ## 第一步：編 kernel
 
 開發機原本沒有 ARM Linux 的交叉工具鏈（只有 bare-metal 的 `arm-none-eabi`），先裝：
@@ -163,6 +180,27 @@ sudo ip rule add to 192.168.10.0/24 lookup main priority 2500
 - `bootz` 的中間參數是 initrd，寫 `-` 代表不用。
 - `bringup.boot=tftp-own` 是我自己塞的標記，kernel 不認得這個參數，會原封不動放在 `/proc/cmdline` 裡，拿來證明這次用的是我設的 bootargs。
 - 先用 `md` 看一眼 zImage magic 和 FDT magic，可以避免「檔案根本沒載對」這種浪費一次開機的錯誤。
+
+這些位址在 DRAM 裡的相對位置（紫色是 tftp 放的位置，青色是之後被搬去的位置，不按比例）。搬移區的位址取自帶 initrd 的那次開機；這次沒帶 initrd，只有 DTB 會被搬：
+
+```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 460, "rankSpacing": 14}}}%%
+flowchart TB
+  top["0xA0000000　DRAM 頂端（512 MiB）"]
+  ubt["0x9FF59000　U-Boot 本體（relocate 後）"]
+  mv["0x8F5D2000　DTB + initrd，bootz 搬過來<br/>交給 kernel 的是這裡（r2 = DTB）"]
+  rd["0x88080000　initrd（rdaddr，10.5 MB）"]
+  dtb["0x88000000　DTB（fdtaddr，約 99 KB）"]
+  zi["0x82000000　zImage（loadaddr，5.7 MB）<br/>offset 0x24 = 016f2818"]
+  kn["0x80008000　kernel 解壓到這裡"]
+  top ~~~ ubt ~~~ mv ~~~ rd ~~~ dtb ~~~ zi ~~~ kn
+  classDef load fill:#EEEDFE,stroke:#534AB7,color:#26215C
+  classDef moved fill:#E1F5EE,stroke:#0F6E56,color:#04342C
+  classDef base fill:#F1EFE8,stroke:#5F5E5A,color:#2C2C2A
+  class rd,dtb,zi load
+  class mv,kn moved
+  class top,ubt base
+```
 
 開機 log：
 

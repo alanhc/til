@@ -21,6 +21,23 @@
 
 先錄一份原廠完整開機 log 當對照組，之後弄壞東西時才知道哪裡不一樣。
 
+開機鏈的每一層，以及這次在哪一層踩到坑（橘色）：
+
+```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 400}}}%%
+flowchart TB
+  rom["<b>Boot ROM</b><br/>晶片內建，讀 SYSBOOT 找 MLO<br/>按住 S2 會改變開機順序"]
+  spl["<b>SPL（MLO）</b><br/>在內部 SRAM 跑，初始化 DDR<br/>坑：log 被 USB hub 重新列舉吃掉"]
+  ub["<b>U-Boot</b><br/>env、bootcmd、tftp、bootz<br/>坑：bootdelay=0，要狂送空白才攔得住"]
+  k["<b>Linux kernel</b><br/>解壓、讀 DTB、probe 驅動<br/>驗 Linux version 與 cmdline"]
+  u["<b>systemd 與 userspace</b><br/>掛 rootfs、起網路、login<br/>坑：少了 net.ifnames=0，網卡變 end0"]
+  rom --> spl --> ub --> k --> u
+  classDef ok fill:#EEEDFE,stroke:#534AB7,color:#26215C
+  classDef pit fill:#FAEEDA,stroke:#854F0B,color:#412402
+  class rom,k ok
+  class spl,ub,u pit
+```
+
 | 階段 | 看到什麼 |
 |---|---|
 | U-Boot | `U-Boot 2019.04`、`DRAM: 512 MiB`、從 EEPROM 讀到 `board_name=A335BNLT` |
@@ -47,6 +64,22 @@
 ## 用 md/mw 點 USR LED
 
 USR0–3 接在 GPIO1 的 bit 21–24，GPIO1 基底 `0x4804_C000`。
+
+讓一個 GPIO 動起來要依序過四關，下面每格的數值是這次在 U-Boot 實際讀到的：
+
+```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 400}}}%%
+flowchart TB
+  clk["<b>時脈</b><br/>CM_PER_GPIO1_CLKCTRL<br/>讀到 0x2：已開啟"]
+  pin["<b>Pinmux</b><br/>conf_gpmc_a5..a8<br/>讀到 0x27：mode 7 = GPIO"]
+  oe["<b>方向</b><br/>GPIO_OE<br/>0xffffffff：全是輸入，要清 0"]
+  out["<b>輸出值</b><br/>SET/CLEARDATAOUT<br/>寫 0x01e00000：四顆亮"]
+  clk --> pin --> oe --> out
+  classDef ok fill:#E1F5EE,stroke:#0F6E56,color:#04342C
+  classDef pit fill:#FAEEDA,stroke:#854F0B,color:#412402
+  class clk,pin,out ok
+  class oe pit
+```
 
 先讀、不寫，確認前置條件：
 
@@ -96,6 +129,27 @@ USR0–3 接在 GPIO1 的 bit 21–24，GPIO1 基底 `0x4804_C000`。
 - `md.l ${loadaddr}`：`MZ`（EFI stub）+ 一串 ARM NOP `e1a00000`，offset 0x24 是 zImage magic **`016f2818`**。
 - `md.b ${fdtaddr}`：**`d0 0d fe ed`**，FDT magic。
 - 檢查三塊不重疊：kernel 8.8MB 到 `0x82876200` < dtb `0x88000000`；dtb 99KB 到 `0x88018493` < initrd `0x88080000`。很多 bring-up 失敗就是 kernel 變大蓋掉了 dtb。
+
+`bootz` 前後 DRAM 裡的配置（紫色是 load 放的位置，青色是之後被搬去的位置，不按比例）：
+
+```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 460, "rankSpacing": 14}}}%%
+flowchart TB
+  top["0xA0000000　DRAM 頂端（512 MiB）"]
+  ubt["0x9FF59000　U-Boot 本體（relocate 後）"]
+  mv["0x8F5D2000　DTB + initrd，bootz 搬過來<br/>交給 kernel 的是這裡（r2 = DTB）"]
+  rd["0x88080000　initrd（rdaddr，10.5 MB）"]
+  dtb["0x88000000　DTB（fdtaddr，約 99 KB）"]
+  zi["0x82000000　zImage（loadaddr，5.7 MB）<br/>offset 0x24 = 016f2818"]
+  kn["0x80008000　kernel 解壓到這裡"]
+  top ~~~ ubt ~~~ mv ~~~ rd ~~~ dtb ~~~ zi ~~~ kn
+  classDef load fill:#EEEDFE,stroke:#534AB7,color:#26215C
+  classDef moved fill:#E1F5EE,stroke:#0F6E56,color:#04342C
+  classDef base fill:#F1EFE8,stroke:#5F5E5A,color:#2C2C2A
+  class rd,dtb,zi load
+  class mv,kn moved
+  class top,ubt base
+```
 
 ```text
 => fdt addr ${fdtaddr}; fdt print / model    # "TI AM335x BeagleBone Black"

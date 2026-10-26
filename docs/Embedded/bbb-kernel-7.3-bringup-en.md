@@ -29,6 +29,23 @@ serial_console.py ◄──── UART ───────────── b
                                            └─ mount the existing rootfs on SD
 ```
 
+Each stage of the boot chain, and where this session's pitfalls landed (amber):
+
+```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 400}}}%%
+flowchart TB
+  rom["<b>Boot ROM</b><br/>On-chip; reads SYSBOOT, finds MLO<br/>Holding S2 changes the boot order"]
+  spl["<b>SPL (MLO)</b><br/>Runs in internal SRAM, sets up DDR<br/>Pitfall: log lost to USB hub re-enumeration"]
+  ub["<b>U-Boot</b><br/>env, bootcmd, tftp, bootz<br/>Pitfall: bootdelay=0, must spam spaces"]
+  k["<b>Linux kernel</b><br/>Decompress, read DTB, probe drivers<br/>Check Linux version and cmdline"]
+  u["<b>systemd and userspace</b><br/>Mount rootfs, bring up network, login<br/>Pitfall: no net.ifnames=0, NIC becomes end0"]
+  rom --> spl --> ub --> k --> u
+  classDef ok fill:#EEEDFE,stroke:#534AB7,color:#26215C
+  classDef pit fill:#FAEEDA,stroke:#854F0B,color:#412402
+  class rom,k ok
+  class spl,ub,u pit
+```
+
 ## Step 1: Build the kernel
 
 The host had no ARM Linux cross toolchain, only the bare-metal `arm-none-eabi` one, so:
@@ -163,6 +180,27 @@ With autoboot interrupted and the network working, in U-Boot:
 - The middle argument of `bootz` is the initrd; `-` means none.
 - `bringup.boot=tftp-own` is a marker of my own. The kernel doesn't recognize it and leaves it untouched in `/proc/cmdline`, which proves the boot used my bootargs.
 - Checking the zImage magic and FDT magic with `md` first avoids wasting a boot on files that never loaded correctly.
+
+Where these addresses sit in DRAM (purple is where tftp puts things, teal is where they get moved later; not to scale). The relocation address comes from the boot that did use an initrd; this boot had none, so only the DTB gets moved:
+
+```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 460, "rankSpacing": 14}}}%%
+flowchart TB
+  top["0xA0000000　Top of DRAM (512 MiB)"]
+  ubt["0x9FF59000　U-Boot itself (after relocation)"]
+  mv["0x8F5D2000　DTB + initrd, moved by bootz<br/>This is what the kernel gets (r2 = DTB)"]
+  rd["0x88080000　initrd (rdaddr, 10.5 MB)"]
+  dtb["0x88000000　DTB (fdtaddr, ~99 KB)"]
+  zi["0x82000000　zImage (loadaddr, 5.7 MB)<br/>offset 0x24 = 016f2818"]
+  kn["0x80008000　Kernel decompresses here"]
+  top ~~~ ubt ~~~ mv ~~~ rd ~~~ dtb ~~~ zi ~~~ kn
+  classDef load fill:#EEEDFE,stroke:#534AB7,color:#26215C
+  classDef moved fill:#E1F5EE,stroke:#0F6E56,color:#04342C
+  classDef base fill:#F1EFE8,stroke:#5F5E5A,color:#2C2C2A
+  class rd,dtb,zi load
+  class mv,kn moved
+  class top,ubt base
+```
 
 Boot log:
 
