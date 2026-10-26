@@ -7,8 +7,30 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import {themes as prismThemes} from 'prism-react-renderer';
 import {nativeIdealImageRemarkPlugin} from 'docusaurus-plugin-native-ideal-image';
+import {visit} from 'unist-util-visit';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
+
+// nativeIdealImage 會把 markdown 裡所有 ![](...) 交給 sharp 轉成 JPEG／WebP，SVG 也不例外。
+// CI runner 沒有中日韓字型，SVG 裡的中文會被畫成方塊（cuda-hello-world 就是這樣壞的），
+// 轉成點陣圖也會失去 SVG 的深淺色切換。所以 SVG 先藏起來不讓它處理，原樣交給瀏覽器畫。
+const skipSvg = (plugin) => (options) => {
+  const transform = plugin(options);
+  return async (ast, ...rest) => {
+    const hidden = [];
+    visit(ast, {type: 'mdxJsxTextElement', name: 'img'}, (node) => {
+      const src = node.attributes.find((a) => a.name === 'src')?.value;
+      const text = typeof src === 'string' ? src : src?.value;
+      if (typeof text === 'string' && /\.svg(?:[?#"]|$)/i.test(text)) {
+        node.name = 'img-svg-skip';
+        hidden.push(node);
+      }
+    });
+    const result = await transform(ast, ...rest);
+    for (const node of hidden) node.name = 'img';
+    return result;
+  };
+};
 
 const baseUrl = '/til/';
 
@@ -61,7 +83,7 @@ const config = {
           // Remove this to remove the "edit this page" links.
           editUrl:
             'https://github.com/alanhc/til/tree/main/',
-          remarkPlugins: [remarkMath, [nativeIdealImageRemarkPlugin, {}]],
+          remarkPlugins: [remarkMath, [skipSvg(nativeIdealImageRemarkPlugin), {}]],
           rehypePlugins: [rehypeKatex],
         },
         blog: {

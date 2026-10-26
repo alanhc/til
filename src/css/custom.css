@@ -28,3 +28,10 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+/* 深淺色各一張圖：沿用 GitHub 的網址片段寫法，跟著網站的切換鈕走，不是跟作業系統。
+   ![說明](./x-light.svg#gh-light-mode-only) 加 ![說明](./x-dark.svg#gh-dark-mode-only) */
+[data-theme='light'] img[src$='#gh-dark-mode-only'],
+[data-theme='dark'] img[src$='#gh-light-mode-only'] {
+  display: none;
+}
