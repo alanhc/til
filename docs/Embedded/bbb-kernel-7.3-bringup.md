@@ -1,17 +1,10 @@
----
-slug: bbb-kernel-7.3-bringup
-title: 在 BeagleBone Black 上把自己編的 Linux 7.3 開起來
-authors: [alanhc]
-tags: [beaglebone, u-boot, linux-kernel, bring-up]
----
+# 在 BeagleBone Black 上把自己編的 Linux 7.3 開起來
 
-> English version: [Booting My Own Linux 7.3 Build on a BeagleBone Black](./2026-10-25-bbb-kernel-7.3-bringup-en.md)
+> English version: [Booting My Own Linux 7.3 Build on a BeagleBone Black](./bbb-kernel-7.3-bringup-en.md)
 
 手上有一塊 BeagleBone Black（TI AM335x，Cortex-A8，512 MiB），SD 卡裡跑著官方的 Debian 13 和 6.12 kernel。這次的目標很單純：**在桌機上交叉編譯 mainline Linux 7.3-rc7，透過 TFTP 丟給板子，讓它用自己編的 kernel 開到 login，而且網路要是通的。**
 
 聽起來是幾行指令的事，實際上一路踩了五個坑，其中只有一個跟 kernel 本身有關。這篇照實際發生的順序寫下來。
-
-{/* truncate */}
 
 ## 環境
 

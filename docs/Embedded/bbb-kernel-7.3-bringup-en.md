@@ -1,17 +1,10 @@
----
-slug: bbb-kernel-7.3-bringup-en
-title: Booting My Own Linux 7.3 Build on a BeagleBone Black
-authors: [alanhc]
-tags: [beaglebone, u-boot, linux-kernel, bring-up]
----
+# Booting My Own Linux 7.3 Build on a BeagleBone Black
 
-> 中文版：[在 BeagleBone Black 上把自己編的 Linux 7.3 開起來](./2026-10-25-bbb-kernel-7.3-bringup.md)
+> 中文版：[在 BeagleBone Black 上把自己編的 Linux 7.3 開起來](./bbb-kernel-7.3-bringup.md)
 
 I have a BeagleBone Black (TI AM335x, Cortex-A8, 512 MiB) whose SD card runs the official Debian 13 image with a 6.12 kernel. The goal was simple: **cross-compile mainline Linux 7.3-rc7 on my desktop, hand it to the board over TFTP, and have it boot to a login prompt with working networking.**
 
 That sounds like a handful of commands. In practice I hit five problems along the way, and only one of them had anything to do with the kernel. This post walks through them in the order they happened.
-
-{/* truncate */}
 
 ## Setup
 

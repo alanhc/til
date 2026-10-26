@@ -2,6 +2,8 @@
 
 用 BeagleBone Black（AM335x）練 bring-up 的第一天紀錄：接 debug UART、錄完整開機 log、在 U-Boot 裡直接戳 GPIO 暫存器點 LED，最後不靠 `bootcmd`，自己一步步把 Linux 開起來。
 
+自編 Linux 7.3 走 TFTP 開機的完整過程另寫成一篇：[在 BeagleBone Black 上把自己編的 Linux 7.3 開起來](./bbb-kernel-7.3-bringup.md)。
+
 ## 接線
 
 - Debug UART 在板子上的 6-pin **J1**：pin 1 GND、pin 4 RX（BBB 收）、pin 5 TX（BBB 送），接 3.3V 的 USB-TTL（我用 CP2102）。VCC 不接，TX/RX 交叉。
