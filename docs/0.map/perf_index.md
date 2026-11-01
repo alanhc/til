@@ -29,6 +29,8 @@ kernel 與 driver 層的觀測工具見 [Embedded 系列索引](embedded_index.m
 |---|---|
 | [在沒有 Play 商店的 Pixel 8 上，把 CPU、GPU、NPU 都量出來](../pixel8-cpu-gpu-npu-benchmark.md) | 自編的 `AOSP_on_shiba` userdebug build 沒有 GMS，Geekbench／3DMark／AITuTu 那條路一開始就斷了。結論反而是：**正因為沒有現成跑分 App，才被迫面對系統暴露的原始介面，也才看見三個單元各自「會給出合理但錯誤數字」的陷阱**——包裝好的工具只會幫你把它們藏起來。含 `simpleperf` 的三個會說謊的地方、GPU 換個角度量、EdgeTPU「到底有沒有在跑」的判定、一支一鍵 runner，以及 NNAPI deprecated 之後怎麼辦 |
 | [在 Pixel 8 上追一個 llama.cpp 的 SVE 效能退化](../llama-cpp-pixel8-sve-flash-attention.md) | 起點只是「thread 綁大核到底值不值得」，做完卻拿到四個沒預期的東西。**量測設計 → 異常數字 → 往下追到 SVE 與 flash attention** 的完整過程，是這一類裡最接近真實除錯節奏的一篇 |
+| [Pixel 8 上的 llama.cpp：NEON、SVE、KleidiAI 三種 build 的逐步實測](../llama-cpp-pixel8-neon-sve-kleidiai.md) | 上一篇的**逐步重現版與根因更正**：每一步指令都在，熱點是 `simd-gemm.h` 的 scalar fallback；附 KleidiAI 對 Q8_0／Q6_K 的 1.8–2.3 倍 |
+| [用 ftrace 看 Pixel 8 的熱節流](../pixel8-ftrace-thermal-pressure.md) | 「量到的頻率」跟「實際被壓的 capacity」是兩回事：`cpu_frequency` 看不到節流，要看 `thermal_pressure_update` |
 | [影片解碼效能觀察](../performance_experient.md) | 判讀練習：從 YouTube 偵錯面板的 `Codecs` 與 `Color` 欄位判斷**走軟解還是硬解**（VP9 Profile 2、`smpte2084 (PQ)`／`bt2020` HDR10），以及瀏覽器版與 App 版的關鍵差異 |
 
 ## 三、觀測層次與系統機制

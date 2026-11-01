@@ -1,5 +1,9 @@
 # 在 Pixel 8 上追一個 llama.cpp 的 SVE 效能退化：從綁核實驗到 flash attention
 
+> **2026-11 更正**：本文第五節「真正的原因」把根因歸到 `vec.h` 的展開因子，後來直接反組譯熱點位址，
+> 看到的是 `simd-gemm.h` 的 **scalar fallback**（SVE build 被排除在 SIMD microkernel 之外）。
+> 前面的實驗與二分結果仍成立，根因請看 [Pixel 8 上的 llama.cpp：NEON、SVE、KleidiAI 三種 build 的逐步實測](llama-cpp-pixel8-neon-sve-kleidiai.md)。
+
 我原本要做的是一件很單純的事：在 Pixel 8 上量 llama.cpp 綁不同 CPU 核心組合的效能差異，看看「把 thread 綁在大核」到底值不值得。
 
 做完之後，我手上有四個東西是一開始沒預期的：
@@ -416,6 +420,13 @@ simpleperf 給出獨立的第二條證據：
 兩個 build 的 GEMM 走同一份 NEON i8mm 程式碼，拿它當內部基準：`flash_attn / gemm` 的比值從 0.106 變成 1.027，**flash attention 貴了 9.7 倍**。
 
 ### 真正的原因
+
+> **2026-11 更正**：下面這段的推論有誤。這裡數的是 FA 裡的 **SVE 指令**，而真正的熱迴圈是 **scalar** `fmadd`，
+> 不會出現在這種統計裡。用 `simpleperf report --sort vaddr_in_file` 找熱位址再反組譯，熱點落在
+> `simd-gemm.h` 的 scalar `simd_gemm`：`#if defined(GGML_SIMD) && !defined(__ARM_FEATURE_SVE) ...` 讓 SVE build
+> 的 tiled flash attention 退回三層純量迴圈。`ops.cpp` 編回 NEON 能修好，是因為 `simd-gemm.h` 就是被 `ops.cpp` include 的。
+> 詳見[新文第五、六節](llama-cpp-pixel8-neon-sve-kleidiai.md)；上游 issue
+> [ggml-org/llama.cpp#30051](https://github.com/ggml-org/llama.cpp/issues/30051)。
 
 `vec.h` 的 `ggml_vec_scale_f32`，SVE 路徑：
 
