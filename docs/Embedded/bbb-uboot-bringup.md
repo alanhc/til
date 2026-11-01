@@ -106,13 +106,34 @@ p.terminate()
 
 上面的開機鏈是「誰交棒給誰」，換成記憶體的角度看，每一段其實都在做同一件事：**下一段需要的空間，現在這段還沒有，或者會被蓋掉，所以先搬家**。
 
-![開機五步驟：Boot ROM 把 MLO 搬進 SRAM、SPL 初始化 DDR 後把 U-Boot 搬進 DRAM 0x80800000、U-Boot 把自己複製到 0x9FF59000、load 與 bootz 放置並搬移 kernel、DTB、initrd、zImage 把 kernel 解壓到 0x80008000](../assets/bbb/boot-memory-flow-zh-light.svg#gh-light-mode-only)
-![開機五步驟：Boot ROM 把 MLO 搬進 SRAM、SPL 初始化 DDR 後把 U-Boot 搬進 DRAM 0x80800000、U-Boot 把自己複製到 0x9FF59000、load 與 bootz 放置並搬移 kernel、DTB、initrd、zImage 把 kernel 解壓到 0x80008000](../assets/bbb/boot-memory-flow-zh-dark.svg#gh-dark-mode-only)
+AM335x 開機時會用到三個地方，性質完全不同：
 
-同樣五步畫在一張記憶體地圖上（圓圈數字對應上圖步驟，不按比例）：
+- **Boot ROM**：晶片內、唯讀，出廠就燒好，上電後 CPU 從這裡開始執行。
+- **內部 SRAM**：晶片內，上電就能用，但只有約 109 KB 給 ROM 放下載的 image。
+- **DRAM**：板子上外接的 DDR3，512 MiB，要等 SPL 設好 DDR 控制器（EMIF）才能讀寫。
 
-![AM335x 開機時的記憶體地圖：DRAM 由高到低是 U-Boot 本體 0x9FF59000、bootz 搬移後的 DTB 與 initrd 0x8F5D2000、DTB 與 initrd 0x88000000、zImage 0x82000000、SPL 的 BSS 0x80A00000、重定位前的 U-Boot 0x80800000、kernel 解壓位置 0x80008000；下方是晶片內 SRAM 的 MLO 0x402F0400 與 Boot ROM 0x40020000](../assets/bbb/boot-memory-map-zh-light.svg#gh-light-mode-only)
-![AM335x 開機時的記憶體地圖：DRAM 由高到低是 U-Boot 本體 0x9FF59000、bootz 搬移後的 DTB 與 initrd 0x8F5D2000、DTB 與 initrd 0x88000000、zImage 0x82000000、SPL 的 BSS 0x80A00000、重定位前的 U-Boot 0x80800000、kernel 解壓位置 0x80008000；下方是晶片內 SRAM 的 MLO 0x402F0400 與 Boot ROM 0x40020000](../assets/bbb/boot-memory-map-zh-dark.svg#gh-dark-mode-only)
+| 東西 | 放在哪 | 位址 | 誰放的 |
+|---|---|---|---|
+| Boot ROM 程式 | 晶片內 ROM | `0x4002_0000` | 出廠燒死 |
+| SPL（MLO 的內容） | 內部 SRAM | `0x402F_0400` | Boot ROM 從 SD 複製 |
+| SPL 的 BSS、malloc | DRAM | `0x80A0_0000` | SPL 初始化 DDR 後自己移過去 |
+| U-Boot（重定位前） | DRAM | `0x8080_0000` | SPL 從 SD 載入 |
+| U-Boot（重定位後） | DRAM 頂端 | `0x9FF5_9000` | U-Boot 自己搬 |
+| zImage | DRAM | `0x8200_0000` | `load`／`tftp` |
+| DTB、initrd | DRAM | `0x8800_0000`／`0x8808_0000` → `0x8F5D_2000`／`0x8F5E_E000` | `load` 放，`bootz` 再搬 |
+| kernel（解壓後） | DRAM | `0x8000_8000` | zImage 的解壓程式 |
+
+UART0（`0x44E0_9000`）、GPIO1（`0x4804_C000`）、EMIF（`0x4C00_0000`）這些位址雖然也能用 `md` 讀，但它們是周邊暫存器（MMIO），不是記憶體。
+
+下圖三條直欄就是三個地方（ROM 本身不放資料，所以只寫在左邊「跑在哪」）：
+
+![開機五步驟，分成內部 SRAM、DRAM、SD 卡或網路三欄：Boot ROM 把 MLO 從 SD 複製進 SRAM 0x402F0400；SPL 在 SRAM 裡初始化 DDR，再把 u-boot.img 從 SD 搬進 DRAM 0x80800000；U-Boot 在 DRAM 裡把自己搬到 0x9FF59000；load 把 zImage、DTB、initrd 放到 0x82000000 起，bootz 再把 DTB、initrd 搬到 0x8F5D2000；zImage 把 kernel 解壓到 0x80008000](../assets/bbb/boot-memory-flow-zh-light.svg#gh-light-mode-only)
+![開機五步驟，分成內部 SRAM、DRAM、SD 卡或網路三欄：Boot ROM 把 MLO 從 SD 複製進 SRAM 0x402F0400；SPL 在 SRAM 裡初始化 DDR，再把 u-boot.img 從 SD 搬進 DRAM 0x80800000；U-Boot 在 DRAM 裡把自己搬到 0x9FF59000；load 把 zImage、DTB、initrd 放到 0x82000000 起，bootz 再把 DTB、initrd 搬到 0x8F5D2000；zImage 把 kernel 解壓到 0x80008000](../assets/bbb/boot-memory-flow-zh-dark.svg#gh-dark-mode-only)
+
+同樣五步畫在一張記憶體地圖上，外框標出 DRAM、內部 SRAM、Boot ROM 三個區域（圓圈數字對應上圖步驟，不按比例）：
+
+![AM335x 開機時的記憶體地圖，分三個區域。DRAM 由高到低是 U-Boot 本體 0x9FF59000、bootz 搬移後的 DTB 與 initrd 0x8F5D2000、DTB 與 initrd 0x88000000、zImage 0x82000000、SPL 的 BSS 0x80A00000、重定位前的 U-Boot 0x80800000、kernel 解壓位置 0x80008000；中間隔著周邊暫存器；內部 SRAM 放 MLO 0x402F0400；Boot ROM 在 0x40020000](../assets/bbb/boot-memory-map-zh-light.svg#gh-light-mode-only)
+![AM335x 開機時的記憶體地圖，分三個區域。DRAM 由高到低是 U-Boot 本體 0x9FF59000、bootz 搬移後的 DTB 與 initrd 0x8F5D2000、DTB 與 initrd 0x88000000、zImage 0x82000000、SPL 的 BSS 0x80A00000、重定位前的 U-Boot 0x80800000、kernel 解壓位置 0x80008000；中間隔著周邊暫存器；內部 SRAM 放 MLO 0x402F0400；Boot ROM 在 0x40020000](../assets/bbb/boot-memory-map-zh-dark.svg#gh-dark-mode-only)
 
 位址的來源分兩種：`relocaddr`、`loadaddr`、bootz 搬移後的位址是這塊板子上實際讀到的；SRAM、U-Boot 載入位址、`bootm_size` 是 AM335x TRM 與 [U-Boot v2019.04 的 TI 預設設定](https://github.com/u-boot/u-boot/blob/v2019.04/include/configs/ti_armv7_common.h)。
 

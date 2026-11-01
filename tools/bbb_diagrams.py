@@ -61,9 +61,22 @@ class Svg:
                           f'fill="{fill}" stroke="{stroke}" stroke-width="0.75"/>')
         if sub is None:
             self._text(cx, y + h / 2, title, tc, title_size, 500, "middle")
-        else:
-            self._text(cx, y + h / 2 - 9, title, tc, title_size, 500, "middle")
-            self._text(cx, y + h / 2 + 10, sub, sc, 12, 400, "middle")
+            return
+        lines = (sub,) if isinstance(sub, str) else sub
+        top = y + h / 2 - 9 * len(lines)
+        self._text(cx, top, title, tc, title_size, 500, "middle")
+        for i, line in enumerate(lines):
+            self._text(cx, top + 19 + 17 * i, line, sc, 12, 400, "middle")
+
+    def region(self, x, y, w, h, ramp, title, sub=None):
+        """A tinted, dashed frame marking a memory region, labelled at its top-left."""
+        fill, stroke, tc, sc = self.p[ramp]
+        self.parts.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="10" '
+                          f'fill="{fill}" fill-opacity="0.45" stroke="{stroke}" '
+                          'stroke-width="0.75" stroke-dasharray="4 3"/>')
+        self._text(x + 12, y + 16, title, tc, 13, 600, "start")
+        if sub:
+            self._text(x + 12, y + 33, sub, sc, 11, 400, "start")
 
     def text(self, x, y, s, size=12, anchor="start", color=None):
         self._text(x, y, s, color or self.p["muted"], size, 400, anchor)
@@ -170,33 +183,46 @@ TEXT = {
     "boot-memory-flow": {
         "zh": {
             "title": "開機每一段跑在哪、把誰搬去哪",
-            "desc": "五個步驟由上而下：Boot ROM 把 MLO 搬進 SRAM、SPL 初始化 DDR 後把 U-Boot 搬進 DRAM、"
-                    "U-Boot 把自己搬到 DRAM 頂端、load 與 bootz 放置並搬移 kernel、DTB、initrd、"
-                    "zImage 把 kernel 解壓到 DRAM 開頭。左邊是程式在哪裡執行，右邊是它搬了什麼。",
-            # (步驟, 跑在哪, 左框顏色, 搬了什麼, 細節, 右框顏色)
+            "desc": "三條直欄是三個地方：內部 SRAM、DRAM、SD 卡或網路。五個步驟由上而下："
+                    "Boot ROM 把 MLO 從 SD 複製進 SRAM；SPL 在 SRAM 裡初始化 DDR，再把 u-boot.img 搬進 DRAM；"
+                    "U-Boot 在 DRAM 裡把自己搬到頂端；U-Boot 把 zImage、DTB、initrd 放進 DRAM，bootz 再搬一次；"
+                    "zImage 在 DRAM 裡把 kernel 解壓到 0x80008000。",
+            "lanes": {
+                "sram": ("amber", "內部 SRAM", "晶片內，約 109 KB"),
+                "dram": ("purple", "DRAM（外部 DDR3）", "0x80000000 起，512 MiB"),
+                "sd": ("gray", "SD 卡 / 網路", "還沒進記憶體"),
+            },
+            # (步驟, 程式跑在哪, [(欄, 標題, 說明)], 箭頭 (從, 到) 或 None, 箭頭上的字)
             "steps": [
-                ("① Boot ROM", "晶片內 ROM", "amber",
-                 "MLO：SD → SRAM 0x402F0400", "DDR 還不能用，最多 109 KB", "amber"),
-                ("② SPL（MLO）", "內部 SRAM", "amber",
-                 "先初始化 DDR，再搬 u-boot.img", "SD → DRAM 0x80800000", "purple"),
-                ("③ U-Boot", "DRAM 0x80800000", "purple",
-                 "把自己複製到 DRAM 頂端", "→ 0x9FF59000，reloc off 0x1F759000", "gray"),
-                ("④ load + bootz", "DRAM 0x9FF59000", "gray",
-                 "zImage / DTB / initrd 放進低位址", "bootz 再把 DTB、initrd 搬到 0x8F5D2000", "teal"),
-                ("⑤ zImage 解壓程式", "DRAM 0x82000000", "purple",
-                 "kernel 解壓到 0x80008000", "開 MMU 後對應虛擬位址 0xC0008000", "teal"),
+                ("① Boot ROM", "跑在晶片內 ROM",
+                 [("sram", "SPL", "0x402F0400"), ("sd", "MLO", "FAT 分割區")],
+                 ("sd", "sram"), "ROM 複製（DDR 還不能用）"),
+                ("② SPL", "跑在 SRAM",
+                 [("sram", "SPL 執行中", "初始化 DDR"), ("dram", "u-boot.img", "0x80800000"),
+                  ("sd", "u-boot.img", "FAT 分割區")],
+                 ("sd", "dram"), None),
+                ("③ U-Boot", "跑在 DRAM",
+                 [("dram", "U-Boot 搬自己到頂端", "0x80800000 → 0x9FF59000")], None, None),
+                ("④ load + bootz", "U-Boot 執行",
+                 [("dram", "zImage / DTB / initrd",
+                   ("load 放到 0x82000000 起", "bootz 再搬到 0x8F5D2000")),
+                  ("sd", "3 個檔", "ext4 或 TFTP")],
+                 ("sd", "dram"), None),
+                ("⑤ zImage", "解壓程式跑在 DRAM",
+                 [("dram", "kernel 解壓", "0x82000000 → 0x80008000")], None, None),
             ],
-            "legend": ("晶片內 ROM / SRAM", "DRAM", "被搬過去的位置"),
         },
     },
     "boot-memory-map": {
         "zh": {
             "title": "AM335x 開機時的完整記憶體地圖",
-            "desc": "由高位址到低位址：DRAM 裡的 U-Boot 本體、bootz 搬移後的 DTB 與 initrd、"
-                    "load 放的 DTB 與 initrd、zImage、SPL 的 BSS、重定位前的 U-Boot、kernel 解壓位置；"
-                    "中間隔著周邊暫存器區；最下面是晶片內 SRAM 的 MLO 與 Boot ROM。圓圈數字對應開機步驟。不按比例。",
-            "top": ("0xA0000000", "DRAM 頂端（512 MiB）"),
+            "desc": "由高位址到低位址分成三個區域。DRAM（外部 DDR3）：U-Boot 本體、bootz 搬移後的 DTB 與 initrd、"
+                    "load 放的 DTB 與 initrd、zImage、SPL 的 BSS、重定位前的 U-Boot、kernel 解壓位置。"
+                    "中間是周邊暫存器，不是記憶體。晶片內 SRAM：MLO／SPL。晶片內 ROM：Boot ROM。"
+                    "圓圈數字對應開機步驟。不按比例。",
             "rows": [
+                ("region", "purple", "DRAM（外部 DDR3，512 MiB）", "DDR 要等 SPL 初始化後才能用"),
+                ("addr", "0xA0000000", "DRAM 頂端"),
                 ("0x9FF59000", "gray", "③ U-Boot 本體（重定位後）", "下方接 malloc、gd、stack"),
                 ("0x8F5D2000", "teal", "④ DTB + initrd（bootz 搬過來）", "bootm_size 限制在 0x90000000 以下"),
                 ("0x88000000", "purple", "④ DTB、initrd（fdtaddr / rdaddr）", None),
@@ -204,11 +230,14 @@ TEXT = {
                 ("0x80A00000", "gray", "② SPL 的 BSS 與 malloc", "DDR 一起來就移出 SRAM"),
                 ("0x80800000", "purple", "② u-boot.img（重定位前）", None),
                 ("0x80008000", "teal", "⑤ kernel 解壓到這裡", None),
-                ("break", "0x80000000 DRAM 起點 ／ 下面隔著周邊暫存器：EMIF、UART0、GPIO1…"),
-                ("0x402F0400", "amber", "① MLO / SPL（內部 SRAM）", "ROM 的下載區到 0x4030B800"),
-                ("0x40020000", "amber", "Boot ROM（public ROM，唯讀）", None),
+                ("addr", "0x80000000", "DRAM 起點"),
+                ("break", "周邊暫存器（MMIO，不是記憶體）：EMIF、UART0、GPIO1…"),
+                ("region", "amber", "內部 SRAM（晶片內）", "上電就能用，Boot ROM 只能把東西放這裡"),
+                ("0x402F0400", "amber", "① MLO / SPL", "ROM 的下載區到 0x4030B800，約 109 KB"),
+                ("region", "gray", "Boot ROM（晶片內，唯讀）", "上電後 CPU 從這裡開始執行"),
+                ("0x40020000", "amber", "Boot ROM 程式", "出廠就燒死"),
             ],
-            "legend": ("load / 搬進來的位置", "之後被搬去的位置", "晶片內 ROM / SRAM"),
+            "legend": ("load / 搬進來的位置", "之後被搬去的位置", "U-Boot 自己用的"),
         },
     },
 }
@@ -263,45 +292,67 @@ def gpio_led(t, mode):
     return s.render()
 
 
+LANES = {"sram": (150, 130), "dram": (288, 230), "sd": (526, 134)}  # x, width
+
+
 def boot_memory_flow(t, mode):
-    steps = t["steps"]
-    h = 40 + len(steps) * 86 - 30 + 60
-    s = Svg(h, t["title"], t["desc"], mode)
-    for i, (name, where, ramp, what, detail, dest) in enumerate(steps):
-        y = 40 + i * 86
-        s.box(40, y, 220, 56, ramp, name, where)
-        s.arrow(262, y + 28, 296, y + 28)
-        s.box(300, y, 340, 56, dest, what, detail)
-        if i:
-            s.arrow(150, y - 28, 150, y - 2)
-    ly = 40 + len(steps) * 86 - 30 + 24
-    s.swatch(40, ly, "amber", t["legend"][0])
-    s.swatch(220, ly, "purple", t["legend"][1])
-    s.swatch(340, ly, "teal", t["legend"][2])
+    y, layout = 66, []
+    for step in t["steps"]:
+        h = 74 if any(not isinstance(c[2], str) for c in step[2]) else 56
+        layout.append((y, h, step))
+        y += h + 14
+    s = Svg(y + 10, t["title"], t["desc"], mode)
+    for lane, (x, w) in LANES.items():
+        ramp, title, sub = t["lanes"][lane]
+        s.region(x, 12, w, y - 16, ramp, title, sub)
+    for y0, h, (name, where, cells, move, note) in layout:
+        s._text(20, y0 + h / 2 - 9, name, s.p["gray"][2], 13, 500, "start")
+        s.text(20, y0 + h / 2 + 10, where)
+        for lane, title, sub in cells:
+            x, w = LANES[lane]
+            s.box(x + 8, y0, w - 16, h, t["lanes"][lane][0], title, sub, title_size=13)
+        if move:
+            src, dst = (LANES[k] for k in move)
+            s.arrow(src[0] + 6, y0 + h / 2, dst[0] + dst[1] - 6, y0 + h / 2)
+            if note:
+                x, w = LANES["dram"]
+                s.text(x + w / 2, y0 + h / 2 - 12, note, size=11, anchor="middle")
     return s.render()
 
 
 def boot_memory_map(t, mode):
-    y, layout = 44, []
+    heights = {"region": 40, "addr": 18, "break": 36}
+    y, layout = 16, []
     for row in t["rows"]:
-        h = 36 if row[0] == "break" else (56 if row[3] else 44)
+        h = heights.get(row[0]) or (56 if row[3] else 44)
+        if row[0] == "region" and layout and layout[-1][2][0] != "break":
+            y += 16  # keep neighbouring region frames apart
         layout.append((y, h, row))
-        y += h + 10
-    s = Svg(y + 34, t["title"], t["desc"], mode)
-    s.text(184, 26, t["top"][0], anchor="end")
-    s.text(200, 26, t["top"][1])
+        y += h + (4 if row[0] in heights else 10)
+    s = Svg(y + 40, t["title"], t["desc"], mode)
+    # region frames first so the boxes sit on top of them
+    starts = [i for i, (_, _, r) in enumerate(layout) if r[0] == "region"]
+    for n, i in enumerate(starts):
+        end = starts[n + 1] if n + 1 < len(starts) else len(layout)
+        end = next((j for j in range(i + 1, end) if layout[j][2][0] == "break"), end)
+        y_end = layout[end - 1][0] + layout[end - 1][1]
+        _, ramp, title, sub = layout[i][2]
+        s.region(20, layout[i][0], W - 40, y_end - layout[i][0] + 10, ramp, title, sub)
     for y0, h, row in layout:
-        if row[0] == "break":
-            s.leader(40, y0 + 4, W - 40, y0 + 4)
-            s.text(W / 2, y0 + 20, row[1], anchor="middle")
-            s.leader(40, y0 + h - 4, W - 40, y0 + h - 4)
+        if row[0] == "region":
             continue
-        addr, ramp, label, sub = row
-        s.box(200, y0, 420, h, ramp, label, sub)
-        s.text(184, y0 + h / 2, addr, anchor="end")
-    s.swatch(200, y + 12, "purple", t["legend"][0])
-    s.swatch(360, y + 12, "teal", t["legend"][1])
-    s.swatch(510, y + 12, "amber", t["legend"][2])
+        if row[0] == "addr":
+            s.text(184, y0 + h / 2, row[1], anchor="end")
+            s.text(200, y0 + h / 2, row[2])
+        elif row[0] == "break":
+            s.text(W / 2, y0 + h / 2 + 4, row[1], anchor="middle")
+        else:
+            addr, ramp, label, sub = row
+            s.box(200, y0, 420, h, ramp, label, sub)
+            s.text(184, y0 + h / 2, addr, anchor="end")
+    s.swatch(40, y + 18, "purple", t["legend"][0])
+    s.swatch(250, y + 18, "teal", t["legend"][1])
+    s.swatch(450, y + 18, "gray", t["legend"][2])
     return s.render()
 
 
