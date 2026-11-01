@@ -167,6 +167,50 @@ TEXT = {
             "note": "Linux 的 gpio-omap 驅動和 DTS 裡的 pinctrl、gpio-leds，做的就是這四步",
         },
     },
+    "boot-memory-flow": {
+        "zh": {
+            "title": "開機每一段跑在哪、把誰搬去哪",
+            "desc": "五個步驟由上而下：Boot ROM 把 MLO 搬進 SRAM、SPL 初始化 DDR 後把 U-Boot 搬進 DRAM、"
+                    "U-Boot 把自己搬到 DRAM 頂端、load 與 bootz 放置並搬移 kernel、DTB、initrd、"
+                    "zImage 把 kernel 解壓到 DRAM 開頭。左邊是程式在哪裡執行，右邊是它搬了什麼。",
+            # (步驟, 跑在哪, 左框顏色, 搬了什麼, 細節, 右框顏色)
+            "steps": [
+                ("① Boot ROM", "晶片內 ROM", "amber",
+                 "MLO：SD → SRAM 0x402F0400", "DDR 還不能用，最多 109 KB", "amber"),
+                ("② SPL（MLO）", "內部 SRAM", "amber",
+                 "先初始化 DDR，再搬 u-boot.img", "SD → DRAM 0x80800000", "purple"),
+                ("③ U-Boot", "DRAM 0x80800000", "purple",
+                 "把自己複製到 DRAM 頂端", "→ 0x9FF59000，reloc off 0x1F759000", "gray"),
+                ("④ load + bootz", "DRAM 0x9FF59000", "gray",
+                 "zImage / DTB / initrd 放進低位址", "bootz 再把 DTB、initrd 搬到 0x8F5D2000", "teal"),
+                ("⑤ zImage 解壓程式", "DRAM 0x82000000", "purple",
+                 "kernel 解壓到 0x80008000", "開 MMU 後對應虛擬位址 0xC0008000", "teal"),
+            ],
+            "legend": ("晶片內 ROM / SRAM", "DRAM", "被搬過去的位置"),
+        },
+    },
+    "boot-memory-map": {
+        "zh": {
+            "title": "AM335x 開機時的完整記憶體地圖",
+            "desc": "由高位址到低位址：DRAM 裡的 U-Boot 本體、bootz 搬移後的 DTB 與 initrd、"
+                    "load 放的 DTB 與 initrd、zImage、SPL 的 BSS、重定位前的 U-Boot、kernel 解壓位置；"
+                    "中間隔著周邊暫存器區；最下面是晶片內 SRAM 的 MLO 與 Boot ROM。圓圈數字對應開機步驟。不按比例。",
+            "top": ("0xA0000000", "DRAM 頂端（512 MiB）"),
+            "rows": [
+                ("0x9FF59000", "gray", "③ U-Boot 本體（重定位後）", "下方接 malloc、gd、stack"),
+                ("0x8F5D2000", "teal", "④ DTB + initrd（bootz 搬過來）", "bootm_size 限制在 0x90000000 以下"),
+                ("0x88000000", "purple", "④ DTB、initrd（fdtaddr / rdaddr）", None),
+                ("0x82000000", "purple", "④ zImage（loadaddr）", None),
+                ("0x80A00000", "gray", "② SPL 的 BSS 與 malloc", "DDR 一起來就移出 SRAM"),
+                ("0x80800000", "purple", "② u-boot.img（重定位前）", None),
+                ("0x80008000", "teal", "⑤ kernel 解壓到這裡", None),
+                ("break", "0x80000000 DRAM 起點 ／ 下面隔著周邊暫存器：EMIF、UART0、GPIO1…"),
+                ("0x402F0400", "amber", "① MLO / SPL（內部 SRAM）", "ROM 的下載區到 0x4030B800"),
+                ("0x40020000", "amber", "Boot ROM（public ROM，唯讀）", None),
+            ],
+            "legend": ("load / 搬進來的位置", "之後被搬去的位置", "晶片內 ROM / SRAM"),
+        },
+    },
 }
 
 
@@ -219,7 +263,50 @@ def gpio_led(t, mode):
     return s.render()
 
 
-BUILDERS = {"boot-chain": boot_chain, "bootz-memory": bootz_memory, "gpio-led": gpio_led}
+def boot_memory_flow(t, mode):
+    steps = t["steps"]
+    h = 40 + len(steps) * 86 - 30 + 60
+    s = Svg(h, t["title"], t["desc"], mode)
+    for i, (name, where, ramp, what, detail, dest) in enumerate(steps):
+        y = 40 + i * 86
+        s.box(40, y, 220, 56, ramp, name, where)
+        s.arrow(262, y + 28, 296, y + 28)
+        s.box(300, y, 340, 56, dest, what, detail)
+        if i:
+            s.arrow(150, y - 28, 150, y - 2)
+    ly = 40 + len(steps) * 86 - 30 + 24
+    s.swatch(40, ly, "amber", t["legend"][0])
+    s.swatch(220, ly, "purple", t["legend"][1])
+    s.swatch(340, ly, "teal", t["legend"][2])
+    return s.render()
+
+
+def boot_memory_map(t, mode):
+    y, layout = 44, []
+    for row in t["rows"]:
+        h = 36 if row[0] == "break" else (56 if row[3] else 44)
+        layout.append((y, h, row))
+        y += h + 10
+    s = Svg(y + 34, t["title"], t["desc"], mode)
+    s.text(184, 26, t["top"][0], anchor="end")
+    s.text(200, 26, t["top"][1])
+    for y0, h, row in layout:
+        if row[0] == "break":
+            s.leader(40, y0 + 4, W - 40, y0 + 4)
+            s.text(W / 2, y0 + 20, row[1], anchor="middle")
+            s.leader(40, y0 + h - 4, W - 40, y0 + h - 4)
+            continue
+        addr, ramp, label, sub = row
+        s.box(200, y0, 420, h, ramp, label, sub)
+        s.text(184, y0 + h / 2, addr, anchor="end")
+    s.swatch(200, y + 12, "purple", t["legend"][0])
+    s.swatch(360, y + 12, "teal", t["legend"][1])
+    s.swatch(510, y + 12, "amber", t["legend"][2])
+    return s.render()
+
+
+BUILDERS = {"boot-chain": boot_chain, "bootz-memory": bootz_memory, "gpio-led": gpio_led,
+            "boot-memory-flow": boot_memory_flow, "boot-memory-map": boot_memory_map}
 
 
 def main():

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 500" width="680" height="500" role="img" font-family="system-ui, -apple-system, 'Segoe UI', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif">
+<title>開機每一段跑在哪、把誰搬去哪</title><desc>五個步驟由上而下：Boot ROM 把 MLO 搬進 SRAM、SPL 初始化 DDR 後把 U-Boot 搬進 DRAM、U-Boot 把自己搬到 DRAM 頂端、load 與 bootz 放置並搬移 kernel、DTB、initrd、zImage 把 kernel 解壓到 DRAM 開頭。左邊是程式在哪裡執行，右邊是它搬了什麼。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#73726C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect x="40" y="40" width="220" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.75"/>
+<text x="150.0" y="59.0" fill="#633806" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">① Boot ROM</text>
+<text x="150.0" y="78.0" fill="#854F0B" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">晶片內 ROM</text>
+<line x1="262" y1="68" x2="296" y2="68" stroke="#73726C" stroke-width="1" marker-end="url(#arrow)"/>
+<rect x="300" y="40" width="340" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.75"/>
+<text x="470.0" y="59.0" fill="#633806" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">MLO：SD → SRAM 0x402F0400</text>
+<text x="470.0" y="78.0" fill="#854F0B" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">DDR 還不能用，最多 109 KB</text>
+<rect x="40" y="126" width="220" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.75"/>
+<text x="150.0" y="145.0" fill="#633806" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">② SPL（MLO）</text>
+<text x="150.0" y="164.0" fill="#854F0B" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">內部 SRAM</text>
+<line x1="262" y1="154" x2="296" y2="154" stroke="#73726C" stroke-width="1" marker-end="url(#arrow)"/>
+<rect x="300" y="126" width="340" height="56" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.75"/>
+<text x="470.0" y="145.0" fill="#3C3489" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">先初始化 DDR，再搬 u-boot.img</text>
+<text x="470.0" y="164.0" fill="#534AB7" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">SD → DRAM 0x80800000</text>
+<line x1="150" y1="98" x2="150" y2="124" stroke="#73726C" stroke-width="1" marker-end="url(#arrow)"/>
+<rect x="40" y="212" width="220" height="56" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.75"/>
+<text x="150.0" y="231.0" fill="#3C3489" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">③ U-Boot</text>
+<text x="150.0" y="250.0" fill="#534AB7" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">DRAM 0x80800000</text>
+<line x1="262" y1="240" x2="296" y2="240" stroke="#73726C" stroke-width="1" marker-end="url(#arrow)"/>
+<rect x="300" y="212" width="340" height="56" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.75"/>
+<text x="470.0" y="231.0" fill="#444441" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">把自己複製到 DRAM 頂端</text>
+<text x="470.0" y="250.0" fill="#5F5E5A" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">→ 0x9FF59000，reloc off 0x1F759000</text>
+<line x1="150" y1="184" x2="150" y2="210" stroke="#73726C" stroke-width="1" marker-end="url(#arrow)"/>
+<rect x="40" y="298" width="220" height="56" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.75"/>
+<text x="150.0" y="317.0" fill="#444441" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">④ load + bootz</text>
+<text x="150.0" y="336.0" fill="#5F5E5A" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">DRAM 0x9FF59000</text>
+<line x1="262" y1="326" x2="296" y2="326" stroke="#73726C" stroke-width="1" marker-end="url(#arrow)"/>
+<rect x="300" y="298" width="340" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.75"/>
+<text x="470.0" y="317.0" fill="#085041" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">zImage / DTB / initrd 放進低位址</text>
+<text x="470.0" y="336.0" fill="#0F6E56" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">bootz 再把 DTB、initrd 搬到 0x8F5D2000</text>
+<line x1="150" y1="270" x2="150" y2="296" stroke="#73726C" stroke-width="1" marker-end="url(#arrow)"/>
+<rect x="40" y="384" width="220" height="56" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.75"/>
+<text x="150.0" y="403.0" fill="#3C3489" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">⑤ zImage 解壓程式</text>
+<text x="150.0" y="422.0" fill="#534AB7" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">DRAM 0x82000000</text>
+<line x1="262" y1="412" x2="296" y2="412" stroke="#73726C" stroke-width="1" marker-end="url(#arrow)"/>
+<rect x="300" y="384" width="340" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.75"/>
+<text x="470.0" y="403.0" fill="#085041" font-size="14" font-weight="500" text-anchor="middle" dominant-baseline="central">kernel 解壓到 0x80008000</text>
+<text x="470.0" y="422.0" fill="#0F6E56" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">開 MMU 後對應虛擬位址 0xC0008000</text>
+<line x1="150" y1="356" x2="150" y2="382" stroke="#73726C" stroke-width="1" marker-end="url(#arrow)"/>
+<rect x="40" y="457" width="14" height="14" rx="3" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.75"/>
+<text x="62" y="464" fill="#5F5E5A" font-size="12" font-weight="400" text-anchor="start" dominant-baseline="central">晶片內 ROM / SRAM</text>
+<rect x="220" y="457" width="14" height="14" rx="3" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.75"/>
+<text x="242" y="464" fill="#5F5E5A" font-size="12" font-weight="400" text-anchor="start" dominant-baseline="central">DRAM</text>
+<rect x="340" y="457" width="14" height="14" rx="3" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.75"/>
+<text x="362" y="464" fill="#5F5E5A" font-size="12" font-weight="400" text-anchor="start" dominant-baseline="central">被搬過去的位置</text>
+</svg>

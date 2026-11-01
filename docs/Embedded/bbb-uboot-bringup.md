@@ -102,10 +102,67 @@ p.terminate()
 
 根本的解法是硬體：UART 轉接器不要和 BBB 共用 USB hub。
 
+## 從記憶體看開機：每一段跑在哪、把誰搬去哪
+
+上面的開機鏈是「誰交棒給誰」，換成記憶體的角度看，每一段其實都在做同一件事：**下一段需要的空間，現在這段還沒有，或者會被蓋掉，所以先搬家**。
+
+![開機五步驟：Boot ROM 把 MLO 搬進 SRAM、SPL 初始化 DDR 後把 U-Boot 搬進 DRAM 0x80800000、U-Boot 把自己複製到 0x9FF59000、load 與 bootz 放置並搬移 kernel、DTB、initrd、zImage 把 kernel 解壓到 0x80008000](../assets/bbb/boot-memory-flow-zh-light.svg#gh-light-mode-only)
+![開機五步驟：Boot ROM 把 MLO 搬進 SRAM、SPL 初始化 DDR 後把 U-Boot 搬進 DRAM 0x80800000、U-Boot 把自己複製到 0x9FF59000、load 與 bootz 放置並搬移 kernel、DTB、initrd、zImage 把 kernel 解壓到 0x80008000](../assets/bbb/boot-memory-flow-zh-dark.svg#gh-dark-mode-only)
+
+同樣五步畫在一張記憶體地圖上（圓圈數字對應上圖步驟，不按比例）：
+
+![AM335x 開機時的記憶體地圖：DRAM 由高到低是 U-Boot 本體 0x9FF59000、bootz 搬移後的 DTB 與 initrd 0x8F5D2000、DTB 與 initrd 0x88000000、zImage 0x82000000、SPL 的 BSS 0x80A00000、重定位前的 U-Boot 0x80800000、kernel 解壓位置 0x80008000；下方是晶片內 SRAM 的 MLO 0x402F0400 與 Boot ROM 0x40020000](../assets/bbb/boot-memory-map-zh-light.svg#gh-light-mode-only)
+![AM335x 開機時的記憶體地圖：DRAM 由高到低是 U-Boot 本體 0x9FF59000、bootz 搬移後的 DTB 與 initrd 0x8F5D2000、DTB 與 initrd 0x88000000、zImage 0x82000000、SPL 的 BSS 0x80A00000、重定位前的 U-Boot 0x80800000、kernel 解壓位置 0x80008000；下方是晶片內 SRAM 的 MLO 0x402F0400 與 Boot ROM 0x40020000](../assets/bbb/boot-memory-map-zh-dark.svg#gh-dark-mode-only)
+
+位址的來源分兩種：`relocaddr`、`loadaddr`、bootz 搬移後的位址是這塊板子上實際讀到的；SRAM、U-Boot 載入位址、`bootm_size` 是 AM335x TRM 與 [U-Boot v2019.04 的 TI 預設設定](https://github.com/u-boot/u-boot/blob/v2019.04/include/configs/ti_armv7_common.h)。
+
+### ① Boot ROM：DDR 還不能用，只有 SRAM
+
+- 上電後 CPU 從晶片內的 ROM 開始跑，讀 SYSBOOT 腳位（鎖存在 `CONTROL_STATUS`，`0x44E1_0040`）決定從 MMC、eMMC、UART 還是 USB 開機。
+- 這時 DDR 還沒初始化，ROM 唯一能放東西的地方是**內部 SRAM**：`0x402F_0400` 到 `0x4030_B800` 是給下載 image 的區域，約 109 KB。
+- MLO 是 `mkimage -T omapimage` 包出來的：前 512 bytes 是 TOC（CHSETTINGS），接著 8 bytes 的 GP header 寫著 image 大小和載入位址。ROM 照它把 SPL 複製到 `0x402F_0400` 再跳過去。
+- 這就是為什麼一定要有 SPL：完整的 U-Boot 好幾百 KB，SRAM 放不下。
+
+### ② SPL：在 SRAM 裡把 DDR 叫醒
+
+- SPL 設好 PLL、時脈、pinmux，再透過 EMIF 設 DDR3 時序。做完這步，`0x8000_0000` 起的 512 MiB 才能讀寫，U-Boot 印的 `DRAM: 512 MiB` 就是這裡來的。
+- DDR 一起來，SPL 就把自己的 BSS 和 malloc 移到 DRAM（`0x80A0_0000` 起），不再擠在 SRAM。
+- 接著從 SD 的 FAT 分割區讀 `u-boot.img`，放到 DRAM 的 `0x8080_0000` 再跳過去。這是**第一次從 SRAM 跨到 DRAM**。
+
+### ③ U-Boot：先把自己搬到 DRAM 頂端
+
+- U-Boot 一開始在 `0x8080_0000` 跑，`board_init_f` 量完 DRAM 大小、規劃好布局後，把整份自己複製到頂端的 `relocaddr = 0x9ff59000`，修正所有絕對位址，再跳到新位置繼續跑。
+- 位移量是 `0x9ff59000 − 0x80800000 = 0x1f759000`，就是 `bdinfo` 的 `reloc off`。用 gdb／JTAG 下斷點時，重定位後的符號要加上這個值。
+- 頂端往下依序是 U-Boot 本體、malloc 區、`bd`／`gd` 結構、stack。低位址整段空出來給 kernel。
+
+### ④ load + bootz：放進低位址，再搬一次
+
+- `load` 把 zImage、DTB、initrd 放到 `0x8200_0000`、`0x8800_0000`、`0x8808_0000`（細節和重疊檢查見[手動 load + bootz](#手動-load--bootz)）。
+- `bootz` 會把 DTB 和 initrd 再搬一次。它們沒有搬到 DRAM 真正的頂端 `0x9FFx_xxxx`，而是落在 `0x8F5D_2000`，因為 TI 的預設 env 有 `bootm_size=0x10000000`：只能用 DRAM 前 256 MB，也就是 `0x9000_0000` 以下。arm32 kernel 早期只看得到 lowmem，DTB 和 initrd 放太高會讀不到。
+- 可以用 `printenv bootm_size fdt_high initrd_high` 確認。
+
+### ⑤ zImage：自己再解壓一次
+
+- zImage 開頭是一段解壓程式，把真正的 kernel 解壓到 `PHYS_OFFSET + TEXT_OFFSET = 0x8000_8000`。
+- `loadaddr` 選 `0x8200_0000`，就是在解壓目的地上方留 32 MB，解壓時不會蓋到 zImage 自己；萬一重疊，解壓程式會先把自己搬開。
+- 開 MMU 之後，實體 `0x8000_0000` 對應到虛擬 `0xC000_0000`，之後 kernel log 裡看到的多半是虛擬位址。
+
+在板子上對得起來的幾個指令：
+
+```text
+=> md.l 0x44e10040 1     # CONTROL_STATUS：SYSBOOT 鎖存值
+=> bdinfo                # relocaddr、reloc off、DRAM bank
+=> printenv bootm_size   # 0x10000000
+```
+
+```bash
+xxd -s 0x200 -l 8 MLO    # GP header：image 大小、載入位址（預期是 00 04 2f 40）
+```
+
 ## bdinfo / printenv 看到的東西
 
 - DRAM 在 `0x8000_0000`，大小 `0x2000_0000`（512 MiB）。
-- `relocaddr = 0x9ff59000`：U-Boot 會把自己搬到 DRAM 頂端，把低位址讓給 kernel。
+- `relocaddr = 0x9ff59000`：U-Boot 會把自己搬到 DRAM 頂端，把低位址讓給 kernel（見上一節第 ③ 步）。
 - `bootcmd` = `findfdt` → `init_console` → `envboot` → `distro_bootcmd`。
 - `findfdt` 用 EEPROM 的 `board_name` / `board_rev` 決定 `fdtfile`，這就是 U-Boot 判斷「這是哪塊板子」的地方。
 - 原廠 `boot` 腳本裡穿插 `gpio set 53..56`，那四個 GPIO 就是 USR0–3 LED，拿來當**開機進度條**。
