@@ -7,7 +7,7 @@ description: "以 ARMv8 開機鏈為主軸，拆解 U-Boot 作為 BL33 的角色
 
 # ARMv8 開機鏈三部曲（三）：U-Boot — 從 BL33 到 Starting kernel
 
-> **系列文章**：[（一）TF-A](./tf-a.md)｜[（二）OP-TEE](./optee.md)｜（三）U-Boot（本文）
+> **系列文章**：[（一）TF-A](./tf-a.md)｜[（二）OP-TEE](./optee.md)｜（三）U-Boot（本文）｜ [實作篇：在 QEMU 上從原始碼拼完整開機鏈](./tf-a-optee-qemu-from-source.md)
 
 > 本文原始碼路徑以 U-Boot 上游 `master`（撰寫時 Makefile 版本為 2026.10 開發週期）為準；不同版本檔名或函式可能有差異，請以你手上的 tree 為主。
 

@@ -7,7 +7,7 @@ description: "從 Exception Level、BL1/BL2/BL31 分工、FIP 與 Trusted Board 
 
 # ARMv8 開機鏈三部曲（一）：Trusted Firmware-A
 
-> **系列文章**：**（一）TF-A（本文）** ｜ [（二）OP-TEE](./optee.md) ｜ [（三）U-Boot](./u-boot.md)
+> **系列文章**：**（一）TF-A（本文）** ｜ [（二）OP-TEE](./optee.md) ｜ [（三）U-Boot](./u-boot.md) ｜ [實作篇：在 QEMU 上從原始碼拼完整開機鏈](./tf-a-optee-qemu-from-source.md)
 >
 > 主軸：BL1 (ROM) → BL2 → **BL31 (EL3 runtime, TF-A)** → BL32 (OP-TEE, S-EL1) → BL33 (U-Boot, NS-EL2/EL1) → Linux
 

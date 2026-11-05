@@ -7,7 +7,7 @@ description: "從 BL32 的角度拆解 OP-TEE：TrustZone 基礎、optee_os / te
 
 # ARMv8 開機鏈三部曲（二）：OP-TEE — 在 S-EL1 跑一個可信任的 OS
 
-> **系列文章**：[（一）TF-A](./tf-a.md) ｜ **（二）OP-TEE（本文）** ｜ [（三）U-Boot](./u-boot.md)
+> **系列文章**：[（一）TF-A](./tf-a.md) ｜ **（二）OP-TEE（本文）** ｜ [（三）U-Boot](./u-boot.md) ｜ [實作篇：在 QEMU 上從原始碼拼完整開機鏈](./tf-a-optee-qemu-from-source.md)
 
 ## TL;DR
 

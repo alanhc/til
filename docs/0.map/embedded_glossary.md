@@ -445,6 +445,7 @@ sidebar_position: 7
 | 名詞 | 說明 | 出處 |
 |---|---|---|
 | **FIP / `fiptool`** | TF-A 的映像打包格式：一張 ToC 加上以 UUID 識別的 payload（BL2、BL31、BL32、BL33、憑證），用 `fiptool` 產生 | [（一）TF-A](../tf-a.md) |
+| **semihosting vs flash boot（QEMU）** | TF-A QEMU port 載入後續 image 的兩種**互斥**方式：semihosting 用 `-bios bl1.bin` 從工作目錄抓 image；flash 用 build 產生的 `qemu_fw.bios`（`bl1.bin` + `fip.bin` 串接）放在 secure FLASH0。混用會安靜地 hang 住 | [實作篇](../tf-a-optee-qemu-from-source.md) |
 | **TBB / TBBR、ROTPK** | Trusted Board Boot：以 ROTPK（Root of Trust Public Key）為根，用 X.509 憑證把 BL2 到 BL33 串成一條 Chain of Trust | [（一）TF-A](../tf-a.md) |
 | **SMCCC / Function ID / OEN** | SMC 呼叫慣例。BL31 依 Function ID 的 OEN 分派：OEN 4 是 Arm 定義的 Standard Service（PSCI），OEN 2 是留給 SoC 廠自訂 EL3 服務的 SiP service | [（一）TF-A](../tf-a.md) |
 | **SPD（Secure Payload Dispatcher）／`opteed`** | BL31 裡負責帶起 BL32 並在兩個 world 之間切 context 的模組；OP-TEE 對應的就是 `opteed` | [（一）TF-A](../tf-a.md) |
