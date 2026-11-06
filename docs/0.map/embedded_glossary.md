@@ -455,6 +455,10 @@ sidebar_position: 7
 | **RPC（secure → normal）** | Secure world 需要記憶體、檔案系統、載入 TA 或遇到 normal world 中斷時，用特殊 SMC 回傳值「暫停」呼叫請 normal world 幫忙，再用 `OPTEE_SMC_CALL_RETURN_FROM_RPC` 回去 | [（二）OP-TEE](../optee.md) |
 | **pseudo TA vs user TA** | pseudo TA 跑在 OP-TEE core 內部、只能用 core 內部函式；user TA 跑在 S-EL0、用 GP Internal Core API（libutee） | [（二）OP-TEE](../optee.md) |
 | **`symbolize.py`** | TA crash 時把 abort dump 的位址還原成函式與行號的 OP-TEE 腳本 | [（二）OP-TEE](../optee.md) |
+| **MLO / GP header** | AM335x Boot ROM 從 SD/eMMC 載入的第一段 image（U-Boot SPL）；開頭 8 bytes 的 GP header 記 image 大小與載入位址（`0x402F0400`） | [BBB SPL 原始碼導讀](../Embedded/bbb-spl-source-walkthrough.md) |
+| **ROM boot parameters（OMAP）** | AM335x ROM 跳進 SPL 時用 r0 傳入的結構指標，記錄開機裝置與 MMC raw/FAT 模式；SPL 在 `reset` 第一條就存下，之後用來決定從哪載 U-Boot | [BBB SPL 原始碼導讀](../Embedded/bbb-spl-source-walkthrough.md) |
+| **EMIF** | AM335x 的外部記憶體控制器；SPL 的 `sdram_init` 把 DDR 顆粒的時序參數寫進去後 DRAM 才能讀寫 | [BBB SPL 原始碼導讀](../Embedded/bbb-spl-source-walkthrough.md) |
+| **`gd`（global data）** | U-Boot 各 phase 共用的狀態結構，ARM 上放在 r9；SPL 在 DRAM 起來前把它放 SRAM，之後由 `spl_relocate_stack_gd` 搬到 DRAM | [BBB SPL 原始碼導讀](../Embedded/bbb-spl-source-walkthrough.md) |
 | **TPL / VPL / SPL / U-Boot proper** | U-Boot 的多段切分。SRAM 小到塞不下完整 U-Boot 時先用小程式把 DRAM 初始化起來；Rockchip、Allwinner 等平台的 SPL 本身就扮演 BL2 | [（三）U-Boot](../u-boot.md) |
 | **`CONFIG_SPL_ATF`** | 讓 SPL 從 FIT 載入 BL31（及可選的 OP-TEE），再由 BL31 把 U-Boot proper 當 BL33 帶起來 | [（三）U-Boot](../u-boot.md) |
 | **`board_init_f` → relocation → `board_init_r`** | U-Boot proper 的骨幹（`_main` 起於 `crt0_64.S`），全程靠 `gd`（AArch64 放在 `x18`）傳狀態。**relocation 前記下的指標 relocation 後還用，是移植新板子的經典 bug** | [（三）U-Boot](../u-boot.md) |
