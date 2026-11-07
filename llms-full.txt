@@ -1792,10 +1792,21 @@ Android 平台架構
 | **`ipmitool sel elist`** | 比 `sel list` 多展開 SDR 資訊，比較好讀。`sel clear` 清空**清掉就沒了**，先備份 | [ipmi](../BMC/ipmi.md) |
 | **FRU (Field Replaceable Unit)** | 可現場更換的單元（主機板、電源、風扇背板）。每片板子放一顆 EEPROM，以 **IPMI Platform Management FRU Information** 格式存製造商、產品名、序號、part number | [fru](../BMC/fru.md)、[ipmi](../BMC/ipmi.md) |
 | **IPMI raw command** | 直接送原始 byte 的指令，格式 `ipmitool raw <NetFn> <Cmd> [data...]`，如 `ipmitool raw 0x04 0x2d 0x01`。**沒有任何保護**，打錯可能觸發非預期行為 | [ipmi](../BMC/ipmi.md)、[ai_bmc](../ai_bmc.md) |
-| **NetFn (Network Function)** | raw command 的功能分類碼：`0x00` Chassis、`0x04` Sensor/Event、`0x06` App、`0x0a` Storage、`0x2c` DCMI，`0x2e`／`0x30` 起為 **OEM 自訂區**（`ipmitool` 沒有對應子命令時就走 raw） | [ipmi](../BMC/ipmi.md) |
+| **NetFn (Network Function)** | raw command 的功能分類碼：`0x00` Chassis、`0x04` Sensor/Event、`0x06` App、`0x0a` Storage、`0x2c` DCMI，`0x2e`／`0x30` 起為 **OEM 自訂區**（`ipmitool` 沒有對應子命令時就走 raw） | [ipmi](../BMC/ipmi.md)、[ipmi-validation-1](../BMC/ipmi-validation-1-basics.md) |
 | **RMCP+** | IPMI v2.0 的網路傳輸協定（UDP 623），相較舊版 RMCP 支援加密與 RAKP 金鑰交換。`ipmitool -I lanplus` 即指定它 | [ipmi](../BMC/ipmi.md)、[sol](../BMC/sol.md) |
 | **KCS** | Keyboard Controller Style，Host 與 BMC 間的 IPMI 傳輸介面之一。`ipmid` 無回應時常見原因就是 KCS 驅動問題 | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md)、[mctp](../BMC/mctp.md) |
 | **IPMI LAN channel** | 經網路下 IPMI 指令的通道，也可用來設定網路（相容舊工具） | [network](../BMC/network.md)、[openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
+| **Completion Code** | IPMI response 的**第一個 byte**，`00` 為成功（`ipmitool raw` 成功時不顯示）。驗證時常見：`C1` 未實作、`C5` Reservation ID 失效、`C7` 長度錯、`C9` 超出範圍、`CB` 資料不存在、`CC` 欄位不合法、`D4` 權限不足、`D5` 目前狀態不允許。**回 `00` 不代表功能正確**，還要看實機行為與 SEL | [ipmi-validation-1](../BMC/ipmi-validation-1-basics.md) |
+| **raw 與 string 雙驗證** | 同一功能分別用 `ipmitool raw` 與字串子命令（`mc info`、`sel list`…）執行並比對：raw 驗 BMC 的 byte-level 行為，string 驗工具與實作的相容性 | [ipmi-validation-1](../BMC/ipmi-validation-1-basics.md) |
+| **Privilege Level** | IPMI session 的權限等級：1 Callback、2 User、3 Operator、4 Administrator、5 OEM。低權限帳號下管理命令應回 `D4` | [ipmi-validation-2](../BMC/ipmi-validation-2-commands.md) |
+| **Cipher Suite** | RMCP+ session 的認證／完整性／加密演算法組合，`ipmitool -C <id>` 指定、`channel getciphers ipmi <ch>` 查詢。**Cipher Suite 0 不做認證，應停用**；IPMI 1.5 的 `-I lan` 非必要也應關閉 | [ipmi-validation-2](../BMC/ipmi-validation-2-commands.md) |
+| **Watchdog Timer** | BMC 的看門狗（App `0x22`／`0x24`／`0x25`）：Set 只設定、**Reset 才開始倒數**，逾時可 Hard Reset／Power Down／Power Cycle；觸發後應有 Watchdog 2 SEL 與對應的 Restart Cause | [ipmi-validation-2](../BMC/ipmi-validation-2-commands.md) |
+| **System Restart Cause** | Chassis `0x07`：回報上次開機原因（Chassis Control、Reset／Power 按鈕、Watchdog、AC 恢復…），用來確認重開的觸發來源與預期一致 | [ipmi-validation-2](../BMC/ipmi-validation-2-commands.md) |
+| **Reservation ID** | 操作 SEL／SDR（Clear、Delete、Partial Add）前先 Reserve 取得的 ID；被其他 reserve 取代後再用舊 ID 會回 `C5`。Clear SEL 要帶 `'C' 'L' 'R'`（`0x43 0x4c 0x52`）加 `0xAA` | [ipmi-validation-2](../BMC/ipmi-validation-2-commands.md) |
+| **PEF / PET** | Platform Event Filter：BMC 依規則對 event 執行動作（power off、reset、送 alert）；送出的 alert 是 SNMP Trap 格式的 **Platform Event Trap**，可用 `tcpdump udp port 162` 驗證 | [ipmi-validation-2](../BMC/ipmi-validation-2-commands.md) |
+| **DCMI** | Data Center Manageability Interface：IPMI 之上的資料中心擴充（NetFn `0x2C`、Group ID `0xDC`），提供 power reading／power limit、asset tag、溫度讀值等，`ipmitool dcmi` 操作 | [ipmi-validation-2](../BMC/ipmi-validation-2-commands.md) |
+| **IANA Enterprise Number** | NetFn `0x2E`／`0x2F` OEM 命令 request 前 3 bytes 帶的廠商識別碼（LS byte 在前），成功 response 也會帶回同樣 3 bytes | [ipmi-validation-3](../BMC/ipmi-validation-3-firmware-cheatsheet.md) |
+| **HPM.1** | PICMG 的韌體升級規格，`ipmitool hpm check`／`hpm upgrade <file>.hpm` 使用。驗證韌體更新要涵蓋升版、降版、同版重燒 × in-band／out-of-band × 主機開關機，燒完檢查版本、SEL、LED 與設定是否保留 | [ipmi-validation-3](../BMC/ipmi-validation-3-firmware-cheatsheet.md)、[flash](../BMC/flash.md) |
 
 ### Redfish
 
@@ -2067,7 +2078,7 @@ Android 平台架構
 | **Nuvoton NPCM750 / NPCM845** | 另一系列 BMC SoC，分別為 Cortex-A9 / Cortex-A35 | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
 | **`aspeed-i2c` / `aspeed-adc` / `aspeed-vuart`** | AST 平台的 kernel 驅動：I2C bus、電壓感測器、Virtual UART（SOL 用） | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
 | **phosphor-state-manager** | 管理 Host 電源狀態的服務。Redfish/IPMI 的開機請求最後會由它去控制 GPIO 的 **`PWRON#`**（電源按鈕訊號） | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
-| **Power Restore Policy** | `AlwaysOff`（BMC 就緒後 Host 保持關機）／`AlwaysOn`（自動開啟 Host）／`LastState`（恢復斷電前狀態） | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
+| **Power Restore Policy** | `AlwaysOff`（BMC 就緒後 Host 保持關機）／`AlwaysOn`（自動開啟 Host）／`LastState`（恢復斷電前狀態）。IPMI 對應 Chassis `0x06`（`chassis policy always-off\|always-on\|previous`），驗證時三種都要實際拔插 AC | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md)、[ipmi-validation-2](../BMC/ipmi-validation-2-commands.md) |
 
 ### systemd
 
@@ -2391,6 +2402,16 @@ Schematic 判讀（i2c topology / address table）
    → Sensor Porting             ← hwmon → dbus-sensors → entity manager → fru
    → Entity Manager             ← 用 JSON 描述硬體、動態探測
    → PID Control / Thermal      ← 讓風扇跟著這顆 sensor 轉
+```
+
+**想驗證一顆 BMC 的 IPMI 實作：**
+
+```
+IPMI                            ← 先懂 SEL／SDR／FRU 與 NetFn／Cmd 格式
+   → IPMI 驗證實戰（一）        ← Completion Code 與通用測試方法（雙驗證、還原、負面、持久性）
+   → IPMI 驗證實戰（二）        ← 主線：逐類命令的測試重點
+   → IPMI 驗證實戰（三）        ← OEM 命令、韌體更新測試矩陣與速查
+   → Flash 與韌體更新           ← 更新路徑的實作面
 ```
 
 ---
@@ -3279,6 +3300,14 @@ interview 核心的十個缺口（hash table、二分、排序、圖、DP、回�
 | **IDM** | 設計＋製造整合（如 Intel、三星） | [半導體](../半導體/半導體.md) |
 | **光罩 / 微影 / 蝕刻 / 沉積 / 離子佈植** | 反覆堆疊的核心製程：photomask、lithography、etch、deposition、implant | [半導體](../半導體/半導體.md) |
 | **製程節點** | 如 3nm、5nm，越先進單位面積電晶體越多、效能/功耗越好 | [半導體](../半導體/半導體.md) |
+| **IC 設計前段／中段／後段** | 數位 IC 流程的三段切分：前段 Spec → 可合成的 RTL 與驗證；中段 RTL → Netlist（合成、DFT 插入、LEC）；後段 Physical Design 與 Signoff，產出 GDSII。中段的邊界依公司而浮動 | [IC 設計流程](../ic-design-flow.md) |
+| **RTL** | Register Transfer Level，用 Verilog／SystemVerilog 描述暫存器之間資料怎麼流動，是前段的主要產出與合成的輸入 | [IC 設計流程](../ic-design-flow.md) |
+| **邏輯合成（Synthesis）／Netlist** | 把 RTL 轉成由 standard cell 組成的閘級電路（netlist），並依 SDC 時序約束最佳化 | [IC 設計流程](../ic-design-flow.md) |
+| **LEC（Logic Equivalence Check）** | 用 formal 方法證明合成與 DFT 插入後的 netlist 在功能上等價於原 RTL，取代重跑大量 simulation，是中段的 gatekeeper | [IC 設計流程](../ic-design-flow.md) |
+| **STA（Static Timing Analysis）** | 不跑 simulation、窮舉所有路徑檢查 setup／hold 是否滿足；中段做初步評估，後段在所有 PVT corner 下做時序簽核 | [IC 設計流程](../ic-design-flow.md) |
+| **CTS（Clock Tree Synthesis）** | 後段專門建時脈樹，讓 clock 到各正反器的時間盡量一致；skew 過大會吃掉時序餘裕，hold violation 在 silicon 上無解 | [IC 設計流程](../ic-design-flow.md) |
+| **Signoff** | 下線前必須全部通過的檢查組合，例如 STA、DRC、LVS 等 | [IC 設計流程](../ic-design-flow.md) |
+| **GDSII／Tape-out** | GDSII（或 OASIS）是後段產出的版圖檔，交給晶圓廠做光罩；送出這一步稱為 tape-out（下線） | [IC 設計流程](../ic-design-flow.md) |
 
 ---
 
@@ -3556,6 +3585,13 @@ interview 核心的十個缺口（hash table、二分、排序、圖、DP、回�
 | **`gd`（global data）** | U-Boot 各 phase 共用的狀態結構，ARM 上放在 r9；SPL 在 DRAM 起來前把它放 SRAM，之後由 `spl_relocate_stack_gd` 搬到 DRAM | [BBB SPL 原始碼導讀](../Embedded/bbb-spl-source-walkthrough.md) |
 | **TPL / VPL / SPL / U-Boot proper** | U-Boot 的多段切分。SRAM 小到塞不下完整 U-Boot 時先用小程式把 DRAM 初始化起來；Rockchip、Allwinner 等平台的 SPL 本身就扮演 BL2 | [（三）U-Boot](../u-boot.md) |
 | **`CONFIG_SPL_ATF`** | 讓 SPL 從 FIT 載入 BL31（及可選的 OP-TEE），再由 BL31 把 U-Boot proper 當 BL33 帶起來 | [（三）U-Boot](../u-boot.md) |
+| **`malloc_limit` 與 "alloc space exhausted"** | `board_init_f` 階段 `gd->malloc_base` 有值但 `malloc_limit` 是 **0**，`malloc_simple` 的 `new_ptr > limit` 檢查因此對任何大小都失敗。limit 要到 `board_init_r` 的 `spl_common_init()` 才設——**錯誤訊息說空間不足，真正原因是階段不對** | [SPL 當 BL2](<../Embedded/spl-as-bl2-arm64-internals.md>) |
+| **`CONFIG_SPL_SEPARATE_BSS`** | 把 SPL 的 `.bss` 放到和 code 不同的 MEMORY region（linker script 的 `>.sdram` vs `>.sram`）。arm64 ZynqMP 上 `.text` 在 OCM `0xfffc0000`、`.bss` 在 DDR `0x1000`，相距近 4 GB；動機是 OCM 要讓位給 BL31 | [SPL 當 BL2](<../Embedded/spl-as-bl2-arm64-internals.md>) |
+| **BSS 清零的時機** | `crt0_64.S` 的 `clear_loop` 排在 `board_init_f` **之後**、`board_init_r` **之前**。所以 `board_init_f` 寫 BSS 不是「不保證保留」而是**一定會被抹掉**；在 `board_init_f` 寫毒值、到 `board_init_r` 讀回 0 就能直接證實 | [SPL 當 BL2](<../Embedded/spl-as-bl2-arm64-internals.md>) |
+| **`dm_fixup_for_gd_move`** | `uclass_root` 是**嵌在 `gd` 結構裡**的環狀 list sentinel，`memcpy` 整個 `gd` 之後鄰居的 `next`/`prev` 還指著舊位址，必須手動接回。「含自我指標的結構不能單純 memcpy」的真實案例 | [SPL 當 BL2](<../Embedded/spl-as-bl2-arm64-internals.md>) |
+| **fdtgrep / `bootph-*` 的實際效果** | build 時用 `bootph-all`、`bootph-pre-ram`（TPL 是 `bootph-pre-sram`、VPL 是 `bootph-verify`）當**選擇器**剪出 SPL 專用 DTB，剪完**把屬性本身也刪掉**。ZynqMP 實測 238 節點 → 23 節點、49 KB → 4.7 KB | [SPL 當 BL2](<../Embedded/spl-as-bl2-arm64-internals.md>) |
+| **`RESET_TO_BL31`** | TF-A 的選項，預設 0；`plat/qemu` 不支援，zynqmp 則強制為 1 ——build 出來**只有 `bl31.bin`，沒有 BL1/BL2**，因為那兩個角色由 U-Boot SPL 擔任 | [SPL 當 BL2](<../Embedded/spl-as-bl2-arm64-internals.md>) |
+| **`CONFIG_OF_BOARD` 在 SPL 的後果** | SPL 預期**前一階段在 runtime 餵一份 DTB**（ZynqMP 由 PMU 放在 `XILINX_OF_BOARD_DTB_ADDR`）。模擬器不餵時 `fdtdec_setup()` 回 `-EINVAL`，`spl_init()` 就回 **−22**，症狀只有一句 `### ERROR ### Please RESET the board ###` | [SPL 當 BL2](<../Embedded/spl-as-bl2-arm64-internals.md>) |
 | **`board_init_f` → relocation → `board_init_r`** | U-Boot proper 的骨幹（`_main` 起於 `crt0_64.S`），全程靠 `gd`（AArch64 放在 `x18`）傳狀態。**relocation 前記下的指標 relocation 後還用，是移植新板子的經典 bug** | [（三）U-Boot](../u-boot.md) |
 | **Driver Model（uclass / udevice / `U_BOOT_DRIVER`）** | U-Boot 的統一驅動框架，硬體描述來自 Device Tree（`OF_CONTROL`） | [（三）U-Boot](../u-boot.md) |
 | **Standard Boot（bootdev / bootmeth / bootflow）** | 取代 `distro_bootcmd` 腳本的開機機制；開 `BOOTSTD_DEFAULTS` 的板子預設 `bootcmd` 就是 `bootflow scan -lb` | [（三）U-Boot](../u-boot.md) |
@@ -3636,6 +3672,7 @@ interview 核心的十個缺口（hash table、二分、排序、圖、DP、回�
 | [Das U-Boot](../Embedded/uboot.md) | U-Boot 實用速查：`printenv`/`setenv`/`saveenv` 環境變數、`bootcmd` 與 `bootargs` 差異、用 `tftp`／`fatload` 載入 kernel 與 dtb 後 `booti` 啟動 |
 | [BeagleBone Black bring-up 練習：從 UART 到手動 bootz](../Embedded/bbb-uboot-bringup.md) | 實作紀錄：J1 debug UART 接線、錄原廠完整開機 log 當對照組、`bootdelay=0` 下靠持續送空白攔 autoboot；從記憶體角度走一次開機（ROM 把 MLO 搬進 SRAM → SPL 初始化 DDR、把 U-Boot 搬進 DRAM → U-Boot 重定位到頂端 → bootz 受 `bootm_size` 限制把 DTB／initrd 搬到 256 MB 內 → zImage 解壓到 `0x80008000`），附流程圖與完整記憶體地圖；在 U-Boot 用 `md`/`mw` 直接戳 GPIO1 點 USR LED（時脈 → pinmux → OE → SET/CLEARDATAOUT 四步）；手動 `load` + 驗 zImage／FDT magic + `bootz`；改走 TFTP（含 Tailscale subnet route 搶走回程路由的坑）；最後用 `omap2plus_defconfig` 自編 7.3 kernel 不帶 initrd 開機，拿掉 `net.ifnames=0` 會讓網卡改名 `end0` 而沒有 IP。完整過程整理成下一篇 |
 | [BeagleBone Black 的 SPL 原始碼導讀：從 Boot ROM 到 DRAM](../Embedded/bbb-spl-source-walkthrough.md) | 照 U-Boot mainline 原始碼走一次 AM335x SPL，附流程圖與每步的程式碼片段：ROM 把 MLO 放進 SRAM `0x402F0400` 並用 r0 傳 boot parameters 指標 → `start.S` 第一件事把 r0 存到 `0x4030B424` → `crt0.S` 在 SRAM 頂端設 stack 與 `gd` → `board_init_f` 關 watchdog、解析 ROM 參數、讀 EEPROM（`A335BNLT`）、先調 TPS65217 電壓再鎖 PLL、用寫死的 MT41K256M16HA125E 參數設 EMIF → DRAM 可用後才清 BSS、把 `gd`／stack 搬到 DRAM（code 留在 SRAM）→ `board_init_r` 照 ROM 給的裝置與 FAT/raw 模式載 `u-boot.img`。另記 v2026.10 SPL 用 gcc 13.3 編會超出 SRAM 120 bytes |
+| [SPL 當 BL2：arm64 pre-relocation 的三個約束，與 QEMU 的極限](../Embedded/spl-as-bl2-arm64-internals.md) | 承上一篇換成 arm64（ZynqMP）與「SPL 當 BL2」形態，用 GDB 把 relocation 之前的執行環境一個一個量出來：OCM 只有 256 KB 而且要分 61.5 KB 給 BL31（`0xfffea000`），所有限制都從這裡推導；`gd` 綁 `x18`（armv7 是 `r9`）是因為那時 `.bss` 沒清零、`.data` 可能不可寫；`board_init_f` 裡 `malloc` 必定回 NULL，因為 `malloc_limit` 要到 `board_init_r` 的 `spl_common_init()` 才設，錯誤訊息卻說 "alloc space exhausted"；用寫毒值的方式證實 BSS 清零排在 `board_init_f` 之後；`gd` 搬家後要 `dm_fixup_for_gd_move()`，因為 `uclass_root` 是嵌在 `gd` 裡的環狀 list sentinel；fdtgrep 靠 `bootph-*` 把 DTB 從 238 節點砍到 23 節點（49 KB → 4.7 KB）而且屬性用完就刪。最後記錄這條路在 QEMU 上跑不完：Rockchip 在 QEMU upstream 是 0 筆，`xlnx-zcu102` 則缺 CRL_APB 與 PMU firmware，UART 要時脈 → 時脈要問 PMU 形成循環依賴 |
 | [在 BeagleBone Black 上把自己編的 Linux 7.3 開起來](../Embedded/bbb-kernel-7.3-bringup.md)（[English](../Embedded/bbb-kernel-7.3-bringup-en.md)） | 上一篇的完整敘事版：`omap2plus_defconfig` 交叉編譯 mainline 7.3-rc7、確認 MMC／ext4／console／cpsw 都是 built-in 所以**不帶 initrd**，經 TFTP 開機到 SSH 驗收（`uname -r`、`/proc/cmdline`、ping）。一路的五個坑只有一個碰到 kernel：`bootdelay=0` 攔不下 autoboot、UART 轉接器和板子共用 USB hub 而在上電時掉線、Tailscale subnet route 搶走回程路由（用 `ip route get` 抓到）、拿掉 `net.ifnames=0` 讓網卡改名 `end0`、原廠系統軟重開卡死。附原廠 6.12 與自編 7.3 的開機時間對照 |
 | [在 BeagleBone Black 上驗證 arm32 kexec，順便修掉一個 cpsw 的 kexec bug](../Embedded/bbb-kexec-cpts.md) | 承上一篇：u-root 的 arm32 kexec 實機驗證（`-L` 走 `kexec_load`、檔案放 `/dev/shm` 避開 SD）。抓到 u-root `pkg/dt` 不支援 32-bit `#address-cells` 的 bug；`Bye!` 之後沒輸出時用 `DEBUG_LL` + `earlyprintk` + decompressor `-DDEBUG` 讓黑箱說話；再追到 cpsw 在 probe 時就註冊 misc IRQ、CPTS 的 event pool 卻到 `ndo_open` 才初始化，kexec 後殘留事件造成 NULL deref。修了四次才對（清 `CPTS_EN` 會讓 `TS_PEND_RAW` 讀回 1），附 2026-10 kernel 取消 `Assisted-by`、AI 不得簽 DCO 與寄出的現況 |
 | [在 BeagleBone Black 上寫一個最小的 platform driver](../Embedded/bbb-platform-driver.md) | 用 DT 的 `compatible` 比對、`devm_gpiod_get` 取 GPIO 點 USR LED：先做自己的 sysfs 屬性版，再改成 LED class（`container_of`、依 `gpiod_cansleep` 選 `brightness_set` 或 `_blocking`、不必寫 `remove`），掛 heartbeat trigger 實測。坑：omap2plus 把 `gpio-leds`／LED class／trigger 都編成 module、pinctrl 跟著 device 走、燈不亮先讀 `GPIO1_DATAIN` |
@@ -18173,6 +18210,7 @@ xxd -s 0x200 -l 8 MLO                                                      # GP 
 - 錄一份真正的 SPL log：UART 轉接器改插主機板直連埠（見上一篇的 USB hub 坑），開 `CONFIG_SPL_SERIAL` 的 debug 輸出，對照這篇的每一步。
 - 換自己 build 的 MLO 上板，用 `CONFIG_DEBUG_UART` 在 `board_init_f` 之前就印東西。
 - 試 Falcon mode：SPL 直接開 kernel，量省下多少時間。
+- 同一條路線換成 arm64 與「SPL 當 BL2」形態（SPL 載 BL31、BL31 再把 U-Boot proper 當 BL33）：[SPL 當 BL2：arm64 pre-relocation 的三個約束，與 QEMU 的極限](./spl-as-bl2-arm64-internals.md)。
 
 ---
 
@@ -18589,6 +18627,424 @@ graph TD
     style D stroke:red,stroke-width:2px
     style E stroke:red,stroke-width:2px
 ```
+
+---
+
+## SPL 當 BL2：arm64 pre-relocation 的三個約束，與 QEMU 的極限
+
+
+> **相關文章**：[BeagleBone Black 的 SPL 原始碼導讀](./bbb-spl-source-walkthrough.md)（armv7、真板子、從 Boot ROM 講到 DRAM）｜[ARMv8 開機鏈三部曲（三）：U-Boot](../u-boot.md)（BL33 的角色與 relocation 理論）
+
+[BBB 那篇](./bbb-spl-source-walkthrough.md)已經把 SPL 的流程走過一遍：Boot ROM 把 SPL 搬進 SRAM、`board_init_f` 只靠 SRAM 把 DDR 叫醒、再搬家到 DRAM。這篇不重複那條路線，而是補三個那篇沒細講、而且**我用 GDB 一個一個量出來**的點：
+
+1. `board_init_f` 階段的「不能用」到底是哪幾種不能用——其中有一個是 `malloc` **必定回 NULL**，原因不是慣例而是一個欄位還沒被設。
+2. `gd` 搬家時為什麼要特別修 Driver Model 的指標。
+3. SPL 的 device tree 是**剪**出來的，`bootph-*` 砍掉多少。
+
+平台換成 arm64（ZynqMP），形態也換成 **SPL 當 BL2**：SPL 不是去載 U-Boot proper，而是先載 TF-A 的 BL31，再由 BL31 把 U-Boot proper 當 BL33 叫起來。U-Boot 官方文件[^spl-doc]把這個用途寫在 SPL 章節的第一條：
+
+> Launching BL31 of ARM Trusted Firmware which invokes main U-Boot as BL33
+
+文章最後會記錄一件事：**這條路在 QEMU 上跑不完**，而且卡住的理由本身很有啟發性。
+
+本文所有位址、大小都是從 `xilinx_zynqmp_virt_defconfig` 實際 build 出來的產物，以及 QEMU + GDB 實測抓的，不是抄文件。每一節都附可自己重跑的指令。
+
+## 一切的根源：256 KB
+
+ZynqMP 剛上電時 DDR 還沒初始化，能用的只有 **OCM**（on-chip memory）：
+
+```text
+OCM 視窗：0xfffc0000 .. 0xffffffff = 256 KB
+```
+
+這 256 KB 要同時容納三樣東西：
+
+| 東西 | 位址範圍 | 大小 |
+|---|---|---|
+| SPL image（`.text`+`.rodata`+`.data`） | `0xfffc0000` .. `0xfffde390` | 120.9 KB |
+| BL31（TF-A）載入位置 | `0xfffea000` .. `0xffff9607` | 61.5 KB |
+| stack（往下長） | 從 `0xfffffff0` 往下 | 剩 26.5 KB |
+
+```text
+0xffffffff ┌────────────────────┐
+           │ stack ↓            │  gd + early malloc 也在這一段
+0xfffffff0 │ ← 初始 sp          │
+0xffff9607 ├────────────────────┤
+           │ BL31      61.5 KB  │  ← SPL 要把 TF-A 載到這裡
+0xfffea000 ├────────────────────┤
+           │ (gap  47 KB)       │
+0xfffde390 ├────────────────────┤
+           │ SPL image 120.9 KB │
+0xfffc0000 └────────────────────┘
+```
+
+BL31 載完之後，stack 頂端到 BL31 尾端只剩 **27,125 bytes**。
+
+**後面每一個「SPL 為什麼這麼彆扭」的答案都是從這張圖來的**，和 BBB 上 SRAM 太擠所以 BSS 要丟 DRAM 是同一種壓力，只是這裡還多了一個 BL31 要分地方。
+
+自己量：
+
+```bash
+aarch64-linux-gnu-nm -n spl/u-boot-spl | grep -E '__image_copy_start|_end'
+aarch64-linux-gnu-size -A spl/u-boot-spl
+```
+
+## `gd` 為什麼是暫存器
+
+`arch/arm/include/asm/global_data.h`[^gd-h]：
+
+```c
+#ifdef CONFIG_ARM64
+#define DECLARE_GLOBAL_DATA_PTR		register gd_t *gd asm ("x18")
+#else
+#define DECLARE_GLOBAL_DATA_PTR		register gd_t *gd asm ("r9")
+#endif
+```
+
+arm64 綁 `x18`，armv7 綁 `r9`（BBB 那篇看到的就是 `mov r9, r0`）。理由在 `crt0_64.S`[^crt0] 的註解講得最白：
+
+```asm
+	bl	board_init_f_alloc_reserve
+	mov	sp, x0
+	/* set up gd here, outside any C code */
+	mov	x18, x0
+	bl	board_init_f_init_reserve
+```
+
+為什麼一定要 outside any C code？因為普通全域變數住在 `.data` / `.bss`，而這個時間點：
+
+- `.bss` **還沒清零**（下一節會證明清零在更後面）
+- SPL 可能是 XIP，`.data` 根本不可寫
+
+**「存放全域狀態的地方」本身還不能用，所以唯一可靠的儲存空間只剩暫存器。** `x18` 在 AAPCS64 裡是 platform register，正好允許被 firmware 徵用。
+
+GDB 在 reset 當下看到的：
+
+```text
+pc = 0xfffc0000   EL = 3   sp = 0   x18 = 0
+```
+
+`sp` 和 `x18` 都還是 0——什麼都還沒有。順帶一提 `EL = 3`：SPL 當 BL2 必須在 EL3 跑，因為它接下來要載入並跳進 BL31。
+
+## gd 和 early malloc 是從 sp 往下切出來的
+
+`common/init/board_init.c`[^board-init]：
+
+```c
+ulong board_init_f_alloc_reserve(ulong top)
+{
+	top -= CONFIG_VAL(SYS_MALLOC_F_LEN);                    /* 先切 early malloc */
+	top = rounddown(top - sizeof(struct global_data), 16);  /* 再切 gd */
+	return top;
+}
+```
+
+算術和實測完全對上：
+
+```text
+CONFIG_SPL_STACK            = 0xfffffffc
+bic sp, x0, #0xf            = 0xfffffff0   ← GDB 看到的 incoming top
+  − SYS_MALLOC_F_LEN 0x8000 = 0xffff7ff0   ← gd->malloc_base（實測值）
+  − sizeof(gd) 376, 16-align = 0xffff7e70  ← gd 本體（實測值），sp 也從這裡開始
+```
+
+GDB 實測：
+
+```text
+base (where gd will live)   : 0xffff7e70
+sp now                      : 0xffff7e70
+x18 (gd) now                : 0xffff7e70
+sizeof(struct global_data)  : 376
+gd->malloc_base             : 0xffff7ff0
+```
+
+**pre-relocation 的全部家當就是 376 bytes 的 `gd` 加 32 KB 的 early malloc arena，都擠在 OCM 頂端。**
+
+## `board_init_f` 裡 malloc 必定失敗——而且不是因為沒空間
+
+這是我這次實測才看清楚的細節。注意 GDB 抓到的三個欄位：
+
+```text
+gd->malloc_base  = 0xffff7ff0   ← 有設
+gd->malloc_limit = 0            ← 是 0
+gd->malloc_ptr   = 0
+```
+
+`malloc_limit` 在 `board_init_f` 期間是 **0**。而 `common/malloc_simple.c`[^malloc-simple] 的配置函式長這樣：
+
+```c
+addr = ALIGN(gd->malloc_base + gd->malloc_ptr, align);
+new_ptr = addr + bytes - gd->malloc_base;
+if (new_ptr > gd->malloc_limit) {
+	log_err("alloc space exhausted ptr %lx limit %x\n", new_ptr,
+		gd->malloc_limit);
+	return NULL;
+}
+```
+
+`limit` 是 0 時，任何 `bytes > 0` 都會讓 `new_ptr > 0` 成立而被打回來。
+
+誰設 `limit`？`common/spl/spl.c` 的 `spl_common_init()`[^spl-c]：
+
+```c
+if (setup_malloc) {
+	gd->malloc_limit = CONFIG_VAL(SYS_MALLOC_F_LEN);
+	gd->malloc_ptr = 0;
+}
+```
+
+而 `spl_common_init()` 是從 **`board_init_r`** 呼叫的，不是 `board_init_f`。
+
+> 所以「`board_init_f` 不要呼叫 malloc」不是風格建議或慣例，**是 arena 的上限還沒被設，呼叫了就一定拿到 NULL**。錯誤訊息還會說 "alloc space exhausted"，看起來像空間不足，實際上是階段不對。
+
+## BSS 在 DDR，而且清零的時機比直覺晚
+
+link map 第一眼很荒謬：
+
+```text
+.text  @ 0xfffc0000   (OCM)
+.bss   @ 0x1000       (DDR)       ← 差了快 4 GB
+.bss size = 360 bytes
+```
+
+答案在 `arch/arm/cpu/armv8/u-boot-spl.lds`[^lds]：
+
+```ld
+MEMORY { .sram  : ORIGIN = IMAGE_TEXT_BASE,            LENGTH = IMAGE_MAX_SIZE }
+#ifdef CONFIG_SPL_SEPARATE_BSS
+MEMORY { .sdram : ORIGIN = CONFIG_SPL_BSS_START_ADDR,  LENGTH = CONFIG_SPL_BSS_MAX_SIZE }
+#endif
+```
+
+`CONFIG_SPL_SEPARATE_BSS=y` 時 BSS 放 `>.sdram`（DDR 的 `0x1000`，在 `memory@0` 的 2 GB 範圍內），code 留 `>.sram`（OCM）。動機和 BBB 一樣是空間，只是這裡要讓位給 BL31。
+
+代價是 `board_init_f` 之前不能碰任何 BSS 變數——那時 DDR 還沒 init。
+
+### 用「下毒」證明清零時機
+
+`crt0_64.S`[^crt0] 的清零迴圈位置很關鍵，在 `board_init_f` **之後**、`board_init_r` **之前**：
+
+```asm
+	bl	board_init_f
+	...
+/* Clear BSS section */
+	adrp	x0, __bss_start
+	adrp	x1, __bss_end
+clear_loop:
+	str	xzr, [x0], #8
+	cmp	x0, x1
+	b.lo	clear_loop
+
+	mov	x0, x18			/* gd_t */
+	bl	board_init_r
+```
+
+與其相信我讀對了，直接做實驗：在 `board_init_f` 裡寫一個毒值，到 `board_init_r` 檢查還在不在。
+
+```gdb
+break board_init_f
+continue
+set *(unsigned long*)0x1000 = 0xdeadbeefcafebabe
+
+break board_init_r
+continue
+printf "BSS[0] = %#lx\n", *(unsigned long*)0x1000
+```
+
+結果：
+
+```text
+== inside board_init_f ==
+BSS[0] now = 0xdeadbeefcafebabe
+== at board_init_r ==
+BSS[0] = 0
+```
+
+**毒值被抹掉了，證實清零確實發生在兩階段之間。** 所以在 `board_init_f` 寫 BSS 不只是「不保證保留」，而是寫了之後一定會被清掉——這比「不要用」的說法具體得多。
+
+## gd 搬家，與一個容易忽略的指標修補
+
+同一個實驗意外證明了第二件事：`gd` 搬家了。
+
+```text
+board_init_f 時：x18 = 0xffff7e70   (OCM)
+board_init_r 時：x18 = 0x17fffe80   (DDR)
+```
+
+機制在 `spl_relocate_stack_gd()`[^spl-c]：
+
+```c
+ulong ptr = CONFIG_SPL_STACK_R_ADDR;        /* 0x18000000 */
+ptr -= roundup(sizeof(gd_t), 16);           /* − 384 */
+new_gd = (gd_t *)ptr;
+memcpy(new_gd, (void *)gd, sizeof(gd_t));
+dm_fixup_for_gd_move(new_gd);
+```
+
+算術再次對上：`0x18000000 − 384 = 0x17fffe80`，正是實測值。
+
+`crt0_64.S` 換 `gd` 的寫法也值得一看——因為 `sp` 不能當 conditional move 的運算元，只好先用 `csel` 處理 `x18`：
+
+```asm
+	bl	spl_relocate_stack_gd		/* may return NULL */
+	cmp	x0, #0
+	csel	x18, x0, x18, ne		/* gd = (x0 != NULL) ? x0 : gd */
+```
+
+### 為什麼 memcpy 完還要修指標
+
+`drivers/core/root.c`[^root-c]：
+
+```c
+void dm_fixup_for_gd_move(struct global_data *new_gd)
+{
+	/* The sentinel node has moved, so update things that point to it */
+	if (gd->dm_root) {
+		new_gd->uclass_root->next->prev = new_gd->uclass_root;
+		new_gd->uclass_root->prev->next = new_gd->uclass_root;
+	}
+}
+```
+
+`uclass_root` 是一個**嵌在 `gd` 結構裡面**的環狀 list sentinel。`memcpy` 整個 `gd` 之後，list 上鄰居的 `next` / `prev` 還指著舊位址，所以要手動接回來。
+
+**這是「含有自我指標的結構不能單純 memcpy」的一個真實案例**，而且它只修 `uclass_root`——因為其他欄位存的都是指向 `gd` 外部的位址，搬家不影響。
+
+## SPL 的 device tree 是剪出來的
+
+這段和在 Linux 上標 `bootph-*` 的工作直接相關。[U-Boot 文件](https://docs.u-boot.org/en/latest/develop/spl.html)[^spl-doc]說 build 時 fdtgrep 會把完整 DTB 過濾成 SPL 專用的小 DTB：
+
+- 保留 mandatory 節點（`/aliases`、`/chosen`、`/config`）
+- 保留帶 pre-relocation 屬性的節點：`bootph-all`、`bootph-pre-ram`（TPL 是 `bootph-pre-sram`，VPL 是 `bootph-verify`）
+- 然後**把這些 `bootph-*` 屬性本身也刪掉**
+
+實測效果：
+
+```text
+完整 dtb：49,176 bytes、238 個節點
+SPL  dtb： 4,687 bytes、 23 個節點      ← 10 倍差距
+SPL dtb 裡殘留的 bootph-*：0 個
+```
+
+`bootph-*` 是**選擇器，用完就丟**。
+
+活下來的 23 個節點，本身就是「SPL 需要什麼」的答案：
+
+```text
+firmware/zynqmp-firmware/{power-management, clock-controller}   ← 時脈
+axi/{spi@…, mmc@…, mmc@…}                                      ← 從哪載入下一階段
+axi/{serial@…, serial@…}                                       ← console
+zynqmp-ipi/mailbox@…                                           ← 跟 PMU 溝通
+{pss-ref-clk, video-clk, pss-alt-ref-clk, …}                   ← 時脈來源
+aliases, chosen                                                ← mandatory
+```
+
+「SPL 只需要能載入下一階段的最小硬體集合」這句話，在這份清單裡是字面意義上的真。
+
+自己量：
+
+```bash
+dtc -I dtb -O dts spl/u-boot-spl.dtb | grep -c '{'
+dtc -I dtb -O dts spl/u-boot-spl.dtb | grep -c bootph
+```
+
+## 完整的 pre-relocation 路徑
+
+每一個都實測可下中斷點：
+
+```text
+_start                       (0xfffc0000, EL3)
+  └─ save_boot_params
+  └─ apply_core_errata
+  └─ crt0_64.S
+       sp = SPL_STACK & ~0xf                  → 0xfffffff0
+       board_init_f_alloc_reserve(sp)         → 0xffff7e70
+       sp = x18 = 0xffff7e70                  ← gd 誕生
+       board_init_f_init_reserve(base)        memset(gd,0)、設 malloc_base
+       debug_uart_init                        ← <debug_uart> 那行的來源
+       board_init_f(0)                        ← 此時無 BSS、malloc 必失敗
+       ---- clear_loop：清 BSS @0x1000 ----
+       spl_relocate_stack_gd()                → gd 搬到 0x17fffe80
+       board_init_r(gd, relocaddr)
+         └─ spl_init() → spl_common_init()
+              bootstage_init
+              log_init
+              fdtdec_setup                    ← 沒有 DTB 的話這裡回 −EINVAL
+              dm_init_and_scan
+              dm_autoprobe
+         └─ board_boot_order / spl_boot_device
+         └─ boot_from_devices
+         └─ spl_invoke_atf                    ← 交棒 BL31
+```
+
+`<debug_uart>` 那行出自 `include/debug_uart.h` 的 `_DEBUG_UART_ANNOUNCE`[^debug-uart]；只看到它而看不到後續訊息，意思是 DM console 還沒接起來，此時所有 `printf` 都會進黑洞——這個現象在下一節會變成一個很好的除錯訊號。
+
+## QEMU 的極限：一道硬體依賴牆
+
+想在 QEMU 上跑完這條路，結果是**跑不完**。記錄下來是因為卡住的理由比成功更有資訊量。
+
+先說結論：`CONFIG_SPL_ATF` 的 defconfig 幾乎全是 Rockchip，而 **Rockchip 在 QEMU upstream 完全不存在**（在 QEMU master 的 `MAINTAINERS` 裡搜 `rockchip` 是 0 筆）；Intel socfpga 同樣沒有 machine。能跑 SPL-as-BL2 又被 QEMU 模擬的平台，交集只有 Xilinx 的 `xlnx-zcu102`。而 ZynqMP 的 `doc/board/xilinx/` 從頭到尾沒提過 QEMU——**這條路本來就不在上游支援範圍內**。
+
+硬推的話會依序撞到這些牆，每一道都是「真板子上有、QEMU 沒有」的硬體：
+
+| 症狀 | 根因 | 處置 |
+|---|---|---|
+| `psu_init` 的 `mask_poll` 無限迴圈 | 等 IOPLL lock，CRL_APB 沒被模擬 | 關 `SPL_ZYNQMP_PSU_INIT_ENABLED`（QEMU 不需要 PLL/DDR bring-up，這是正解不是 hack） |
+| 讀 boot mode 暫存器失敗 | 同一個 CRL_APB 區塊沒被模擬 | 開 `SPL_ZYNQMP_ALT_BOOTMODE_ENABLED` + `JTAG_MODE`，直接寫死 boot mode 繞過那個讀取 |
+| `spl_init()` 回 **−22**（`−EINVAL`） | `CONFIG_OF_BOARD=y`，SPL 預期前一階段在 runtime 餵一份 DTB；QEMU 不餵 | 載 `u-boot-spl-dtb.bin`，並把 dtb 放到 `XILINX_OF_BOARD_DTB_ADDR` |
+| `panic("PMUFW version error")` | 向 PMU firmware 問版本，而 PMU 是一顆 QEMU 不跑的 MicroBlaze | 關 SPL 的 firmware/FPGA 支援 |
+| `serial_zynq: failed to get clock` | **走不下去** | — |
+
+前四道都過了之後 SPL 的 console 真的活了（開始自己報錯，而不是只有 `<debug_uart>` 一行），但最後一道是真正的循環依賴，從 DTB 本身就看得出來：
+
+```text
+serial@ff010000  clocks = <&clock-controller …>
+  └─ clock-controller  compatible = "xlnx,zynqmp-clk"
+       └─ 它是 zynqmp-firmware 的子節點，method = "smc"
+```
+
+UART 要時脈 → 時脈要問 PMU firmware → **PMU 是 QEMU 不跑的另一顆核**；就算改走 SMC 到 EL3，BL31 在這個階段還沒被載入（SPL 正是要去載它的那個人）。
+
+U-Boot 有 `CONFIG_SPL_CLK_STUB`，描述寫著 "a stub clock driver in SPL for non-essential clock controllers"，看起來正是為這種情況設計的。但它的 `of_match` 只列 Qualcomm 的 compatible，沒有 `xlnx,zynqmp-clk`，所以開了沒有效果。要過這關就得改上游原始碼去遷就模擬器缺的硬體，那已經不是在學 SPL 了。
+
+**不過形態 B 的結構在 build 層面是驗證成立的。** TF-A 的 zynqmp 平台強制 `RESET_TO_BL31 := 1`，整個 build 只產出一個 BL：
+
+```console
+$ find . -name 'bl*.bin' -printf '%f\n'
+bl31.bin
+```
+
+沒有 `bl1.bin`、沒有 `bl2.bin`——因為 BL1/BL2 的角色由 SPL 擔任了。而 FIT 裡看得到完整的交棒結構：
+
+```console
+$ dumpimage -l u-boot.itb
+ Image 0 (uboot)   Load Address: 0x08000000    ← DDR，U-Boot proper 當 BL33
+ Image 1 (atf)     Load Address: 0xfffea000    ← OCM，BL31
+```
+
+`0xfffea000` 正是本文第一張圖裡 BL31 的位置——「剛上電只有 SRAM 可用」這個約束的具體數字。
+
+## 小結
+
+- **OCM 只有 256 KB，而且要分給 BL31**，這一條推導出後面所有限制。
+- `gd` 綁 `x18`（armv7 是 `r9`）不是風格選擇：那個時間點 `.bss` 沒清零、`.data` 可能不可寫，暫存器是唯一可靠的儲存空間。
+- `board_init_f` 裡 `malloc` 必定回 NULL，因為 `malloc_limit` 要到 `board_init_r` 的 `spl_common_init()` 才被設。錯誤訊息說 "alloc space exhausted"，但真正的原因是階段不對。
+- BSS 清零排在 `board_init_f` **之後**——用下毒法可以直接看到毒值被抹掉。
+- `gd` 搬家後要 `dm_fixup_for_gd_move()`，因為 `uclass_root` 是嵌在 `gd` 裡的環狀 list sentinel。
+- `bootph-*` 把 DTB 從 238 節點砍到 23 節點（49 KB → 4.7 KB），而且屬性本身用完就被刪掉。
+- 在模擬器上追開機鏈，**撞到的牆往往就是「這塊硬體真板子上由誰負責」的答案**：CRL_APB、PMU firmware、前一階段餵的 DTB，三件事在 QEMU 上都沒人做。
+
+## 參考
+
+[^spl-doc]: U-Boot, "Generic SPL framework" — https://docs.u-boot.org/en/latest/develop/spl.html
+[^gd-h]: `arch/arm/include/asm/global_data.h` — https://github.com/u-boot/u-boot/blob/master/arch/arm/include/asm/global_data.h
+[^crt0]: `arch/arm/lib/crt0_64.S` — https://github.com/u-boot/u-boot/blob/master/arch/arm/lib/crt0_64.S
+[^board-init]: `common/init/board_init.c` — https://github.com/u-boot/u-boot/blob/master/common/init/board_init.c
+[^malloc-simple]: `common/malloc_simple.c` — https://github.com/u-boot/u-boot/blob/master/common/malloc_simple.c
+[^spl-c]: `common/spl/spl.c` — https://github.com/u-boot/u-boot/blob/master/common/spl/spl.c
+[^lds]: `arch/arm/cpu/armv8/u-boot-spl.lds` — https://github.com/u-boot/u-boot/blob/master/arch/arm/cpu/armv8/u-boot-spl.lds
+[^root-c]: `drivers/core/root.c` — https://github.com/u-boot/u-boot/blob/master/drivers/core/root.c
+[^debug-uart]: `include/debug_uart.h` — https://github.com/u-boot/u-boot/blob/master/include/debug_uart.h
 
 ---
 
