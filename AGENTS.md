@@ -35,12 +35,22 @@
 
 ## Deployment
 
-- **Deploys automatically on push to `main`** via `.github/workflows/deploy.yml`,
-  which runs `yarn lint:md` → `yarn build` → `actions/deploy-pages`.
-  There is no manual deploy step — pushing to `main` publishes the site.
-- A `yarn deploy` script still exists in package.json but is legacy: it runs
-  `docusaurus deploy` (pushes to a `gh-pages` branch), which is not how the site
-  is served anymore. Don't use it.
+- **Deploys automatically within ~5 minutes of a push to `main`**, built on a
+  self-hosted Mac mini (not GitHub Actions). There is no manual deploy step —
+  pushing to `main` publishes the site.
+  - GitHub Pages serves the **`gh-pages` branch** (Settings → Pages → Deploy from a branch).
+  - On the Mac mini, launchd (`~/Library/LaunchAgents/io.github.alanhc.til-deploy.plist`)
+    runs `~/til-deploy/deploy.sh` every 5 minutes: if `origin/main` moved, it runs
+    `yarn lint:md` → `yarn build` and pushes `build/` to `gh-pages` with a repo-scoped
+    deploy key. Commits whose subject starts with `vault backup:` are skipped.
+  - Logs: `~/til-deploy/deploy.log` (runs) and `~/til-deploy/last-build.log` (last build).
+    Force a rebuild: `ssh macmini ~/til-deploy/deploy.sh --force`.
+- `.github/workflows/deploy.yml` (Actions → `actions/deploy-pages`) is **disabled**
+  (`gh workflow disable deploy.yml`) because the GitHub account's Actions are
+  billing-locked. To switch back: set Pages source to "GitHub Actions",
+  `gh workflow enable deploy.yml`, and unload the Mac mini launchd job.
+- Don't use `yarn deploy` (`docusaurus deploy`); `gh-pages` is owned by the Mac mini
+  job, and two writers would race.
 - `git push` is gated by a pre-push hook running `yarn preflight`
   (`yarn lint:md && yarn build`). Bypass with `--no-verify` only if you mean it.
 
