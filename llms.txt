@@ -1,0 +1,362 @@
+# alanhc's TIL
+
+> Today I Learned
+
+This file contains links to documentation sections following the llmstxt.org standard.
+
+## Table of Contents
+
+- [知識地圖](https://alanhc.github.io/til/docs/0.map/README): 整個知識庫的入口。文章依主題分成九類，每類會逐步長出自己的**文章索引**與**名詞表**。
+- [關於我](https://alanhc.github.io/til/docs/map/about): **Alan Tseng** — 用 AI agent 讓韌體工作跑更快的嵌入式軟體工程師。
+- [AI 名詞表](https://alanhc.github.io/til/docs/map/ai_glossary): 彙整知識庫中所有 AI / LLM / Agent 筆記出現過的名詞。
+- [AI / Agent 文章索引](https://alanhc.github.io/til/docs/map/ai_index): 本頁整理知識庫中所有 AI、LLM、Agent 相關筆記，依主題分類：從 Claude Code 生態、MCP 開發、本機推論，到 Agent 安全架構與組織導入的觀點文章。
+- [Android 名詞表](https://alanhc.github.io/til/docs/map/android_glossary): 彙整知識庫中所有 Android / AOSP / Pixel 筆記出現過的名詞。
+- [Android / Pixel 系列文章索引](https://alanhc.github.io/til/docs/map/android_index): 本頁整理知識庫中所有 Android、AOSP、Pixel 相關筆記，依主題分類。
+- [BMC 名詞表](https://alanhc.github.io/til/docs/map/bmc_glossary): 彙整知識庫中所有 BMC / OpenBMC 筆記出現過的名詞。BMC 文章都集中在 `BMC/` 資料夾，文章清單直接走側邊欄即可（這類不另做索引），本表用於**從名詞反查回原始筆記**。
+- [BMC / OpenBMC 文章索引](https://alanhc.github.io/til/docs/map/bmc_index): 本頁整理知識庫中所有 BMC / OpenBMC 筆記，依主題分類，方便從「想做什麼」找到對應文章。
+- [職涯 / 生活 / 學習 名詞表](https://alanhc.github.io/til/docs/map/career_glossary): 這一類的「名詞」多半是**概念與判準**而不是縮寫——用來在真實情境裡指認「我現在遇到的是哪一種問題」。
+- [職涯 / 生活 / 學習 文章索引](https://alanhc.github.io/til/docs/map/career_index): 這一類的重心是**組織如何運作、以及你在裡面怎麼活**：為什麼大公司永遠在找 owner、
+- [開源貢獻紀錄](https://alanhc.github.io/til/docs/map/contributions): 貢獻散在四個不同的系統上：**GitHub PR**、**AOSP 的 Gerrit**（android-review）、
+- [資料結構與演算法（DSA）文章索引](https://alanhc.github.io/til/docs/map/dsa_index): 本頁整理知識庫中所有資料結構與演算法筆記，依主題分類。文章以 C／Python 從零實作為主線，輔以複雜度分析、常見陷阱與 LeetCode 對照。
+- [Embedded / 韌體 / 硬體 名詞表](https://alanhc.github.io/til/docs/map/embedded_glossary): 彙整知識庫中所有嵌入式系統、韌體、硬體與半導體筆記出現過的名詞，用於**從名詞反查回原始筆記**。文章清單見 [Embedded 系列索引](embedded_index.md)。
+- [Embedded / 韌體 / 硬體 文章索引](https://alanhc.github.io/til/docs/map/embedded_index): 本頁整理知識庫中所有嵌入式系統、韌體與硬體相關筆記，依主題分類：從開機流程、Bootloader、建置系統，到韌體工程實踐與底層硬體知識。
+- [效能 / Benchmark 名詞表](https://alanhc.github.io/til/docs/map/perf_glossary): 從一個陌生的縮寫反查回原始筆記。文章清單見 [效能 / Benchmark 索引](perf_index.md)。
+- [效能 / Benchmark 文章索引](https://alanhc.github.io/til/docs/map/perf_index): 這一類回答的是同一個問題的不同層次：**「它到底快不快，以及你憑什麼這樣說」**。
+- [工具 / 其他 文章索引](https://alanhc.github.io/til/docs/map/tools_index): 這是**雜項分類**：收的是不屬於其他大類的筆記——開發工具速查、雲端服務、自動化、資安、side project 構想。性質偏向速查與隨手紀錄，篇幅落差很大，有幾篇目前仍是佔位頁（下表會逐一註明）。
+- [深入淺出 Android Build System:Chip Vendor 視角](https://alanhc.github.io/til/docs/android-build-system-chip-vendor): App 開發者眼中的 Android build system 是 Gradle 與 AGP;但對 chip vendor(SoC 廠)而言,build system 是另一個世界——你不是在寫 `build.gradle`,而是在維護一份 **BSP(Board Support Packag...
+- [GKI 與 Kleaf Kernel Build 實戰:Chip Vendor 視角](https://alanhc.github.io/til/docs/gki-kleaf-kernel-build): > 系列文章之二。總覽請見《Chip Vendor 視角的 Android Build System》。
+- [Soong 與 Android.bp 實戰:vendor variant 與 VNDK](https://alanhc.github.io/til/docs/soong-android-bp-vendor-vndk): > 系列文章之三。總覽請見《Chip Vendor 視角的 Android Build System》。
+- [SELinux Sepolicy 除錯實戰:Chip Vendor 視角](https://alanhc.github.io/til/docs/selinux-sepolicy-debugging): > 系列文章之四。總覽請見《Chip Vendor 視角的 Android Build System》。
+- [OTA 與簽章流程實戰:Chip Vendor 視角](https://alanhc.github.io/til/docs/ota-signing-flow): > 系列文章之五。總覽請見《Chip Vendor 視角的 Android Build System》。
+- [xTS 認證測試實戰:CTS/VTS/GTS/STS,Chip Vendor 視角](https://alanhc.github.io/til/docs/xts-compliance-testing): > 系列文章之六。總覽請見《Chip Vendor 視角的 Android Build System》。
+- [開機流程與 Bootloader 實戰:Chip Vendor 視角](https://alanhc.github.io/til/docs/boot-flow-bootloader): > 系列文章之七。總覽請見《Chip Vendor 視角的 Android Build System》。
+- [HAL 開發實戰:從 AIDL 介面到開機起服務,End-to-End](https://alanhc.github.io/til/docs/hal-development-aidl): > 系列文章之八。總覽請見《Chip Vendor 視角的 Android Build System》。
+- [Android 年度版本升級方法論:Chip Vendor 的最大例行專案](https://alanhc.github.io/til/docs/annual-android-upgrade): > 系列文章之九。總覽請見《Chip Vendor 視角的 Android Build System》。
+- [效能與功耗調校實戰:Chip Vendor 視角](https://alanhc.github.io/til/docs/performance-power-tuning): > 系列文章之十。總覽請見《Chip Vendor 視角的 Android Build System》。
+- [Camera 與多媒體 Pipeline 實戰:Chip Vendor 視角](https://alanhc.github.io/til/docs/camera-multimedia-pipeline): > 系列文章之十一。總覽請見《Chip Vendor 視角的 Android Build System》。
+- [Ramdump 與穩定性除錯實戰:Chip Vendor 視角](https://alanhc.github.io/til/docs/ramdump-stability-debugging): > 系列文章之十二。總覽請見《Chip Vendor 視角的 Android Build System》。
+- [工廠與量產流程實戰:Chip Vendor 視角](https://alanhc.github.io/til/docs/factory-production-flow): > 系列文章之十三。總覽請見《Chip Vendor 視角的 Android Build System》。
+- [Android 上的 Rust:Chip Vendor 需要知道什麼](https://alanhc.github.io/til/docs/rust-on-android): > 系列文章之十四。總覽請見《Chip Vendor 視角的 Android Build System》。
+- [Project Mainline 與 APEX:對 Chip Vendor 的影響](https://alanhc.github.io/til/docs/mainline-apex-vendor-impact): > 系列文章之十五。總覽請見《Chip Vendor 視角的 Android Build System》。
+- [多專案 BSP 的 Branch 與 Manifest 管理:SCM 視角](https://alanhc.github.io/til/docs/bsp-branch-manifest-management): > 系列文章之十六(完)。總覽請見《Chip Vendor 視角的 Android Build System》。
+- [Android Automotive OS（AAOS）開發者入門指南](https://alanhc.github.io/til/docs/AAOS-開發者入門): 在深入之前，務必分清三個常被混用的名詞，否則整個心智模型都會歪掉：
+- [AI 生態系整理](https://alanhc.github.io/til/docs/AI): 三大陣營（OpenAI / Google / Anthropic）在同樣的產品位置上各自都有對應品項，這頁用來對照，避免名詞混淆。
+- [ARM Trusted Firmware(TF-A)解析:Android 開機前,你的手機都在跑什麼?](https://alanhc.github.io/til/docs/ARM_Trusted_Firmware_解析): > 目標讀者:嵌入式/韌體工程師,或想進入 Android firmware / bootloader 領域的開發者。
+- [Android Verified Boot（AVB）深入解析：從信任根到 vbmeta 的完整開機驗證](https://alanhc.github.io/til/docs/Android-Verified-Boot-AVB): > 給 Android 系統開發者的技術長文——理解 AVB 的設計動機、信任鏈運作、vbmeta 結構、dm-verity 驗證，以及刷機與客製化時最常踩到的雷。
+- [Android Build Number](https://alanhc.github.io/til/docs/Android_build_number): `BP4A.251205.006` 的 Build ID 解析：
+- [BMC 開機流程](https://alanhc.github.io/til/docs/BMC/bootup): BMC 通常是一顆 ARM SoC（如 ASPEED AST2500/AST2600），跑一套嵌入式 Linux。開機大致經過 **bootloader → kernel（zImage）→ rootfs** 三個階段。
+- [com0com / com2tcp 筆記](https://alanhc.github.io/til/docs/BMC/com0com-com2tcp): > Windows 上的虛擬序列埠與 serial-over-TCP 橋接工具
+- [CPLD](https://alanhc.github.io/til/docs/BMC/cpld): **CPLD**（Complex Programmable Logic Device）是板上的可程式邏輯裝置，容量介於 GAL 與 FPGA 之間，非揮發（開機即運作，不需外部載入 bitstream）。伺服器主機板常用它做「膠合邏輯」與時序控制。
+- [資料中心叢集架構](https://alanhc.github.io/til/docs/BMC/data_center): 資料中心以 **cluster（叢集）** 為單位組織大量伺服器，透過高速網路把多台機器組成一個運算/儲存整體。常見的節點角色分工如下：
+- [D-Bus](https://alanhc.github.io/til/docs/BMC/dbus): **D-Bus** 是 Linux 上的行程間通訊（IPC）機制。OpenBMC 把它當成整個系統的骨幹：感測器讀值、電源狀態、韌體版本、事件記錄……各個 daemon 都把資料掛在 D-Bus 上，彼此透過 D-Bus 互相查詢與呼叫，而不是各自開 socket 或寫檔案。
+- [BMC 除錯手法](https://alanhc.github.io/til/docs/BMC/debug): BMC 上資源有限（記憶體小、無 GUI），常用兩種方式除錯：遠端 **gdb server** 動態除錯，以及事後的 **coredump analysis**。
+- [設備租約與遠端除錯通道](https://alanhc.github.io/til/docs/BMC/device-lease-design): > 實驗室設備的租約服務。讓遠端使用者拿到設備的獨佔使用權，
+- [Device Driver](https://alanhc.github.io/til/docs/BMC/device_driver): Linux driver 開發最常碰到的幾個名詞，先把它們的角色講清楚：
+- [porting pmbus driver](https://alanhc.github.io/til/docs/BMC/device_driver/porting_pmbus_driver): ![image](https://hackmd.io/_uploads/HkoDvihBgx.png)
+- [Device Tree](https://alanhc.github.io/til/docs/BMC/device_tree): x86 平台可以靠 ACPI 或 PCI 列舉自動發現硬體，但 **ARM 的嵌入式系統（BMC 就是）大多數週邊掛在 I2C、SPI、GPIO 上，是「不可列舉」的**——kernel 沒辦法自己問出「i2c-7 上 0x4c 位址接的是一顆 TMP75 溫度感測器」。
+- [Entity Manager](https://alanhc.github.io/til/docs/BMC/entity_manager): OpenBMC 用來「描述硬體並動態探測」的服務。用 JSON 檔描述一塊板子上有哪些元件（sensor、fan、FRU、電源等），開機時依偵測結果決定要啟用哪些設定。
+- [Event Log](https://alanhc.github.io/til/docs/BMC/event_log): OpenBMC 的事件/錯誤紀錄機制，把硬體與系統事件記成結構化 log，供本機除錯與遠端（Redfish）查詢。
+- [Redfish EventService](https://alanhc.github.io/til/docs/BMC/event_service): Redfish 的事件訂閱機制，讓管理端不必一直輪詢（polling），改由 BMC 在事件發生時主動送出通知（push style）。
+- [Flash 與韌體更新](https://alanhc.github.io/til/docs/BMC/flash): BMC 的韌體存在板上的 **SPI NOR flash**（常見 32MB / 64MB）。這顆 flash 同時放 u-boot、kernel、device tree 與 rootfs，所以「更新 BMC」實質上就是把新的 image 寫進這顆 flash 的某些區段。
+- [FRU（Field Replaceable Unit）](https://alanhc.github.io/til/docs/BMC/fru): **FRU** 指「可現場更換的單元」（如主機板、電源、風扇背板）。每片板子上通常放一顆 **EEPROM**，以 **IPMI Platform Management FRU Information** 格式儲存製造商、產品名、序號、part number 等資料，供 BMC 讀取做資產盤點...
+- [在自己的筆電上開機 NVIDIA GB200 NVL 的 BMC firmware](https://alanhc.github.io/til/docs/BMC/gb200nvl-qemu): OpenBMC 的原始碼樹裡有一個 `meta-nvidia` 層，裡面是 NVIDIA 資料中心平台的真實 BMC 設定 ——
+- [Git / Gerrit Workflow](https://alanhc.github.io/til/docs/BMC/git): OpenBMC 上游採 **Gerrit** 做 code review，流程與 GitHub PR 不同：以「每個 commit = 一個可審查的 change」為單位，靠 `Change-Id` 追蹤修訂。
+- [BMC 硬體入門總覽](https://alanhc.github.io/til/docs/BMC/hardware-overview): BMC 是一顆獨立於主機 CPU 之外、常駐供電的管理晶片。它要回答的問題永遠是那幾個：**這塊板子上有什麼？現在多熱？電壓正不正常？風扇要轉多快？韌體是哪一版？**
+- [BMC 週邊介面](https://alanhc.github.io/til/docs/BMC/hardware): BMC 要管理整台伺服器，靠的是幾條低速匯流排與一堆 GPIO。這頁整理 BMC 開發最常碰到的介面與對應的除錯指令。
+- [GPIO Hog](https://alanhc.github.io/til/docs/BMC/hog): 在 device tree 中直接宣告某支 GPIO 於開機時就被 kernel「佔用並設定成固定狀態」，不需要任何 driver 或 user space 程式介入。常用來拉高/拉低 enable、reset、power-good select 等訊號。
+- [I2C Hotplug](https://alanhc.github.io/til/docs/BMC/hotplug): `i2c-hotplug`
+- [hwmon](https://alanhc.github.io/til/docs/BMC/hwmon): `driver define`
+- [IC 設計的前段、中段、後段:一條從規格到 GDSII 的路](https://alanhc.github.io/til/docs/BMC/ic-design-flow): 跟不同背景的工程師聊天時,「前段 / 後段」這組詞的邊界常常對不起來。做驗證的人講的前段,跟做 Place & Route 的人心裡的前段,切點未必一樣;而「中段」這個詞在台灣業界很常用,到了歐美履歷上卻幾乎看不到。
+- [Linux 中斷處理（Interrupt）](https://alanhc.github.io/til/docs/BMC/interrupt): 硬體透過 **IRQ（Interrupt Request）** 通知 CPU 有事件發生（如網路封包到達、timer 到期），CPU 暫停當前工作轉去執行對應的 **irq handler**。這讓系統不必忙碌輪詢（polling）即可即時反應。
+- [BMC IPMI 驗證實戰（一）：基礎觀念與通用測試方法](https://alanhc.github.io/til/docs/BMC/ipmi-validation-1-basics): > TL;DR：IPMI 命令「回了 `00`」不代表功能正確。驗證一顆 BMC，要同時看 **byte-level 的回應**、**設定在重開後是否保留**、**權限與介面限制**，以及**實機行為和 SEL 紀錄是否對得上**。這篇先講 IPMI 命令的組成、連線方式、Completion...
+- [BMC IPMI 驗證實戰（二）：各命令類別的測試重點](https://alanhc.github.io/til/docs/BMC/ipmi-validation-2-commands): > TL;DR：依照 IPMI 2.0 的 NetFn 分類，逐類整理命令、`ipmitool` 用法和測試重點。共通原則是[上一篇](./ipmi-validation-1-basics.md)講的：raw 與 string 雙驗證、Set → Get → 還原、負面測試、持久性，以及用實機...
+- [BMC IPMI 驗證實戰（三）：OEM 命令、韌體更新與命令速查](https://alanhc.github.io/til/docs/BMC/ipmi-validation-3-firmware-cheatsheet): > TL;DR：OEM 命令一律以廠商規格為準，不要跨平台套用；韌體更新要用「方向 × 路徑 × 主機狀態 × 對象 × 異常」的矩陣來測，燒完檢查版本、SEL、LED 和設定是否保留。最後附上整個系列的命令速查與結語。
+- [IPMI](https://alanhc.github.io/til/docs/BMC/ipmi): **IPMI**（Intelligent Platform Management Interface）是伺服器的**頻外管理**（out-of-band management）標準介面，由 Intel 等廠商在 1998 年提出，目前廣泛使用的是 IPMI v2.0。
+- [MCTP](https://alanhc.github.io/til/docs/BMC/mctp): **MCTP**（Management Component Transport Protocol）是 DMTF 定義的傳輸協定，讓平台管理元件之間（BMC、NIC、SSD、retimer、GPU 等）能在各種實體匯流排上交換管理訊息。
+- [MediaMTX / RTSP / ONVIF 筆記](https://alanhc.github.io/til/docs/BMC/mediamtx-rtsp-onvif): > 三者常被放在一起講，但其實不在同一層。先把分層搞清楚，後面就都好懂。
+- [Shell Collector / VictoriaMetrics / Grafana — 這是什麼、為什麼重要](https://alanhc.github.io/til/docs/BMC/metrics-stack-notes): > 一句話：這三個東西組成一條「指標管線」— **採集 → 儲存 → 視覺化**。
+- [Network (phosphor-networkd)](https://alanhc.github.io/til/docs/BMC/network): `phosphor-network`
+- [NTP 時間同步](https://alanhc.github.io/til/docs/BMC/ntp): BMC 需要正確時間，讓 event log、SEL、憑證有效期等有一致的時間戳。透過 **NTP** 與外部時間伺服器同步。
+- [OpenBMC](https://alanhc.github.io/til/docs/BMC/openbmc): **OpenBMC** 是 Linux Foundation 底下的開源 BMC 韌體專案，由 IBM、Intel、Google、Microsoft 等共同維護。它取代過去各家自行開發的封閉 BMC 韌體，提供一套可共用、可審計的基礎。
+- [OpenBMC Boot Flow](https://alanhc.github.io/til/docs/BMC/openbmc_boot_flow): OpenBMC 是由 Linux Foundation 主導的開源 BMC（Baseboard Management Controller）韌體專案，廣泛應用於伺服器管理晶片（如 ASPEED AST2500/AST2600、Nuvoton NPCM）。本文整理完整的 OpenBMC 開機流程...
+- [PID Control (phosphor-pid-control)](https://alanhc.github.io/til/docs/BMC/pid_control): OpenBMC 的風扇/散熱閉迴路控制 daemon，依感測器讀值動態調整風扇 PWM，避免過熱也避免全速空轉。
+- [PMBus](https://alanhc.github.io/til/docs/BMC/pmbus): **PMBus**（Power Management Bus）是電源管理裝置的標準通訊協定，建立在 [SMBus](./hardware.md) 之上（SMBus 又建立在 I2C 之上）。伺服器上的 PSU、VRM、hot-swap controller、eFuse 都用它，讓 BMC 可以...
+- [pyftdi / FT2232H / PCA9555 筆記](https://alanhc.github.io/til/docs/BMC/pyftdi-ft2232h-pca9555): 用 PC 當主機去控制硬體低階匯流排（SPI / I²C / JTAG / GPIO）時常見的一組東西。
+- [Redfish](https://alanhc.github.io/til/docs/BMC/redfish): **Redfish** 是 DMTF 定義的 RESTful 管理介面標準，用 HTTPS + JSON 管理伺服器硬體，目標是取代老舊、二進位、難擴充的 **IPMI**。
+- [PCIe Retimer](https://alanhc.github.io/til/docs/BMC/retimer): 高速訊號在 PCB 上走長距離會衰減，Retimer 是主動元件，負責把 PCIe 訊號重新取樣、重建（re-clock），恢復乾淨的眼圖，延長可用走線距離。
+- [讀電路圖（Schematic）](https://alanhc.github.io/til/docs/BMC/schemantic): Datasheet 告訴你「這顆晶片怎麼用」（見 [spec](./spec.md)），**電路圖告訴你「這顆晶片在這塊板子上怎麼接」**。移植感測器時，device tree 裡要填的 bus 編號與 slave address，答案全在電路圖裡。
+- [phosphor-sel-logger](https://alanhc.github.io/til/docs/BMC/sel_logger): OpenBMC 服務，負責產生並維護 **IPMI SEL**（System Event Log）——BMC 記錄硬體事件（感測器越限、power 事件等）的標準紀錄，供 `ipmitool sel` 這類傳統工具查詢。
+- [感測器移植（Sensor Porting）](https://alanhc.github.io/til/docs/BMC/sensor_porting): 板子上多了一顆溫度或電壓感測器，要讓它一路顯示到 Redfish / IPMI，中間要打通四層：
+- [serial over lan](https://alanhc.github.io/til/docs/BMC/serial_over_lan): |組件|本質角色|解釋|
+- [SOL（Serial over LAN）](https://alanhc.github.io/til/docs/BMC/sol): **SOL** 讓管理者透過網路存取主機（host）的序列埠 console，不必實體接一條 serial cable。BMC 把 host 的 serial 資料封裝進 IPMI over LAN 的封包，經網路轉送給遠端 client，達成遠端看 BIOS/開機訊息與登入 console。
+- [讀 Datasheet / Spec](https://alanhc.github.io/til/docs/BMC/spec): 移植一顆新的 I2C 裝置時，手上會有兩份文件：**datasheet**（晶片廠給的規格書）與 **schematic**（板廠給的電路圖，見 [schemantic](./schemantic.md)）。Datasheet 動輒幾十上百頁，但寫 driver 真正會用到的其實只有固定幾個章節。
+- [Server-Sent Events (SSE)](https://alanhc.github.io/til/docs/BMC/sse): **SSE** 是一種基於 HTTP 的單向串流技術：client 開一條長連線，server 持續往下推送文字事件。Redfish 用它做事件即時推送。
+- [systemd](https://alanhc.github.io/til/docs/BMC/systemd): **systemd** 是現代 Linux 的 init 系統與服務管理員，PID 1 就是它。OpenBMC 直接採用 systemd 管理所有背景服務：Redfish server、IPMI daemon、感測器監控、電源狀態機……全部都是 systemd unit。
+- [韌體測試流程](https://alanhc.github.io/til/docs/BMC/testing): BMC 韌體驗證通常圍繞三件事展開：**test plan（測試計畫）→ functional testing（功能測試）→ report（測試報告）**。
+- [Thermal Management](https://alanhc.github.io/til/docs/BMC/thermal): BMC 的散熱管理：讀溫度感測器，依策略調整風扇轉速，在「不過熱」與「不吵/省電」之間取平衡。
+- [Yocto Project](https://alanhc.github.io/til/docs/BMC/yocto): OpenBMC 用 **Yocto Project** 這套嵌入式 Linux build 框架來產生 BMC firmware image。它不是一個發行版，而是「幫你組出自己發行版」的工具鏈。
+- [DFT（Design for Test）工程實務整理](https://alanhc.github.io/til/docs/DFT_Design_for_Test_工程實務): > 給 IC 工程師的可測試性設計筆記：從為什麼要 DFT，到 scan、ATPG、BIST、boundary scan 的實作重點與量產考量。
+- [DFT Verification 學習筆記](https://alanhc.github.io/til/docs/DFT_Verification_學習筆記): > 整理 DFT Verification（DFT 的 simulation-based 驗證）需要的知識結構。這個領域的核心是**驗證能力**，不是純 DFT 設計：DFT 知識（Scan/ATPG/BIST/JTAG）是差異化的部分，真正的地基是驗證方法、debug、以及對 SoC 架構的理解。
+- [回溯（Backtracking）](https://alanhc.github.io/til/docs/DSA/Backtracking): **回溯（Backtracking）** 是一種系統化窮舉所有可能的方法：一步步做選擇往下探，走到底或走不通就**退回上一步、還原狀態，換另一個選擇再試**。它本質上是帶「撤銷」動作的 DFS，是解決「列出所有排列 / 組合 / 子集 / 路徑」這類題目的萬用框架。面試裡只要你認得出題目在要「...
+- [二分搜尋（Binary Search）](https://alanhc.github.io/til/docs/DSA/Binary-Search): **二分搜尋（Binary Search）** 是「每次把搜尋範圍砍一半」的技巧，在有序資料上把 O(n) 的線性搜尋降到 **O(log n)**。概念人人會講，但真正在面試白板上寫對的人不多——因為它的難不在主概念，而在**邊界處理**。off-by-one、無窮迴圈、`lo`/`hi` ...
+- [位元運算（Bit Manipulation）](https://alanhc.github.io/til/docs/DSA/Bit-Manipulation): **位元運算（Bit Manipulation）** 是直接對整數的二進位表示逐位操作的技巧。對做韌體（firmware）的人來說，這不是「面試才用的花招」，而是每天在讀寫暫存器、拼裝旗標、做記憶體對齊時都會碰到的基本功。這篇用 **C** 來寫，因為底層工作幾乎都在 C 的世界裡。
+- [Boyer-Moore 投票法（Majority Element）](https://alanhc.github.io/til/docs/DSA/Boyer-Moore): **Boyer-Moore 投票法（Boyer-Moore Voting Algorithm）** 是一個用來找出陣列中「多數元素」（majority element，出現次數超過 n/2 的元素）的經典演算法，最大的優點是只需要 **O(n) 時間、O(1) 空間**，一次遍歷就能完成。
+- [環形緩衝區（Circular Buffer / Ring Buffer）](https://alanhc.github.io/til/docs/DSA/Circular-Buffer): **環形緩衝區（Circular Buffer，又叫 Ring Buffer）** 是一段固定大小的陣列，配上「頭尾指標繞圈回頭」的規則，用來實作一個 FIFO（先進先出）佇列。它是嵌入式 / 韌體世界裡最重要的資料結構之一——UART 收發、DMA、log 系統幾乎都靠它。
+- [動態規劃（Dynamic Programming）](https://alanhc.github.io/til/docs/DSA/Dynamic-Programming): **動態規劃（Dynamic Programming，DP）** 是把一個大問題拆成一系列小問題，並且**把每個小問題的答案記下來、只算一次**的解題法。它常被形容成「有記憶的遞迴」或「有策略的窮舉」。面試裡它幾乎是必考大題，卡住的人多半不是不會寫迴圈，而是**想不出狀態怎麼定義**。這篇就把...
+- [圖與 BFS/DFS](https://alanhc.github.io/til/docs/DSA/Graph-BFS-DFS): 圖（graph）是演算法面試裡最會「換皮」的主題：迷宮、島嶼、課程依賴、社群網路、狀態轉移、build 系統，表面完全不同，本質都是「節點 + 邊」加上 **BFS 或 DFS** 兩把走訪的刀。認出「這其實是一張圖」通常就解決了一半，剩下的只是選對走訪方式。
+- [雜湊表（Hash Table）](https://alanhc.github.io/til/docs/DSA/Hash-Table): **雜湊表（Hash Table）** 是把「鍵（key）」對應到「值（value）」的資料結構，理想情況下 `insert`／`search`／`delete` 都是 **平均 O(1)**。它幾乎是所有語言標準函式庫的內建型別（C++ `unordered_map`、Python `dic...
+- [LRU 快取（LRU Cache）](https://alanhc.github.io/til/docs/DSA/LRU-Cache): **LRU（Least Recently Used）快取** 是一種「容量固定」的快取：當空間用滿、又要放新資料進來時，就淘汰掉 **最久沒被使用** 的那一筆。它是作業系統、資料庫、CPU 都在用的置換策略，也是面試裡的超高頻題（LeetCode 146），因為它剛好把 **hash 表**...
+- [Single Linked list](https://alanhc.github.io/til/docs/DSA/Linked_List/linked_list): 我們先實作一個簡單的 linked list，我們使用 `main.c` 來撰寫主要的測試 case ， `list.h` 來定義 linked list 的結構和函式原型， `list.c` 來實作 linked list 的函式。完整的程式可以參考 [code](https://githu...
+- [Doubly Linked List](https://alanhc.github.io/til/docs/DSA/Linked_List/double_linked_list): 每個節點同時記錄前一個（prev）與後一個（next）節點，可雙向走訪。
+- [Linked List 經典題](https://alanhc.github.io/til/docs/DSA/Linked_List/leetcode): Linked list 的題目變化不多，來來回回就是那幾個技巧。把下面這幾題做熟，大部分 linked list 題目都能拆解出來。
+- [Linux Kernel Linked List](https://alanhc.github.io/til/docs/DSA/Linked_List/linux_linked_list): 參考：https://hackmd.io/@sysprog/linux2025-lab0/%2F%40sysprog%2Flinux2025-lab0-a
+- [單調堆疊（Monotonic Stack）](https://alanhc.github.io/til/docs/DSA/Monotonic-stack): **Monotonic stack(單調堆疊)** 是一種使用技巧,不是新的資料結構——它就是普通的 stack,只是在使用時額外維持一個規則:stack 裡的元素從底到頂保持單調遞增或單調遞減。每當要 push 新元素時,先把所有會破壞單調性的元素 pop 掉,再放入新元素。
+- [排序演算法總覽（Sorting Algorithms）](https://alanhc.github.io/til/docs/DSA/Sorting): 排序是最基礎、也最容易被面試官拿來「探底」的主題。很多人以為「排序不就 `sort()` 一行」，但面試真正想知道的是：**你懂不懂每個演算法背後的取捨**——為什麼 quicksort 平均最快卻可能退化成 O(n²)？為什麼 mergesort 穩定但要額外空間？在 firmware 這種...
+- [Binary Tree](https://alanhc.github.io/til/docs/DSA/Tree/binary_tree): 每個節點最多有兩個子節點（left、right）的樹結構。
+- [Heap](https://alanhc.github.io/til/docs/DSA/Tree/heap): Heap 是一種完全二元樹（complete binary tree），滿足 **heap property**：
+- [雙指標與滑動視窗（Two Pointers / Sliding Window）](https://alanhc.github.io/til/docs/DSA/Two-Pointers-Sliding-Window): **雙指標**與**滑動視窗**是同一個核心思想的不同面貌：與其用兩層迴圈把所有配對都掃一遍（O(n²)），不如用兩個索引在陣列／字串上移動，讓每個元素只被看常數次，把問題壓到 **O(n)**。它們是陣列與字串題最主力的手法，面試出現率極高——認得出模式，題目就從「想不到」變「照套」。
+- [Booting My Own Linux 7.3 Build on a BeagleBone Black](https://alanhc.github.io/til/docs/Embedded/bbb-kernel-7.3-bringup-en): > 中文版：[在 BeagleBone Black 上把自己編的 Linux 7.3 開起來](./bbb-kernel-7.3-bringup.md)
+- [在 BeagleBone Black 上把自己編的 Linux 7.3 開起來](https://alanhc.github.io/til/docs/Embedded/bbb-kernel-7.3-bringup): > English version: [Booting My Own Linux 7.3 Build on a BeagleBone Black](./bbb-kernel-7.3-bringup-en.md)
+- [在 BeagleBone Black 上驗證 arm32 kexec，順便修掉一個 cpsw 的 kexec bug](https://alanhc.github.io/til/docs/Embedded/bbb-kexec-cpts): 接續[自己編的 Linux 7.3 開機](./bbb-kernel-7.3-bringup.md)：這次要讓 u-root 的 `kexec` 在 32-bit arm 真機上，從一顆 kernel 直接跳進另一顆 kernel，不經過 U-Boot。過程中在 u-root 和 Linux ...
+- [在 BeagleBone Black 上寫一個最小的 platform driver](https://alanhc.github.io/til/docs/Embedded/bbb-platform-driver): [U-Boot 練習](./bbb-uboot-bringup.md)裡用 `md`/`mw` 直接戳 GPIO1 暫存器點亮 USR LED。這次把同一件事交給 kernel：寫一個 platform driver，靠 device tree 找到 LED，先用自己的 sysfs 屬性控制，...
+- [BeagleBone Black 的 SPL 原始碼導讀：從 Boot ROM 到 DRAM](https://alanhc.github.io/til/docs/Embedded/bbb-spl-source-walkthrough): [上一篇](./bbb-uboot-bringup.md)從記憶體的角度走了一次開機：Boot ROM 把 MLO 搬進 SRAM，SPL 叫醒 DDR，再把 U-Boot 搬進 DRAM。那篇只講「搬到哪」，這篇照著 U-Boot 原始碼，一行一行看 SPL 是**怎麼**做到的：上電後第一...
+- [BeagleBone Black bring-up 練習：從 UART 到手動 bootz](https://alanhc.github.io/til/docs/Embedded/bbb-uboot-bringup): 用 BeagleBone Black（AM335x）練 bring-up 的第一天紀錄：接 debug UART、錄完整開機 log、在 U-Boot 裡直接戳 GPIO 暫存器點 LED，最後不靠 `bootcmd`，自己一步步把 Linux 開起來。
+- [Buildroot](https://alanhc.github.io/til/docs/Embedded/buildroot): `make menuconfig`
+- [State Machine](https://alanhc.github.io/til/docs/Embedded/state_machine): State Machine
+- [Das U-Boot](https://alanhc.github.io/til/docs/Embedded/uboot): U-Boot 是 embedded 平台最常見的 bootloader，負責初始化硬體、載入 kernel 與 device tree，並跳入 OS。提供互動式命令列，方便開發與除錯。
+- [Yocto Project](https://alanhc.github.io/til/docs/Embedded/yocto): Yocto 是一套用來「打造客製化 embedded Linux 發行版」的建構框架。它不是一個發行版，而是幫你從原始碼建出專屬的 toolchain、kernel、rootfs image 的工具集。核心建構引擎是 **BitBake** 搭配 **OpenEmbedded**。
+- [在 Arduino 101 上跑 Zephyr（Windows + WSL）](https://alanhc.github.io/til/docs/Embedded/zephyr-arduino-101): Arduino 101（海外版叫 Genuino 101）用的是 Intel Curie 模組，裡面是 Quark SE C1000：一顆 32 MHz 的 x86（Quark）核心加一顆 ARC EM 感測器子系統核心，兩顆共用記憶體、同時運作。這篇記錄在 Windows 11 上用 WSL...
+- [在 STM32 Blue Pill 上跑 Zephyr（只接 ST-Link）](https://alanhc.github.io/til/docs/Embedded/zephyr-stm32-bluepill): 手上有一塊 STM32F103C8T6 的 Blue Pill，只用一支 ST-Link V2 接 SWD 四條線（3.3V、SWDIO、SWCLK、GND），**沒有接 NRST，也沒有接 UART**。這篇記錄從確認晶片、備份原廠韌體、架 Zephyr 4.4 環境，到把 blinky 燒...
+- [Kubernetes 作為 AI 代理系統之縱深防禦平台：以 Hermes 為例的安全架構設計](https://alanhc.github.io/til/docs/HERMES_AI_KUBERNETES_SECURITY_ARCHITECTURE): **Alan Tseng**
+- [Kubernetes as a Defense-in-Depth Platform for AI Agent Systems: A Security Architecture Design Using Hermes as an Example](https://alanhc.github.io/til/docs/HERMES_AI_KUBERNETES_SECURITY_ARCHITECTURE_EN): **Alan Tseng**
+- [學習](https://alanhc.github.io/til/docs/Learning): https://youtu.be/EViSmcCPK5g?si=vVYVKPKvZ5nQrKLI
+- [Linux Kernel Image 名詞對照](https://alanhc.github.io/til/docs/Linux): - vmlinux
+- [Linux 開機流程](https://alanhc.github.io/til/docs/Linux/booting): 從按下電源到看到登入畫面，大致經過以下階段：
+- [Device Driver](https://alanhc.github.io/til/docs/Linux/device_driver): Device Driver
+- [Device Tree](https://alanhc.github.io/til/docs/Linux/device_tree): Device Tree (DT) 是一種描述硬體的資料結構，用來告訴 kernel 那些「無法自我探測 (non-discoverable)」的硬體。常見於 ARM、RISC-V 等 embedded 平台；x86 多半靠 ACPI/PCI 自動列舉，較少用 DT。
+- [Linux Kernel 概觀](https://alanhc.github.io/til/docs/Linux/kernel): Linux 是 monolithic kernel：排程、記憶體管理、檔案系統、網路、driver 都跑在同一個 kernel address space。但它支援 loadable kernel module (`.ko`)，可在執行期動態載入/卸載，兼具模組化彈性。
+- [Linux 核心除錯案例分析 — 學習筆記](https://alanhc.github.io/til/docs/Linux/kernel_debugging): > 原文：jserv〈[Linux 核心除錯案例分析](https://hackmd.io/@sysprog/kernel-debugging)〉
+- [Linux 記憶體管理](https://alanhc.github.io/til/docs/Linux/memory): 每個 process 看到的是自己獨立的 **virtual address space**，實體記憶體 (physical memory) 由 kernel 統一管理。virtual → physical 的轉換靠 **MMU** 搭配 page table 完成。
+- [systemd](https://alanhc.github.io/til/docs/Linux/systemd): systemd 是現代多數 Linux 發行版的 **init system**（PID 1），負責開機後拉起並管理服務、掛載、裝置、socket 等。以平行化啟動與相依關係管理取代傳統 SysV init 的循序 script。
+- [Microdroid：Android 為什麼要在手機裡再開一台 Android](https://alanhc.github.io/til/docs/Microdroid): > 讀者定位：知道 Android 開機流程、SELinux、AVB 大概在做什麼，但沒碰過 AVF / pKVM。本文從「為什麼需要」講到「開機鏈每一步在驗什麼」，最後收在實務邊界。
+- [Secure Boot 解析:從一顆 eFuse 到 Android 開機的完整信任鏈](https://alanhc.github.io/til/docs/Secure_Boot_解析): > 目標讀者:嵌入式/韌體工程師。本文是〈ARM Trusted Firmware 解析〉的姊妹篇——上一篇講「誰在跑」,這一篇講「憑什麼信任它」。
+- [VAD 語音喚醒](https://alanhc.github.io/til/docs/VAD語音喚醒): 浏览器语音活动检测实战指南：3种方法快速集成VAD功能https://blog.csdn.net/gitblog_00517/article/details/156661924
+- [把 ABL 拆開看:AVB 驗證在真機上到底怎麼跑](https://alanhc.github.io/til/docs/abl-avb-reversing): > 這是 [vboot vs AVB] 那篇的續集。上一篇談的是「規格上兩套 Verified Boot 的設計差異」——那是紙上的 AVB。這篇要做的是把 Qualcomm 手機的 **ABL(Android Boot Loader)** 反組譯出來,對照 AOSP 的 `libavb` 原...
+- [ACPI 與 Device Tree 到底差在哪:從「kernel 怎麼知道板子上有什麼」講起](https://alanhc.github.io/til/docs/acpi-vs-devicetree): > 本文為入門導向,假設你寫過應用層程式、大致知道 driver 是什麼,但沒實際碰過開機階段的硬體描述。所有範例與引用皆來自公開規格與 mainline kernel 文件,文末附完整出處。
+- [adb logcat 與 UART:Android 除錯的兩把刀](https://alanhc.github.io/til/docs/adb-logcat-vs-uart): 做 Android 開發或板級(BSP)工作時,幾乎一定會碰到兩個抓 log 的手段:`adb logcat` 和 UART 序列埠。新手常有個疑問——「我都能接 UART 了,為什麼還要 logcat?」這篇把兩者的定位、用法與互補關係一次講清楚。
+- [AI Agent 相關專案](https://alanhc.github.io/til/docs/agent): 收集的一些 agent 生態系專案，依用途分類。
+- [AI 輔助韌體開發：MCP、Skills 與 Harness 的三層拆解](https://alanhc.github.io/til/docs/ai-firmware-mcp-skills-harness): > **本文引用原則**
+- [Why Companies Can't Get Agentic AI Off the Ground: It's Not a Technology Problem — It's Four Organizational Walls](https://alanhc.github.io/til/docs/ai-why-companies-struggle-agentic-ai-en): Over the past year, I've put agentic AI into a real development workflow, and I gave a talk on the topic at COSCUP. Seen from the tech community, a...
+- [為什麼公司推不動 Agentic AI:不是技術問題,是四道組織的牆](https://alanhc.github.io/til/docs/ai-why-companies-struggle-agentic-ai): 過去一年,我在工作中把 agentic AI 用進實際開發流程,也在 COSCUP 分享過這個題目。從技術社群往外看,agentic AI 是下一波生產力革命;但從公司內部往裡看,大多數導入會卡住——而且卡住的地方,幾乎都不在技術。
+- [Apple Intelligence](https://alanhc.github.io/til/docs/ai_apple_intelligence): Apple 在 macOS / iOS 上內建的 AI 功能集合。和 ChatGPT 那類「開一個對話視窗」的產品定位不同，Apple Intelligence 的策略是**把 AI 散進既有的系統 App 裡**——你不會特地去「用 Apple Intelligence」，而是在寫郵件、看通...
+- [AI 時代的「基本功」：一句永遠不會錯、也永遠無法驗證的話](https://alanhc.github.io/til/docs/ai_basic_knowledge): AI 寫程式的能力每三個月上一個台階，於是一種說法開始在技術圈流行：「工具會變，但基本功才是最重要的。」這句話聽起來成熟、穩重、政治正確，底下的留言通常一片認同。
+- [AI 輔助 BMC 開發](https://alanhc.github.io/til/docs/ai_bmc): 用 AI 工具加速 OpenBMC / 韌體開發的實用筆記。
+- [ChatGPT](https://alanhc.github.io/til/docs/ai_chatgpt): ChatGPT
+- [Ai_google_ai](https://alanhc.github.io/til/docs/ai_google_ai): https://labs.google.com/mariner/landing
+- [Google AI Studio](https://alanhc.github.io/til/docs/ai_google_ai_studio): 目前體感上還蠻喜歡的建立幾個App
+- [Google Antigravity](https://alanhc.github.io/til/docs/ai_google_antigravaty): https://antigravity.google/docs
+- [Google Gemini CLI](https://alanhc.github.io/til/docs/ai_google_gemini): Google 官方的開源終端機 AI agent，可在命令列直接與 Gemini 模型互動、讀寫檔案與執行工具。
+- [Google NotebookLM](https://alanhc.github.io/til/docs/ai_google_notebook_lm): NotebookLM 是 Google 推出的 AI 研究與筆記助理，特色是以「你上傳的資料源」為依據來回答問題，減少憑空捏造。
+- [本機 LLM 推論工具](https://alanhc.github.io/til/docs/ai_inference): 在本機執行 LLM 推論的常見工具比較，底層多半基於 `llama.cpp`。
+- [Jan.ai](https://alanhc.github.io/til/docs/ai_jan_ai): 開源、可離線的本機 LLM 桌面應用，採 Apache 2.0 license，底層以 `llama.cpp` 進行推論。
+- [AI 測試](https://alanhc.github.io/til/docs/ai_testing): llm+MCP
+- [在 VSCode 使用 AI coding 工具](https://alanhc.github.io/til/docs/ai_vscode): VSCode 可透過官方 extension 整合各家 AI coding agent，直接在編輯器中對話、產生與修改程式碼。常見選擇包含 GitHub Copilot、Claude Code、以及 OpenAI Codex 等。
+- [Whisper 語音轉文字](https://alanhc.github.io/til/docs/ai_whisper): 繁體中文可以用聯發科開發個
+- [Ai整理.Excalidraw](https://alanhc.github.io/til/docs/ai整理.excalidraw): ==⚠  Switch to EXCALIDRAW VIEW in the MORE OPTIONS menu of this document. ⚠== You can decompress Drawing data with the command palette: 'Decompress...
+- [優化 Android Platform Build Time:從 Full Build 到快速迭代工作流](https://alanhc.github.io/til/docs/android-build-time-optimization): 在 Android platform(AOSP / vendor codebase)開發中,最常見的時間黑洞是「改一行 code → full build → 燒錄整包 → 開機驗證」這個迴圈。一次 full build 動輒數十分鐘到數小時,如果每次改動都走完整流程,一天能驗證的次數非常有限。
+- [搞懂 Android 的三種 Build Variant:user、userdebug 與 eng 差在哪](https://alanhc.github.io/til/docs/android-build-variants): 在 Android(AOSP)開發流程裡,`lunch` 選 target 時你一定看過類似 `aosp_arm64-userdebug` 這種寫法。中間那個 `userdebug` 就是 build variant(建置變體),它決定了刷出來的 image「多開放、多好除錯、多接近正式出貨版...
+- [Android Generic Bootloader（GBL）介紹：用 UEFI 統一 Android 開機流程](https://alanhc.github.io/til/docs/android-gbl-intro): > TL;DR：GBL 是 Google 在 AOSP 開源、用 Rust 寫的 **UEFI application**。它把「Android 專屬的開機邏輯」（A/B slot、AVB、fastboot、kernel/DTB/bootconfig 組裝）從各家 SoC 的 bootload...
+- [Android Kernel:從手工藝品到標準化零件——一顆核心的供應鏈故事](https://alanhc.github.io/til/docs/android-kernel): > 面向對象:Android 產業鏈的工程師與 PM。本文介紹 Android kernel 的本質、它與 Linux 的關係、四層 fork 供應鏈的碎片化問題,以及 GKI 如何重構這一切;並延續系列前兩篇〈[Android Migration](./android-migration.m...
+- [Android Migration:一次大版本升級,整條供應鏈要做什麼](https://alanhc.github.io/til/docs/android-migration): > 面向對象:Android 產業鏈的工程師與 PM。本文是系列第一篇,拆解「Android 大版本遷移」這件事的全貌——為什麼升級這麼難、每年新版本落地時 Google、晶片商、系統廠三方各自要做什麼,以及 Project Treble 如何從架構上改寫遊戲規則。它是後兩篇〈[Vendor ...
+- [你的手機在 Android 發表前就準備好了：聊聊 PDK 與 aosp.xml](https://alanhc.github.io/til/docs/android-pdk-aosp-xml): 每年 Google 發表新版 Android 的時候，總會有一批手機在幾個月內就跟著升級。這件事其實有點違反直覺——原始碼不是剛剛才公開嗎？晶片廠和手機廠是怎麼做到的？
+- [Android Product Flavor 完整教學:一份程式碼,多個 App](https://alanhc.github.io/til/docs/android-product-flavor-完整教學): 在真實的 Android 開發裡,你經常會遇到這種需求:同一套 App 需要有免費版和付費版、需要賣給不同客戶做成白牌(white-label)、或是需要區分開發、測試、正式三種環境。
+- [從 `mount -o remount` 到 OverlayFS：Android Driver 開發者必須弄懂的 remount 機制](https://alanhc.github.io/til/docs/android-remount-deep-dive): > 適合對象：做 BSP、kernel module、vendor HAL、firmware 整合的系統工程師。假設你已經知道 AOSP build 流程、fastboot、以及 Linux mount 的基本語意。
+- [Android](https://alanhc.github.io/til/docs/android): ![](file-20251206231448138.png)
+- [adb（Android Debug Bridge）](https://alanhc.github.io/til/docs/android_adb): adb 是 Android SDK Platform Tools 提供的命令列工具，用來與裝置或模擬器溝通。
+- [Android Boot Flow](https://alanhc.github.io/til/docs/android_boot_flow): ![Android Boot Flow 概觀](assets/image-3.png)
+- [Android_build_project](https://alanhc.github.io/til/docs/android_build_project): https://source.android.com/docs/setup/start?hl=zh-tw#hardware-requirements
+- [Android_engineer_skills](https://alanhc.github.io/til/docs/android_engineer_skills): 我會把它拆成「系統整合團隊日常重複工作」來看：哪些流程有固定輸入、固定檢查點、固定輸出，就最適合包成 agent skill。
+- [韌體開發與 Agentic AI](https://alanhc.github.io/til/docs/android_firmware_development_and_agentic_ai): *Firmware Development and Agentic AI: Let AI Handle the Builds, You Solve the Hard Parts*
+- [Learning Pixel](https://alanhc.github.io/til/docs/android_pixel_learning): Learning Pixel
+- [Android SEPolicy / SELinux](https://alanhc.github.io/til/docs/android_sepolicy): Android 使用 SELinux 做強制存取控制（MAC），對每個 process 與資源標上 security context，並依 policy 規則決定是否允許操作。
+- [AOSP Codebase：repo 與 manifest](https://alanhc.github.io/til/docs/aosp_codebase): AOSP 不是一個 git repo，而是**上千個 git repo 的集合**。管理它們的工具叫 `repo`（Google 寫的 Python 腳本，包在 git 外面），而「哪些 repo、各自要抓哪個分支、放在哪個目錄」全部記錄在一份 **manifest** 裡。
+- [Pixel 8 AOSP 完整工作流程：從查 build ID、選版本、編譯到燒錄](https://alanhc.github.io/til/docs/aosp_pixel_full_workflow): 本文是給開發者的完整教學，和「把 Pixel 刷回原廠」不同，這篇要做的是：
+- [Pixel 8 AOSP Full Workflow: Build ID, Version Selection, Compilation, and Flashing](https://alanhc.github.io/til/docs/aosp_pixel_full_workflow_EN): This is a complete developer guide. Unlike "restoring a Pixel to stock," this guide covers:
+- [從 coreboot 到 Hafnium：重建 NVIDIA Grace 的 ARM Server Boot Flow](https://alanhc.github.io/til/docs/arm-server-boot-flow-grace): coreboot、depthcharge、TF-A、Hafnium、EDK2 哪些真的出現在 ARM server 開機流程裡？用公開原始碼、upstream commit 與 OpenBMC 下游樹，把 NVIDIA Grace 的完整開機鏈重建出來。
+- [ARM Server 韌體技能地圖：DMTF 協定組、UEFI，與一台桌上型 BMC + ERoT](https://alanhc.github.io/til/docs/arm-server-firmware-skill-map): 從公開規格、開源專案與業界常見分工，整理 ARM server 韌體分成哪幾條軌道，每條需要什麼；哪些能用 QEMU 補完、哪些非得碰硬體不可。附一個用 BeagleBone Black + STM32 搭出 BMC + satellite MCU 子系統的練習專案。
+- [Arm SystemReady：讓 Arm 平台做到「裝了就能開機」](https://alanhc.github.io/til/docs/arm-systemready): 在 x86 上，你拿一個 Ubuntu 或 Fedora 的 ISO，不管是 Dell、HP 還是自己組的電腦，大多直接就能開機安裝。這背後靠的是業界幾十年累積的共同介面：UEFI、ACPI、PCI 列舉。作業系統不必知道板子的細節，韌體會把硬體資訊交給它。
+- [Arm 虛擬化的隔離：從 Stage-2 到 Realm，四道邊界怎麼疊起來](https://alanhc.github.io/til/docs/arm-virtualization-isolation): > 這篇文章想回答一個問題：當我們說「這個 VM 被隔離了」，到底是誰、在哪一層、用什麼硬體機制擋住了誰？
+- [ARM Trusted Firmware](https://alanhc.github.io/til/docs/arm_trust_firmware): What: ARM 官方的Secure World 執行環境的詞作
+- [ATF 名詞整理](https://alanhc.github.io/til/docs/atf): | 階段        | 常見名稱                           | 任務                              | 層級             |
+- [自動化工具](https://alanhc.github.io/til/docs/automation): n8n
+- [performance](https://alanhc.github.io/til/docs/benchmark): 連線
+- [Benchmark：iPad Air 4](https://alanhc.github.io/til/docs/benchmark_ipad_air): Benchmark Ipad Air 4
+- [潛伏九年的 bug：Java 標準函式庫的 binarySearch 是怎麼壞掉的](https://alanhc.github.io/til/docs/binary-search-bug): 2006 年 6 月 2 日，當時任職於 Google 的 Joshua Bloch 在 Google Research Blog 上發表了一篇標題聳動的文章：〈Extra, Extra — Read All About It: Nearly All Binary Searches and M...
+- [從按下電源到 Linux：PC、伺服器、Android、ARM Server 開機流程由淺入深](https://alanhc.github.io/til/docs/boot-flow-intro): > 這篇從「開機到底在做什麼」講起，一路談到 UEFI、LinuxBoot/u-root、Android/嵌入式，最後到 ARM server 和 NVIDIA Jetson。重點會放在**為什麼**各種平台的開機流程長得不一樣。
+- [ARM Trusted Firmware（TF-A）](https://alanhc.github.io/til/docs/booting/atf): **ARM Trusted Firmware（TF-A）** 是 ARMv8-A/AArch64 平台的參考安全韌體，提供各開機階段（boot stage）與 secure world 的基礎服務，並實作 **PSCI** 等標準介面。開機依序經過 BL1 → BL2 → BL31 → BL3...
+- [開機流程 (泛用概念)](https://alanhc.github.io/til/docs/booting/boot): 不論 x86、ARM 或 RISC-V，開機都是一段「愈來愈有能力」的接力：每一階段初始化足夠的硬體，把控制權交給下一階段，逐步從幾行 ROM code 走到完整 OS。
+- [RISC-V Linux Boot Flow](https://alanhc.github.io/til/docs/booting/riscv_linux_boot_flow): RISC-V 是一個開放的指令集架構（ISA），其開機流程與 x86 或 ARM 有顯著差異，引入了 **SBI（Supervisor Binary Interface）** 作為韌體與 OS 之間的標準介面。本文整理完整的 RISC-V Linux 開機流程，以主流平台（SiFive HiF...
+- [UEFI gdb 除錯](https://alanhc.github.io/til/docs/booting/uefi-gdb-dxe-debugging): 中文圈關於 UEFI 的文章，絕大多數停在「SEC → PEI → DXE → BDS 四個階段」的架構圖。
+- [x86 Linux Boot Flow](https://alanhc.github.io/til/docs/booting/x86_linux_boot_flow): 從按下電源鍵到登入提示符，x86 架構的 Linux 開機流程跨越韌體、Bootloader、Kernel 與 Userspace 四個層次。本文整理完整流程，並涵蓋 BIOS/Legacy 與現代 UEFI 兩種路徑的差異。
+- [Bootloader](https://alanhc.github.io/til/docs/bootloader): **Bootloader** 是 CPU 上電後、OS 接手前跑的那段程式。它的任務很單純：**把硬體初始化到「足以載入 kernel」的程度，然後把 kernel 搬進記憶體並跳過去**。
+- [Bring-up:新硬體從「不會動」到「能量產」的關鍵戰役](https://alanhc.github.io/til/docs/bringup-article): 在晶片與硬體產業,有一個時刻的張力不亞於火箭發射:tape-out 數個月後,第一批工程樣品(engineering sample)從封測廠送回實驗室,bring-up 團隊把晶片放上測試板、接上電源、按下開關。接下來幾小時到幾天內發生的事,將決定這顆花費數千萬甚至上億美元開發的晶片,是走向量...
+- [瀏覽器效能 Benchmark](https://alanhc.github.io/til/docs/browser_performance_benchmark): 我想透過網頁的benchmark 測試來了解某一台的機體性能
+- [職涯](https://alanhc.github.io/til/docs/career): 除了技術能力之外，影片也強調了 協作能力與跨職能影響力，例如成為產品與設計團隊的策略夥伴（4:00），理解需求背後的「為什麼」，並且提出解決方案，而不只是指出問題。
+- [晶片（Materials）](https://alanhc.github.io/til/docs/chip): 晶片（Materials）
+- [Chrome 擴充套件](https://alanhc.github.io/til/docs/chrome_extension): - Youtube
+- [Claude](https://alanhc.github.io/til/docs/claude): ![](assets/claude/file-20260405203359007.png)
+- [Claude Code Channels](https://alanhc.github.io/til/docs/claude_channel): Claude Code 的 channels 功能，用於在不同介面/管道與 Claude Code 互動。詳細用法與設定請參考官方文件。
+- [Claude Code](https://alanhc.github.io/til/docs/claude_code): Anthropic 官方的 agentic 命令列工具，可在終端機中讓 Claude 讀取專案、編輯檔案、執行指令並完成多步驟開發任務。
+- [Claude Code 安裝](https://alanhc.github.io/til/docs/claude_install): Claude Code 是 Anthropic 官方的 CLI 工具，可在終端機中進行 agentic 的程式開發。
+- [Claude_remote_playwright_mcp](https://alanhc.github.io/til/docs/claude_remote_playwright_mcp): 可以做到,原理其實很單純。關鍵在於 Chrome DevTools Protocol (CDP)。
+- [Claude Skills](https://alanhc.github.io/til/docs/claude_skills): ```
+- [Claude UI](https://alanhc.github.io/til/docs/claude_ui): Claude 使用介面的相關筆記與截圖。
+- [Claude 接 Ollama](https://alanhc.github.io/til/docs/claude_use_ollama): ```
+- [Cloudflare Tunnel](https://alanhc.github.io/til/docs/cloudflare): cloudflared tunnel create app-tunnel
+- [CPU DVFS（Dynamic Voltage and Frequency Scaling）](https://alanhc.github.io/til/docs/cpu_dvfs): DVFS 是依負載動態調整 CPU 的頻率與電壓，以在效能與功耗之間取得平衡。功耗大致與電壓平方及頻率成正比，因此降頻降壓能顯著省電。
+- [網路爬蟲 (Web Crawler / Scraper)](https://alanhc.github.io/til/docs/crawler): 爬蟲工具與相關概念筆記。
+- [CUDA 入門第一步：安裝 Toolkit，跑出你的第一支 GPU 程式](https://alanhc.github.io/til/docs/cuda-hello-world): 如果你聽過「用 GPU 做平行運算」，卻不知道從哪裡開始，這篇就是為你寫的。我們會從零開始：先把 NVIDIA 官方的 CUDA Toolkit 裝好，接著寫一支只有十幾行的 `Hello World`，讓數千個執行緒（thread）同時跟你打招呼。全程不需要任何背景，跟著做就會動。
+- [data viz](https://alanhc.github.io/til/docs/data_viz): Sankiey Diagram 的重點是能量流向的視覺化，適合用來表示流程、資源分配等情境。
+- [aisuite](https://alanhc.github.io/til/docs/deeplearning_ai_aisuite): aisuite 是 Andrew Ng 團隊開源的 Python 套件，提供統一介面來呼叫多家 LLM 供應商的 API，讓你用一致的寫法切換不同模型。
+- [Dirty SEPolicy 偵測：一種讓所有 Root 方案都現形的新向量](https://alanhc.github.io/til/docs/dirty-sepolicy-detection): 2026 年初，Android root 社群（r/androidroot）開始討論一種被稱為 **dirty sepolicy detection** 的偵測手法。它的特別之處在於：不管你用 Magisk、KernelSU（及其分支）還是 APatch，只要你 root 了，這個手法幾乎都能...
+- [Discord Bot 開發](https://alanhc.github.io/til/docs/discord): 開發 Discord bot 的筆記。
+- [DMA-BUF Heaps 完整導覽：Android 記憶體共享機制的前世今生](https://alanhc.github.io/til/docs/dma-heap-guide): > 從 PMEM 的群雄割據，到 ION 的十年統治，再到 dma-heap 的正式接班。
+- [Docker 網路除錯](https://alanhc.github.io/til/docs/docker_debug_network): ```
+- [三個子系統，同一套心法：DRM、V4L2、ASoC 的共通設計模式](https://alanhc.github.io/til/docs/drm-v4l2-asoc-common-patterns): 顯示 (DRM/KMS)、視訊 (V4L2 + Media Controller)、音訊 (ALSA/ASoC) 表面上是三套毫不相干的 API，但它們解的是同一類問題：**一條由多顆獨立 IP 串起來的硬體管線，要讓 userspace 能列舉、協商、設定、餵資料，而且 uAPI 一旦公開就...
+- [嵌入式系統背景知識](https://alanhc.github.io/til/docs/embedded): Bootloader kernel domain knowledge background — 嵌入式 Linux 系統從開機到執行的主要組成。
+- [Firecrawl](https://alanhc.github.io/til/docs/firecrawl): [Firecrawl](https://www.firecrawl.dev/) 是一個把網站轉成 LLM 可用資料的爬取工具。
+- [韌體 Image 管理](https://alanhc.github.io/til/docs/firmware_image_management): QA 在 XTS 期間可能要image，但一個專案無時無刻要有人上code，要怎麼去透過自動化機制去管理，這就是 會有正式image可以比較嚴謹給QA使用以及用於提前找出問題讓 system integration team 在正式image 前就發現問題
+- [韌體安全全景：在 OS 之下、開機之前，守住信任的起點](https://alanhc.github.io/til/docs/firmware_security): > 目標讀者：嵌入式／韌體工程師，或想建立韌體安全整體觀的人。
+- [韌體自動化測試](https://alanhc.github.io/til/docs/firmware_testing): 韌體測試和一般軟體測試最大的差別是：**測試對象是一塊實體板子**。你不能像跑 unit test 那樣「開一個 container 跑完就丟」，而是要處理燒錄、上電、序列埠輸出、板子當掉要能強制斷電重來這些事。
+- [Gemini CLI](https://alanhc.github.io/til/docs/gemini): Google Gemini 的命令列 AI agent 工具，可在終端機直接與 Gemini 模型互動並操作檔案。
+- [Gemini + Google Sheet](https://alanhc.github.io/til/docs/gemini_google_sheet): ✦ 我已經透過我的視覺能力幫你辨識完這兩張圖片的金額，並且把金額與對應的帳號關聯起來了！
+- [Git 常用指令](https://alanhc.github.io/til/docs/git): - `git diff`
+- [使用自訂義的GPTs](https://alanhc.github.io/til/docs/gpts): ```python
+- [NVIDIA GPU 檢查](https://alanhc.github.io/til/docs/gpu_nvidia): lsmod | grep nvidia
+- [個人成長 / 學習資源](https://alanhc.github.io/til/docs/grow): 收集有助於自我成長與拓展視野的演講與學習資源。
+- [GRUB 被 Windows 覆蓋的修復](https://alanhc.github.io/til/docs/grub): 在原本的ubuntu電腦買了一個新硬碟並灌windows後，發現grub被覆蓋掉了，導致無法進入ubuntu系統。
+- [health](https://alanhc.github.io/til/docs/health): health
+- [Hermes Agent](https://alanhc.github.io/til/docs/hermes): Nous Research 的 Hermes Agent，基於其 Hermes 系列開源模型打造的 agent 系統。
+- [Hermes on Kubernetes](https://alanhc.github.io/til/docs/hermes_kubernetes): ![alt text](assets/image.png)
+- [Hibernation:一份可以寫回 kernel 記憶體的快照](https://alanhc.github.io/til/docs/hibernation): 大部分人對 hibernation 的理解停在一句話:「把記憶體存到硬碟,然後關機。」
+- [Jev 是什麼？從 System One 決策模型看韌體 CI 自動化](https://alanhc.github.io/til/docs/jev-decision-model-for-firmware-ci): - **Jev** 是 TypeSafe AI 在 2026 年 9 月推出的「System One Model」（也叫 decision model）。它**不生成文字，只回傳帶機率的型別化判斷**。
+- [刷題面試：一場決策外包的共謀](https://alanhc.github.io/til/docs/job_interview): 每個工程師大概都經歷過這樣的時刻：深夜盯著 LeetCode 上第三百題，心裡冒出一個念頭——「我未來的工作內容，跟反轉二元樹到底有什麼關係？」
+- [kexec：讓 Linux kernel 自己當 bootloader](https://alanhc.github.io/til/docs/kexec): > TL;DR：kexec 讓一個正在執行的 Linux kernel 直接載入並跳進另一個 kernel，跳過韌體與 bootloader。它是 kdump 的基礎，也是 LinuxBoot 這類「用 Linux 當韌體」方案的核心。代價是硬體不會被韌體重置，driver 的 shutdow...
+- [人生](https://alanhc.github.io/til/docs/life): Prioritizing your life
+- [LinuxBoot 與 u-root：用 Linux 取代 UEFI DXE 的伺服器韌體架構](https://alanhc.github.io/til/docs/linuxboot-u-root): > TL;DR：LinuxBoot 保留韌體中負責 DRAM／silicon 初始化的 SEC、PEI（或 coreboot romstage），把 DXE 以後那一大段 UEFI 換成一個放在 SPI flash 裡的精簡 Linux kernel，加上 Go 寫的 initramfs（u-...
+- [LinuxBoot：用 Linux 取代韌體的開機流程](https://alanhc.github.io/til/docs/linuxboot): 伺服器開機很慢，工程師早就習慣了。一台資料中心的機器從按下電源到進入作業系統，常常要好幾分鐘，大部分時間花在 UEFI 韌體裡：初始化各種驅動、掃描 PCIe 裝置、找開機裝置。這些工作 OS 起來之後通常還會再做一次。
+- [Pixel 8 上的 llama.cpp：NEON、SVE、KleidiAI 三種 build 的逐步實測](https://alanhc.github.io/til/docs/llama-cpp-pixel8-neon-sve-kleidiai): 這是一份**照著打就能重現**的學習筆記：在 Pixel 8（Tensor G3）上交叉編譯三種 llama.cpp CPU build，
+- [在 Pixel 8 上追一個 llama.cpp 的 SVE 效能退化：從綁核實驗到 flash attention](https://alanhc.github.io/til/docs/llama-cpp-pixel8-sve-flash-attention): > **2026-11 更正**：本文第五節「真正的原因」把根因歸到 `vec.h` 的展開因子，後來直接反組譯熱點位址，
+- [Mcp](https://alanhc.github.io/til/docs/mcp): https://github.com/modelcontextprotocol/servers
+- [一支手機從開機到連上網，中間跨過了幾道信任邊界](https://alanhc.github.io/til/docs/mobile-trust-boundaries): > 本文整理自公開規格與業界通用知識（ARM TF-A、GlobalPlatform、Android Verified Boot、3GPP 等），不涉及任何特定廠商的內部設計或未公開資訊。文中描述的是通用架構，實際產品會有各自的差異。
+- [理財名詞](https://alanhc.github.io/til/docs/money): 名詞
+- [MTBF 是什麼？為什麼它是 Chip Vendor 系統整合工程師的主場](https://alanhc.github.io/til/docs/mtbf-and-why-si-owns-it): > 本文可視為半導體量產測試系列的延伸篇——前面的 [CP/FT/SLT](./semiconductor-test-overview-cp-ft-slt-ate.md) 講的是「矽」的品質怎麼度量，這篇講「軟體堆疊」的品質怎麼度量。
+- [MTK Boot 深入筆記:Preloader/DRAM Init 與 LK/AVB](https://alanhc.github.io/til/docs/mtk-boot-deep-dive): > 通用架構說明,實際檔名、暫存器與流程細節會隨 SoC 世代(MT6xxx)與 Android 版本而異,請以自家 codebase 為準。
+- [MTK Preloader Combo Header 與 Google OTA 流程整理](https://alanhc.github.io/til/docs/mtk-preloader-combo-header-ota): > 整理日期:2026-07-16
+- [MediaTek UART APDMA：從 Virtual FIFO 硬體模型讀懂 `mtk-uart-apdma.c`](https://alanhc.github.io/til/docs/mtk-uart-apdma): > 本文對照 `torvalds/linux` master 分支（2026-07）的 `drivers/dma/mediatek/mtk-uart-apdma.c` 與 `drivers/tty/serial/8250/8250_mtk.c` 撰寫，所有 register offset、常數...
+- [用 n8n 自動總結 YouTube 影片](https://alanhc.github.io/til/docs/n8n/youtube總結): 用 [n8n](https://n8n.io/)（開源 workflow 自動化工具）打造 YouTube 影片自動摘要流程。
+- [Obsidian](https://alanhc.github.io/til/docs/obsidian): [Obsidian](https://obsidian.md/) 是本機優先 (local-first) 的 markdown 筆記軟體，筆記以純文字檔存在自己的資料夾（vault）中。
+- [讓 Ollama 對區網/VPN 開放存取](https://alanhc.github.io/til/docs/ollama_export_in_vpn): 預設 Ollama 只監聽本機（127.0.0.1）。將 `OLLAMA_HOST` 設為 `0.0.0.0` 可讓它監聽所有網路介面，方便同區網或 VPN 內其他裝置存取這台的 Ollama API。
+- [Open-weight LLM 是什麼？](https://alanhc.github.io/til/docs/open-weight-llm): **Open-weight LLM（開放權重大型語言模型）**：模型訓練完成後的**權重（weights / parameters）公開釋出**，任何人都可以下載到自己的機器上執行、微調或部署的語言模型。
+- [CanopyBMC](https://alanhc.github.io/til/docs/openbmc_canopybmc): https://canopybmc.org/blog/qemu-to-hardware-testing-approach/
+- [OpenClaw](https://alanhc.github.io/til/docs/openclaw): ![](assets/openclaw/file-20260316205958715.png)
+- [OpenClaw + JAN AI](https://alanhc.github.io/til/docs/openclaw_jan_ai): curl -i http://127.0.0.1:1337/v1/models \
+- [Open WebUI](https://alanhc.github.io/til/docs/openwebui): ![alt text](image-20.png)
+- [機密要放哪裡？從 OP-TEE Secure Storage 看 HDCP 與 Widevine 的金鑰儲存全景](https://alanhc.github.io/til/docs/optee-hdcp-widevine-storage): > 本文全部內容取自公開資料（OP-TEE 官方文件、JEDEC/DCP 規格公開描述、學術論文、Linaro 簡報、SoC 廠商公開手冊），不包含任何廠內資訊。
+- [ARMv8 開機鏈三部曲（二）：OP-TEE — 在 S-EL1 跑一個可信任的 OS](https://alanhc.github.io/til/docs/optee): 從 BL32 的角度拆解 OP-TEE：TrustZone 基礎、optee_os / tee-supplicant / Linux TEE driver 的分工、GlobalPlatform API、TA 的種類與載入、SMC 與 RPC 呼叫流程、foreign interrupt 處理，...
+- [Priority Inversion（優先權反轉）](https://alanhc.github.io/til/docs/os_priority_inversion): 作業系統排程中的經典問題。
+- [影片解碼效能觀察](https://alanhc.github.io/til/docs/performance_experient): 這張是**瀏覽器版 (m.youtube.com)** 的偵錯面板,跟第一張(原版 YouTube App)很像,但有個關鍵差異值得注意。
+- [Pixel 8 軟體整合層 Bringup：boot 流程、device tree、vendor HAL](https://alanhc.github.io/til/docs/pixel8-bringup): 這份文件記錄在一台 Pixel 8(shiba)上,把「driver 能載入」推進到「裝置從 device tree 描述它」的過程,以及沿路把 boot 流程拆開驗證的結果。
+- [在沒有 Play 商店的 Pixel 8 上，把 CPU、GPU、NPU 都量出來](https://alanhc.github.io/til/docs/pixel8-cpu-gpu-npu-benchmark): 我手上這台 Pixel 8（代號 shiba，Tensor G3）跑的是自己編的 `AOSP_on_shiba` userdebug build。沒有 GMS、沒有 Play 商店，所以 Geekbench、3DMark、AITuTu 那條路一開始就斷了。
+- [從 hello world 到 Binder:一支 Android driver 的完整歷程](https://alanhc.github.io/til/docs/pixel8-driver-course): 這份文件記錄在一台 Pixel 8 上,從零寫出一支 kernel driver 並逐步加上真實硬體驅動所需的每項機制的過程。
+- [把 Pixel 8 的 TPU 從一支 shell binary 開機：libedgetpu_util.so 拆解](https://alanhc.github.io/til/docs/pixel8-edgetpu-runtime-teardown): [上一篇 benchmark](./pixel8-cpu-gpu-npu-benchmark.md) 的結尾我下了一個更正：Tensor G3 上其實存在一條非 TFLite 的 TPU 路徑——`/vendor/lib64/libedgetpu_util.so` 導出一整套 C ABI。但那...
+- [用 ftrace 看 Pixel 8 的熱節流：cpu_frequency 說滿頻，thermal_pressure 說沒有](https://alanhc.github.io/til/docs/pixel8-ftrace-thermal-pressure): 在 Pixel 8 上跑 llama.cpp 時，用到 X3 的那組數字標準差特別大。直覺是熱節流，但 `cpu_frequency`
+- [當防護開滿反而露出破口：Pixel 8 GXP DSP 漏洞與 MTE 繞過完整分析](https://alanhc.github.io/til/docs/pixel8-gxp-dsp): **作者**：整理自 HITCON 2025 — Billy（Jheng Bing Jhong）& Pan Zhenpeng（Peter），STAR LABS SG
+- [Pixel 8 Kernel Driver 開發實戰](https://alanhc.github.io/til/docs/pixel8-kernel-tutorial): 在 Pixel 8(codename `shiba`)上從零寫出 kernel driver 並在實機驗證的完整流程。
+- [用 Kleaf 編 Pixel 8 vendor module：從 hello 到記錄 thermal pressure 的 tpstat](https://alanhc.github.io/til/docs/pixel8-kleaf-vendor-module-tpstat): 這篇是在 Pixel 8（`shiba`）上，用**完整的 Pixel kernel 樹 + Kleaf** 編出 vendor module，
+- [Pixel 無法 adb root](https://alanhc.github.io/til/docs/pixel_can_not_run_as_root): adbd cannot run as root in production builds
+- [Pixel_driver](https://alanhc.github.io/til/docs/pixel_driver): > 來源：作者的 Gemini 對話 `gemini.google.com/app/342fdad855ec58d8`（私人連結，僅作者本人可開啟）
+- [Pixel Fastboot Deep Dive](https://alanhc.github.io/til/docs/pixel_fastboot_deepdive): ```
+- [用 Android Flash Tool 幫 Pixel 刷不同版本](https://alanhc.github.io/til/docs/pixel_flash_another_version): Google 官方提供網頁版的 [Android Flash Tool](https://flash.android.com/)，可直接在瀏覽器（Chrome / Edge）幫 Pixel 刷入系統映像檔。
+- [Flash History — Pixel 8 (shiba)](https://alanhc.github.io/til/docs/pixel_flash_debug): **Date:** 2026-05-03  
+- [Pixel 代號體系](https://alanhc.github.io/til/docs/pixel_hardware): Google Pixel 的開發文件裡會出現各種代號，容易混淆的關鍵是：**同一台手機同時有「SoC 代號」與「裝置代號」兩個名字，用在不同地方**。
+- [Pixel Image 對照](https://alanhc.github.io/til/docs/pixel_img): 我們 build 出來的 (m 編譯)
+- [Pixel Root：Magisk vs KernelSU](https://alanhc.github.io/til/docs/pixel_root): Android 取得 root 權限主要有兩套方案，差別在**它跑在哪一層、因此要改哪一個 image**。
+- [Pixel_study](https://alanhc.github.io/til/docs/pixel_study): ```
+- [PMU、Ftrace、EMI：SoC 效能問題的三個觀測層次](https://alanhc.github.io/til/docs/pmu-ftrace-emi): 在讀韌體或 kernel 相關的討論串時，PMU、Ftrace、EMI 這三個縮寫常常混在同一段話裡出現。第一次遇到會覺得毫無關聯 —— 一個像硬體、一個像 kernel 工具、一個看起來像電磁相容測試。但如果把它們放在「一個效能問題該從哪裡看」這個脈絡下，其實是三個互補的觀測層次：**CPU...
+- [Post-Silicon Validation 入門：晶片回來之後，我們在做什麼](https://alanhc.github.io/til/docs/post-silicon-validation-introduction): 假設你是一家 CPU 公司的工程師。設計團隊花了兩年，寫了幾千萬行 RTL，跑了幾十萬個 regression test，模擬結果全綠。專案送去晶圓廠，三個月後，第一批晶片（first silicon）裝在盒子裡送到辦公室。
+- [功耗 / 效能 Benchmark 工具](https://alanhc.github.io/til/docs/power_benchmark): 測試裝置功耗與效能的 benchmark 工具筆記。
+- [Preflight Check](https://alanhc.github.io/til/docs/preflight): what is preflight check?Preflight check is a process of verifying that all necessary conditions and requirements are met before proceeding with a s...
+- [生產力](https://alanhc.github.io/til/docs/productivity): [How to actually stick to your plans with ADHD (it's not discipline)](https://www.youtube.com/watch?v=U6O95TeUPZw)
+- [從 vendor 分割區看 Project Treble](https://alanhc.github.io/til/docs/project-treble-移植開發者筆記): ---
+- [高通與聯發科 Android 開機流程深度解析](https://alanhc.github.io/til/docs/qualcomm-vs-mediatek-android-boot-flow): > 給 BSP / 嵌入式工程師的架構對照筆記
+- [Raspberry Pi](https://alanhc.github.io/til/docs/raspberry pi): 單板電腦 Raspberry Pi 的筆記。
+- [當組織把你設計成備援:單點故障恐懼、過載,與成就感的消失](https://alanhc.github.io/til/docs/redundancy-overload): > 本文為「組織設計」系列之一。關於 owner 制度與問責結構,見〈為什麼大公司永遠在找 Owner?〉;關於組織對 agentic AI 的抗拒,見〈為什麼公司推不動 Agentic AI〉。三篇共用部分理論底座,可獨立閱讀。
+- [遠端控制 Server 的方式選擇](https://alanhc.github.io/til/docs/remote_server_idea): 我需要從本機傳送一些操作指令到遠端 server 去控制它。方式很多，差別在於**資料量、頻率、以及是單向下指令還是雙向互動**。
+- [從 Linux 走進 SoC 內部：RTOS 與 co-processor 韌體的學習地圖](https://alanhc.github.io/til/docs/rtos-coprocessor-roadmap): > **這篇寫給誰**：已經懂 Linux / Android 平台，想往 SoC 韌體、BSP、平台系統軟體方向走的人。
+- [Rust 韌體筆記：常被追問的那些點](https://alanhc.github.io/til/docs/rust-firmware-notes): > 定位：寫給**已經有 C / 系統軟體底子**、想把 Rust 用在 BSP / bare-metal 韌體上的人。
+- [Secure Boot 與 Attestation：從信任的起點談起](https://alanhc.github.io/til/docs/secure-boot-attestation): > 給有技術背景、但還沒真正碰過安全開機與遠端證明的工程師
+- [資安 / LLM 測試工具](https://alanhc.github.io/til/docs/security): 資安 / LLM 測試工具
+- [我們的 AI Agent 防護，可能正在為了 1% 的攻擊，懲罰 99% 的正常工作](https://alanhc.github.io/til/docs/security_paper_CausalArmor): > 寫給正在評估或已經導入 AI agent 的主管與決策者。技術細節我會盡量翻成人話，但結論的重量請不要打折。
+- [SELinux 是什麼？為什麼 Android 韌體工程師必須懂它](https://alanhc.github.io/til/docs/selinux): 在 Android 平台整合的日常裡，`avc: denied` 大概是最常被丟來丟去的 log 之一——功能壞了、開機卡住、CTS 過不了，最後追下去常常是一條 SELinux denial。這篇文章從基礎概念講起，一路講到 Android 的分層架構與 denial 的 ownership...
+- [半導體量產測試全景：CP、FT、SLT 與 ATE](https://alanhc.github.io/til/docs/semiconductor-test-overview-cp-ft-slt-ate): 一顆晶片從晶圓出廠到交到客戶手上，要經過一連串測試站點（test insertion）：**CP**（晶圓測試）在封裝前篩掉壞 die，**FT**（最終測試）在封裝後驗證成品，**SLT**（系統級測試）在出貨前模擬終端使用情境做最後把關。前兩者在 **ATE**（自動化測試設備）上執行結構...
+- [Shmoo 與電氣驗證：晶片「能不能用」是怎麼被畫出來的](https://alanhc.github.io/til/docs/shmoo-and-electrical-validation): > 這是《Post-Silicon Validation 入門》的延伸篇。前一篇談整體流程，這篇專注在其中最工程、也最常被面試問到的一段：electrical validation / characterization。
+- [device-loop：把手邊散落的開發板變成可預約的裝置 farm](https://alanhc.github.io/til/docs/side-projects/device-loop-裝置預約系統): 原始碼與完整設計文件：[github.com/alanhc/device-loop](https://github.com/alanhc/device-loop)
+- [用問卷找回你的時間精力](https://alanhc.github.io/til/docs/side-projects/用問卷找回你的時間精力): 一個側專案（side project）：用簡短問卷幫助使用者盤點時間與精力的分配，找出消耗與可調整之處。
+- [緩解焦慮 App](https://alanhc.github.io/til/docs/side-projects/緩解焦慮app): 網站：https://breathe-journal.vercel.app/
+- [評論音樂段落](https://alanhc.github.io/til/docs/side-projects/評論音樂段落): 一個側專案（side project）構想：讓使用者針對一首歌的**特定段落（timestamp 區間）**留下評論與感受，而非只對整首歌評分。
+- [Agent Skills](https://alanhc.github.io/til/docs/skills): Agent skills 讓 AI coding agent（如 Claude Code）以可重複使用的技能模組擴充能力，安裝後即可在對話中被自動或手動觸發。
+- [SoC Android 軟體專案規劃方法論](https://alanhc.github.io/til/docs/soc-android-planning-methodology): > 適用情境：被指派規劃一顆新 SoC 的 Android 軟體專案，手上還沒有數字。
+- [SoC Android 專案一頁摘要範本](https://alanhc.github.io/til/docs/soc-android-planning-onepager-template): **撰寫人**：［姓名］　**日期**：［YYYY-MM-DD］　**狀態**：［初版，多項待確認］
+- [SoC Android 軟體專案規劃書範本](https://alanhc.github.io/til/docs/soc-android-planning-proposal-template): **Vendor Domain + System Domain**
+- [SoC Android 軟體專案規劃工作表](https://alanhc.github.io/til/docs/soc-android-planning-worksheet): **專案**：［晶片代號］　**版本**：［v0.1］　**更新日**：［YYYY-MM-DD］
+- [軟體工程](https://alanhc.github.io/til/docs/software_engineering): 軟體工程中，sustainability 是很重要的議題是核心，scale也翅
+- [SSH Tunnel：從協定機制到多人系統下的安全邊界](https://alanhc.github.io/til/docs/ssh-tunnel): > 本文整理 SSH port forwarding 的協定層原理、實務操作，以及在共用（multi-user）機器上使用時真正的威脅模型。內容全部取材自公開規格（RFC 4251/4253/4254）與 OpenSSH man page，不涉及任何非公開資訊。
+- [個股風險衡量](https://alanhc.github.io/til/docs/stock_個股風險): 我在想一個問題：到底開怎麼衡量一隻股票的風險，比如台積電跟緯穎哪個股票風險大？
+- [Supabase](https://alanhc.github.io/til/docs/supabase): [Supabase](https://supabase.com/) 是開源的 Firebase 替代方案，以 PostgreSQL 為核心。
+- [SurfaceFlinger：Android 畫面是怎麼被「合成」出來的](https://alanhc.github.io/til/docs/surfaceflinger-composition-and-debugging): 在 Android 上做系統整合，遲早會遇到這類 bug report：
+- [把整個 Tailnet 接進 macOS Finder：VNC、Taildrop 與 Taildrive 實戰](https://alanhc.github.io/til/docs/tailscale-finder-vnc-taildrive): > 從「為什麼 Finder 只看得到一台機器」出發，一路踩到 Taildrive 的兩段式授權陷阱，以及一次「看起來完美但其實是巧合」的誤判。本文記錄完整的診斷過程與可直接複製的設定。
+- [Tegra BSP 學習地圖](https://alanhc.github.io/til/docs/tegra-bsp-learning-map): > 更新：2026-09-21 ・ 作者：Alan Tseng
+- [Telemetry、OpenTelemetry、BMC 與 Grafana/Loki 的關係](https://alanhc.github.io/til/docs/telemetry-otel-bmc-grafana): > 一句話總結：**Telemetry 是資料本身；OpenTelemetry 是收集與傳輸的標準和工具；BMC 是硬體層的資料來源之一；Loki / Prometheus / Tempo 負責存，Grafana 負責看。**
+- [在 QEMU 上從原始碼拼出完整 Secure Boot 鏈：TF-A + OP-TEE + TA 實作紀錄](https://alanhc.github.io/til/docs/tf-a-optee-qemu-from-source): 不用 OP-TEE build repo，而是分別從原始碼 build TF-A、OP-TEE OS、optee_client、optee_test 和 kernel，拼成 BL1→BL2→BL31→BL32→BL33 五段開機鏈並跑完 xtest。記錄只有自己動手才會遇到的九個坑：QEMU ...
+- [ARMv8 開機鏈三部曲（一）：Trusted Firmware-A — 從 BL1 到 EL3 Runtime](https://alanhc.github.io/til/docs/tf-a): 從 Exception Level、BL1/BL2/BL31 分工、FIP 與 Trusted Board Boot，一路讀到 BL31 的 SMC 分派、PSCI、OP-TEE Dispatcher 與 world switch，並用 OP-TEE 的 QEMU v8 環境觀察 TF-A 開...
+- [用 Coding Agent 讀一棵陌生的 SoC BSP](https://alanhc.github.io/til/docs/til-agent-assisted-bsp-navigation): > 一份可重複使用的導讀清單。重點不是「叫 agent 解釋這段程式碼」，
+- [TIL: Android Vendor 升級要跨過的四道牆](https://alanhc.github.io/til/docs/til-android-vendor-upgrade): 升級 Android 版本時，最直覺的預期是「改一改、重編、修 build error」。
+- [異構 SoC 的 IPC 與三種 Domain：一份自學地圖](https://alanhc.github.io/til/docs/til-heterogeneous-ipc-and-domains): > 素材：mainline kernel、TF-A，以及手邊的兩塊開發板。
+- [畫圖 / 白板工具](https://alanhc.github.io/til/docs/tool): 常用的線上白板與繪圖工具筆記。
+- [好用工具清單](https://alanhc.github.io/til/docs/tools): 平常覺得好用的工具整理。
+- [ARMv8 開機鏈三部曲（三）：U-Boot — 從 BL33 到 Starting kernel](https://alanhc.github.io/til/docs/u-boot): 以 ARMv8 開機鏈為主軸，拆解 U-Boot 作為 BL33 的角色：TPL/SPL/U-Boot proper、board_init_f/relocation/board_init_r、Driver Model、Standard Boot、FIT verified boot、arm64 ...
+- [u-root 與 LinuxBoot：20 秒伺服器開機是怎麼做到的](https://alanhc.github.io/til/docs/u-root-linuxboot-20s-boot): > 最後更新：2026-10-07
+- [Ubuntu 常用指令](https://alanhc.github.io/til/docs/ubuntu_cmds): 一些日常會用到的 Ubuntu 指令筆記。
+- [Ubuntu PPA 404 錯誤](https://alanhc.github.io/til/docs/ubuntu_ppa_error): 有時候會看到類似
+- [送出 kernel patch：實際跑過一遍的步驟](https://alanhc.github.io/til/docs/upstream-runbook): 這份是操作手冊。每個步驟都實際執行過，包含四個中途撞到的錯誤與它們的解法。
+- [VAD 是什麼？Silero VAD 跟晶片效能有什麼關係？](https://alanhc.github.io/til/docs/vad-silero-chip-performance): **VAD（Voice Activity Detection，語音活動偵測）** 做的是一個二元判斷：這一小段音訊裡**有沒有人在說話**。
+- [Vendor Freeze:一份 BSP 走七年——晶片商、Google 與系統廠的凍結賽局](https://alanhc.github.io/til/docs/vendor-freeze): > 面向對象:Android 產業鏈的工程師與 PM。本文拆解 vendor freeze(以 Google 的 GRF/Longevity GRF 為核心)的技術機制與商業邏輯,並從 chip vendor、Google、系統廠(OEM/ODM)三個角度分析各自的得失與實務眉角。可視為前一篇...
+- [Agent Skills（skills.sh）](https://alanhc.github.io/til/docs/vercel_skills): Vercel 相關的 agent skills 平台，用於瀏覽、安裝與分享可重複使用的 AI agent 技能（skills）。
+- [ATE 是什麼：結構性測試的基礎設施](https://alanhc.github.io/til/docs/what-is-ate): > 本文是半導體量產測試系列的一篇，全流程概觀見[〈半導體量產測試全景：CP、FT、SLT 與 ATE〉](./semiconductor-test-overview-cp-ft-slt-ate.md)。
+- [CP 是什麼：晶圓測試（Chip Probing / Wafer Sort）](https://alanhc.github.io/til/docs/what-is-cp-wafer-test): > 本文是半導體量產測試系列的一篇，全流程概觀見[〈半導體量產測試全景：CP、FT、SLT 與 ATE〉](./semiconductor-test-overview-cp-ft-slt-ate.md)。
+- [FT 是什麼：最終測試（Final Test）](https://alanhc.github.io/til/docs/what-is-ft-final-test): > 本文是半導體量產測試系列的一篇，全流程概觀見[〈半導體量產測試全景：CP、FT、SLT 與 ATE〉](./semiconductor-test-overview-cp-ft-slt-ate.md)。
+- [SLT 是什麼？為什麼對 Chip Vendor 這麼重要](https://alanhc.github.io/til/docs/what-is-slt-and-why-chip-vendors-care): > 本文是半導體量產測試系列的一篇，全流程概觀見[〈半導體量產測試全景：CP、FT、SLT 與 ATE〉](./semiconductor-test-overview-cp-ft-slt-ate.md)。
+- [Why Big Companies Are Forever Hunting for an Owner — From the Problem of Many Hands to Accountability Sinks, and How AI Agents Are Reshuffling the Deck](https://alanhc.github.io/til/docs/why-big-companies-hunt-for-owners-en): Something breaks. A cross-team meeting convenes. The dashboard on the screen is red. The first thing out of the manager's mouth is not "what's the ...
+- [為什麼大公司永遠在找 Owner?——從眾手問題到問責黑洞,以及 AI Agent 如何讓這一切重新洗牌](https://alanhc.github.io/til/docs/why-big-companies-hunt-for-owners): 系統出問題了。跨部門會議開起來,螢幕上是一張紅色的 dashboard。主管開口的第一句話,不是「問題的根因是什麼」,而是——
+- [人際](https://alanhc.github.io/til/docs/人際): 人際
+- [Alanhc Blog Summary](https://alanhc.github.io/til/docs/分析/alanhc-blog-summary): ---FILE_END---
+- [Android 知識整理摘要](https://alanhc.github.io/til/docs/分析/android-summary): > 本文整理自 TIL 知識庫中所有 Android / AOSP / Pixel 相關筆記，涵蓋從硬體到系統、從開發環境到 Root 的完整脈絡。
+- [半導體](https://alanhc.github.io/til/docs/半導體): 導電性介於導體與絕緣體之間的材料（最常見為矽 Si），可透過摻雜（doping）與外加電壓控制其導電行為，是 IC 的基礎。
+- [反直覺](https://alanhc.github.io/til/docs/反直覺): https://www.threads.com/@alanhc.316/post/DKuHilNSEfq
+- [學習](https://alanhc.github.io/til/docs/學習): https://github.com/mattpocock/skills/blob/main/skills/productivity/teach/SKILL.md
+- [工程機（Engineering Sample）](https://alanhc.github.io/til/docs/工程機): **工程機**指的是還沒進入量產、只在開發與驗證階段流通的機器。它們不對外販售，但因為各種原因偶爾會流出到二手市場。
+- [房（買房筆記）](https://alanhc.github.io/til/docs/房): 買房是多數人最大的單筆決策，涉及自住需求與資產配置，需先分清「自住」與「投資」目的。
+- [投資](https://alanhc.github.io/til/docs/投資): 技術指標大致分三類：**趨勢型**（判斷方向）、**擺盪型**（判斷超買超賣）、**量能型**（判斷參與度）。單一指標都會失效，實務上是組合使用——用趨勢型定方向，用擺盪型抓進場時機，用量能型確認訊號真假。
+- [投資計劃](https://alanhc.github.io/til/docs/投資計劃): 1. 目標
+- [振奮人心的音樂](https://alanhc.github.io/til/docs/振奮人心的音樂): Queen - Don't Stop Me Now (Official Video)
+- [晶片](https://alanhc.github.io/til/docs/晶片): Copying Nvidia? After using it for three months, I've discovered that the M5 is Apple's most unde...
+- [當責](https://alanhc.github.io/til/docs/當責): root cause analysis
+- [程式交易](https://alanhc.github.io/til/docs/程式交易): https://havocfuture.tw/blog/python-backtesting-py
+- [簡報](https://alanhc.github.io/til/docs/簡報): As if To be
+- [英文學習](https://alanhc.github.io/til/docs/英文/英文學習): 累積可理解輸入（comprehensible input）+ 持續輸出練習，比背單字表更有效。
+- [說不](https://alanhc.github.io/til/docs/說不): 1. 問更多問題
+- [酒田戰法（酒田五法）](https://alanhc.github.io/til/docs/酒田戰法): 日本江戶時代米商本間宗久（Honma Munehisa）發展出的 K 線（蠟燭線 candlestick）技術分析方法，是現代 K 線理論的源頭。核心透過多根 K 線的組合型態判斷行情反轉與續勢。
+- [銀行操作](https://alanhc.github.io/til/docs/銀行操作): 銀行操作
+- [鏈鋸人 蘲潔篇](https://alanhc.github.io/til/docs/電影/鏈鋸人蘲潔篇): 瑪奇瑪 一開始無關緊要電影 被感動 相擁抱再一起
+- [hello world](https://alanhc.github.io/til/blog/first-post): Blog posts support [Docusaurus Markdown features](https://docusaurus.io/docs/markdown-features), such as [MDX](https://mdxjs.com/).

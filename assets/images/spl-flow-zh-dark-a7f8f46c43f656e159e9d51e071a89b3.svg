@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 590" width="800" height="590" role="img" font-family="system-ui, -apple-system, 'Segoe UI', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif">
+<title>BeagleBone Black SPL 開機流程</title><desc>九個步驟由上而下，四條直欄是 SD 卡、Boot ROM、內部 SRAM、DRAM。Boot ROM 把 MLO 從 SD 複製進 SRAM 0x402F0400，r0 帶著 boot parameters 指標；reset 把 r0 存到 0x4030B424；_main 在 SRAM 0x4030FF00 設 stack 與 gd；early_system_init 關 watchdog、解析 ROM 參數、讀 EEPROM 得到 A335BNLT；prcm_init 先調 PMIC 電壓再鎖 PLL；sdram_init 設好 EMIF 後 DRAM 才能用；之後 BSS 清在 0x80A00000，gd 與 stack 搬到 0x82000000；board_init_r 依 ROM 給的開機裝置從 SD 載入 u-boot.img 到 0x80800000；最後跳過去交給 U-Boot proper。SPL 的程式碼全程在 SRAM 執行。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#9C9A92" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#5F5E5A" stroke-width="1.5"/></pattern></defs>
+<rect x="262" y="12" width="80" height="568" rx="10" fill="#444441" fill-opacity="0.35" stroke="#B4B2A9" stroke-width="0.75" stroke-dasharray="4 3"/>
+<text x="302.0" y="30" fill="#F1EFE8" font-size="13" font-weight="600" text-anchor="middle" dominant-baseline="central">SD 卡</text>
+<text x="302.0" y="48" fill="#B4B2A9" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">MLO、u-boot.img</text>
+<rect x="350" y="12" width="90" height="568" rx="10" fill="#085041" fill-opacity="0.35" stroke="#5DCAA5" stroke-width="0.75" stroke-dasharray="4 3"/>
+<text x="395.0" y="30" fill="#E1F5EE" font-size="13" font-weight="600" text-anchor="middle" dominant-baseline="central">Boot ROM</text>
+<text x="395.0" y="48" fill="#5DCAA5" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">0x40020000</text>
+<rect x="448" y="12" width="166" height="568" rx="10" fill="#633806" fill-opacity="0.35" stroke="#EF9F27" stroke-width="0.75" stroke-dasharray="4 3"/>
+<text x="531.0" y="30" fill="#FAEEDA" font-size="13" font-weight="600" text-anchor="middle" dominant-baseline="central">內部 SRAM</text>
+<text x="531.0" y="48" fill="#EF9F27" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">0x402F0400 起，約 109 KB</text>
+<rect x="622" y="12" width="166" height="568" rx="10" fill="#3C3489" fill-opacity="0.35" stroke="#AFA9EC" stroke-width="0.75" stroke-dasharray="4 3"/>
+<text x="705.0" y="30" fill="#EEEDFE" font-size="13" font-weight="600" text-anchor="middle" dominant-baseline="central">DRAM</text>
+<text x="705.0" y="48" fill="#AFA9EC" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">0x80000000 起，512 MiB</text>
+<rect x="626" y="74" width="158" height="266" rx="6" fill="url(#hatch)" fill-opacity="0.6"/>
+<text x="705.0" y="207.0" fill="#B4B2A9" font-size="12" font-weight="600" text-anchor="middle" dominant-baseline="central">還不能用</text>
+<text x="705.0" y="225.0" fill="#B4B2A9" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">（EMIF 還沒設）</text>
+<path d="M448 340 L788 340" stroke="#F0997B" stroke-width="1.2" stroke-dasharray="5 3"/>
+<text x="780" y="331" fill="#F0997B" font-size="10" font-weight="600" text-anchor="end" dominant-baseline="central">↓ 從這裡起 DRAM 可用</text>
+<text x="20" y="88.0" fill="#D3D1C7" font-size="13" font-weight="600" text-anchor="start" dominant-baseline="central">⓪ Boot ROM</text>
+<text x="20" y="106.0" fill="#B4B2A9" font-size="11" font-weight="400" text-anchor="start" dominant-baseline="central">TI 燒死，沒有原始碼</text>
+<text x="20" y="142.0" fill="#D3D1C7" font-size="13" font-weight="600" text-anchor="start" dominant-baseline="central">① reset</text>
+<text x="20" y="160.0" fill="#B4B2A9" font-size="11" font-weight="400" text-anchor="start" dominant-baseline="central">start.S：先救 r0</text>
+<text x="20" y="196.0" fill="#D3D1C7" font-size="13" font-weight="600" text-anchor="start" dominant-baseline="central">② _main</text>
+<text x="20" y="214.0" fill="#B4B2A9" font-size="11" font-weight="400" text-anchor="start" dominant-baseline="central">crt0.S：SRAM 裡設 sp、gd</text>
+<text x="20" y="250.0" fill="#D3D1C7" font-size="13" font-weight="600" text-anchor="start" dominant-baseline="central">③a early_system_init</text>
+<text x="20" y="268.0" fill="#B4B2A9" font-size="11" font-weight="400" text-anchor="start" dominant-baseline="central">WDT、UART、ROM 參數、EEPROM</text>
+<text x="20" y="304.0" fill="#D3D1C7" font-size="13" font-weight="600" text-anchor="start" dominant-baseline="central">③b prcm_init</text>
+<text x="20" y="322.0" fill="#B4B2A9" font-size="11" font-weight="400" text-anchor="start" dominant-baseline="central">先調 PMIC 電壓，再鎖 PLL</text>
+<text x="20" y="358.0" fill="#D3D1C7" font-size="13" font-weight="600" text-anchor="start" dominant-baseline="central">③c sdram_init</text>
+<text x="20" y="376.0" fill="#B4B2A9" font-size="11" font-weight="400" text-anchor="start" dominant-baseline="central">EMIF 寫入 DDR3L 參數</text>
+<text x="20" y="412.0" fill="#D3D1C7" font-size="13" font-weight="600" text-anchor="start" dominant-baseline="central">④ CLEAR_BSS + 搬 gd</text>
+<text x="20" y="430.0" fill="#B4B2A9" font-size="11" font-weight="400" text-anchor="start" dominant-baseline="central">crt0.S：資料搬到 DRAM</text>
+<text x="20" y="466.0" fill="#D3D1C7" font-size="13" font-weight="600" text-anchor="start" dominant-baseline="central">⑤ board_init_r</text>
+<text x="20" y="484.0" fill="#B4B2A9" font-size="11" font-weight="400" text-anchor="start" dominant-baseline="central">spl.c：照 ROM 的答案載 U-Boot</text>
+<text x="20" y="520.0" fill="#D3D1C7" font-size="13" font-weight="600" text-anchor="start" dominant-baseline="central">⑥ jump_to_image</text>
+<text x="20" y="538.0" fill="#B4B2A9" font-size="11" font-weight="400" text-anchor="start" dominant-baseline="central">交棒給 U-Boot proper</text>
+<rect x="266" y="77" width="72" height="40" rx="6" fill="#444441" stroke="#B4B2A9" stroke-width="0.75"/>
+<text x="302.0" y="97.0" fill="#F1EFE8" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="central">MLO</text>
+<rect x="354" y="77" width="82" height="40" rx="6" fill="#085041" stroke="#5DCAA5" stroke-width="1.6"/>
+<text x="395.0" y="89.0" fill="#E1F5EE" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="central">讀 SYSBOOT</text>
+<text x="395.0" y="105.0" fill="#E1F5EE" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">複製 MLO</text>
+<rect x="452" y="77" width="158" height="40" rx="6" fill="#633806" stroke="#EF9F27" stroke-width="0.75"/>
+<text x="531.0" y="89.0" fill="#FAEEDA" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="central">SPL @0x402F0400</text>
+<text x="531.0" y="105.0" fill="#FAEEDA" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">r0 = boot params 指標</text>
+<path d="M338 109.0 L452 109.0" fill="none" stroke="#9C9A92" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="452" y="131" width="158" height="40" rx="6" fill="#633806" stroke="#EF9F27" stroke-width="1.6"/>
+<text x="531.0" y="151.0" fill="#FAEEDA" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="central">str r0 → 0x4030B424</text>
+<rect x="452" y="185" width="158" height="40" rx="6" fill="#633806" stroke="#EF9F27" stroke-width="1.6"/>
+<text x="531.0" y="197.0" fill="#FAEEDA" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="central">sp = 0x4030FF00</text>
+<text x="531.0" y="213.0" fill="#FAEEDA" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">r9 = gd（含 8 KB malloc）</text>
+<rect x="452" y="239" width="158" height="40" rx="6" fill="#633806" stroke="#EF9F27" stroke-width="1.6"/>
+<text x="531.0" y="251.0" fill="#FAEEDA" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="central">關 WDT · UART</text>
+<text x="531.0" y="267.0" fill="#FAEEDA" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">ROM 參數→gd · EEPROM</text>
+<rect x="452" y="293" width="158" height="40" rx="6" fill="#633806" stroke="#EF9F27" stroke-width="1.6"/>
+<text x="531.0" y="305.0" fill="#FAEEDA" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="central">PMIC TPS65217 調壓</text>
+<text x="531.0" y="321.0" fill="#FAEEDA" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">PLL：MPU 1 GHz · DDR 400 MHz</text>
+<rect x="452" y="347" width="158" height="40" rx="6" fill="#633806" stroke="#EF9F27" stroke-width="1.6"/>
+<text x="531.0" y="359.0" fill="#FAEEDA" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="central">config_ddr(400, …)</text>
+<text x="531.0" y="375.0" fill="#FAEEDA" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">MT41K256M16HA125E</text>
+<rect x="626" y="347" width="158" height="40" rx="6" fill="#3C3489" stroke="#AFA9EC" stroke-width="0.75"/>
+<text x="705.0" y="359.0" fill="#EEEDFE" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="central">EMIF 設好</text>
+<text x="705.0" y="375.0" fill="#EEEDFE" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">get_ram_size = 512 MiB</text>
+<path d="M610 367.0 L626 367.0" fill="none" stroke="#9C9A92" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="452" y="401" width="158" height="40" rx="6" fill="#633806" stroke="#EF9F27" stroke-width="1.6"/>
+<text x="531.0" y="413.0" fill="#FAEEDA" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="central">gd · stack 複製出去</text>
+<text x="531.0" y="429.0" fill="#FAEEDA" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">code 留在 SRAM</text>
+<rect x="626" y="401" width="158" height="40" rx="6" fill="#3C3489" stroke="#AFA9EC" stroke-width="0.75"/>
+<text x="705.0" y="413.0" fill="#EEEDFE" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="central">BSS @0x80A00000</text>
+<text x="705.0" y="429.0" fill="#EEEDFE" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">gd · stack @0x82000000</text>
+<path d="M610 421.0 L626 421.0" fill="none" stroke="#9C9A92" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="266" y="455" width="72" height="40" rx="6" fill="#444441" stroke="#B4B2A9" stroke-width="0.75"/>
+<text x="302.0" y="475.0" fill="#F1EFE8" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="central">u-boot.img</text>
+<rect x="452" y="455" width="158" height="40" rx="6" fill="#633806" stroke="#EF9F27" stroke-width="1.6"/>
+<text x="531.0" y="467.0" fill="#FAEEDA" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="central">spl_mmc_load</text>
+<text x="531.0" y="483.0" fill="#FAEEDA" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">ROM 的裝置 · FAT 模式</text>
+<rect x="626" y="455" width="158" height="40" rx="6" fill="#3C3489" stroke="#AFA9EC" stroke-width="0.75"/>
+<text x="705.0" y="467.0" fill="#EEEDFE" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="central">U-Boot proper</text>
+<text x="705.0" y="483.0" fill="#EEEDFE" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">@0x80800000</text>
+<path d="M302 495.0 L302 501.0 L662 501.0 L662 495.0" fill="none" stroke="#9C9A92" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="452" y="509" width="158" height="40" rx="6" fill="#633806" stroke="#EF9F27" stroke-width="0.75"/>
+<text x="531.0" y="529.0" fill="#FAEEDA" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="central">jump_to_image</text>
+<rect x="626" y="509" width="158" height="40" rx="6" fill="#3C3489" stroke="#AFA9EC" stroke-width="1.6"/>
+<text x="705.0" y="521.0" fill="#EEEDFE" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="central">U-Boot proper 執行</text>
+<text x="705.0" y="537.0" fill="#EEEDFE" font-size="10" font-weight="400" text-anchor="middle" dominant-baseline="central">之後自己 relocate</text>
+<path d="M610 529.0 L626 529.0" fill="none" stroke="#9C9A92" stroke-width="1.2" marker-end="url(#arrow)"/>
+<text x="20" y="576" fill="#B4B2A9" font-size="10" font-weight="400" text-anchor="start" dominant-baseline="central">粗框＝這一步的程式在這裡執行</text>
+</svg>
