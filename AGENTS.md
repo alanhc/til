@@ -46,8 +46,8 @@
   - Logs: `~/til-deploy/deploy.log` (runs) and `~/til-deploy/last-build.log` (last build).
     Force a rebuild: `ssh macmini ~/til-deploy/deploy.sh --force`.
 - `.github/workflows/deploy.yml` (Actions → `actions/deploy-pages`) is **disabled**
-  (`gh workflow disable deploy.yml`) because the GitHub account's Actions are
-  billing-locked. To switch back: set Pages source to "GitHub Actions",
+  (`gh workflow disable deploy.yml`); builds run on the self-hosted machine instead of
+  GitHub Actions. To switch back: set Pages source to "GitHub Actions",
   `gh workflow enable deploy.yml`, and unload the Mac mini launchd job.
 - Don't use `yarn deploy` (`docusaurus deploy`); `gh-pages` is owned by the Mac mini
   job, and two writers would race.

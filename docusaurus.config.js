@@ -153,6 +153,7 @@ const config = {
           {from: '/docs/OpenBMC/openbmc', to: '/docs/BMC/openbmc'},
           {from: '/docs/OpenBMC/debug', to: '/docs/BMC/debug'},
           {from: '/docs/OpenBMC/hardwate', to: '/docs/BMC/hardware'},
+          {from: '/docs/BMC/ic-design-flow', to: '/docs/ic-design-flow'},
           {from: '/docs/DSA/linked_list_101', to: '/docs/DSA/Linked_List/linked_list'},
           {from: '/docs/dsa_Boyer-Moore', to: '/docs/DSA/Boyer-Moore'},
           {from: '/docs/google_ai', to: '/docs/ai_google_ai'},
