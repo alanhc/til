@@ -29,6 +29,9 @@ sidebar_position: 4
 | 文章 | 內容 |
 |---|---|
 | [IPMI](../BMC/ipmi.md) | 頻外管理標準：KCS／RMCP+／IPMB 傳輸介面；**SEL**（非揮發事件日誌）、**SDR**（感測器描述與換算門檻，非讀值）、**FRU**（零件身分資料）三者的分工；`ipmitool raw` 的 NetFn／Cmd 格式與 OEM command 用法；末段講與 Redfish 的世代關係 |
+| [IPMI 驗證實戰（一）：基礎觀念與通用測試方法](../BMC/ipmi-validation-1-basics.md) | **驗證系列的入口**：為什麼「回 `00`」不代表功能正確；NetFn 對照、in-band／out-of-band、常見 Completion Code（`C5`／`CC`／`D4`…）與出現情境；一套可套用到所有命令的方法：raw 與 string 雙驗證、Set→Get→還原、負面測試、cold reset／AC cycle 後的持久性、用實機行為與 SEL 判定 |
+| [IPMI 驗證實戰（二）：各命令類別的測試重點](../BMC/ipmi-validation-2-commands.md) | 依 NetFn 逐類整理命令、`ipmitool` 用法與測試重點：App（Device ID、Watchdog 的 byte 定義與觸發驗證、Session／Cipher Suite 安全檢查、User 權限）、Chassis（電源控制、Power Restore Policy 拔插 AC、Restart Cause、Boot Options）、Sensor／Event（人為觸發 UNC event）、Storage（FRU 先備份、SDR、SEL 的 Reservation ID 與 Clear 流程）、Transport（LAN、SOL baud rate）、DCMI |
+| [IPMI 驗證實戰（三）：OEM 命令、韌體更新與命令速查](../BMC/ipmi-validation-3-firmware-cheatsheet.md) | OEM 命令（NetFn `0x2E` 帶 IANA、`0x30`–`0x3F`）的測試原則；韌體更新的測試矩陣（升降版 × in-band／out-of-band × 主機狀態 × 對象 × 異常情境）與燒錄後檢查項；整個系列的 `ipmitool` 速查與結語 |
 | [Redfish](../BMC/redfish.md) | DMTF 的 RESTful 管理介面（HTTPS + JSON），資源導向、標準動詞，目標取代 IPMI；OpenBMC 由 bmcweb 把 D-Bus 資料對映成 `/redfish/v1/` 底下的 Systems／Chassis／Managers 等資源 |
 | [Redfish EventService](../BMC/event_service.md) | Redfish 事件訂閱機制：`POST` 到 `EventService/Subscriptions` 帶 `Destination` 與過濾條件，事件發生時 BMC 主動推送，免管理端輪詢；遞送方式分 push(webhook) 與 SSE |
 | [Server-Sent Events (SSE)](../BMC/sse.md) | 基於 HTTP 的單向串流（`text/event-stream`），client 開一條長連線即時收事件，免預先註冊 webhook destination；比 WebSocket 簡單但只能單向 |
