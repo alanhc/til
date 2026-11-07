@@ -157,6 +157,16 @@ Schematic 判讀（i2c topology / address table）
    → PID Control / Thermal      ← 讓風扇跟著這顆 sensor 轉
 ```
 
+**想驗證一顆 BMC 的 IPMI 實作：**
+
+```
+IPMI                            ← 先懂 SEL／SDR／FRU 與 NetFn／Cmd 格式
+   → IPMI 驗證實戰（一）        ← Completion Code 與通用測試方法（雙驗證、還原、負面、持久性）
+   → IPMI 驗證實戰（二）        ← 主線：逐類命令的測試重點
+   → IPMI 驗證實戰（三）        ← OEM 命令、韌體更新測試矩陣與速查
+   → Flash 與韌體更新           ← 更新路徑的實作面
+```
+
 ---
 
 ## 待補主題

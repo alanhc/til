@@ -184,6 +184,14 @@ sidebar_position: 7
 | **IDM** | 設計＋製造整合（如 Intel、三星） | [半導體](../半導體/半導體.md) |
 | **光罩 / 微影 / 蝕刻 / 沉積 / 離子佈植** | 反覆堆疊的核心製程：photomask、lithography、etch、deposition、implant | [半導體](../半導體/半導體.md) |
 | **製程節點** | 如 3nm、5nm，越先進單位面積電晶體越多、效能/功耗越好 | [半導體](../半導體/半導體.md) |
+| **IC 設計前段／中段／後段** | 數位 IC 流程的三段切分：前段 Spec → 可合成的 RTL 與驗證；中段 RTL → Netlist（合成、DFT 插入、LEC）；後段 Physical Design 與 Signoff，產出 GDSII。中段的邊界依公司而浮動 | [IC 設計流程](../ic-design-flow.md) |
+| **RTL** | Register Transfer Level，用 Verilog／SystemVerilog 描述暫存器之間資料怎麼流動，是前段的主要產出與合成的輸入 | [IC 設計流程](../ic-design-flow.md) |
+| **邏輯合成（Synthesis）／Netlist** | 把 RTL 轉成由 standard cell 組成的閘級電路（netlist），並依 SDC 時序約束最佳化 | [IC 設計流程](../ic-design-flow.md) |
+| **LEC（Logic Equivalence Check）** | 用 formal 方法證明合成與 DFT 插入後的 netlist 在功能上等價於原 RTL，取代重跑大量 simulation，是中段的 gatekeeper | [IC 設計流程](../ic-design-flow.md) |
+| **STA（Static Timing Analysis）** | 不跑 simulation、窮舉所有路徑檢查 setup／hold 是否滿足；中段做初步評估，後段在所有 PVT corner 下做時序簽核 | [IC 設計流程](../ic-design-flow.md) |
+| **CTS（Clock Tree Synthesis）** | 後段專門建時脈樹，讓 clock 到各正反器的時間盡量一致；skew 過大會吃掉時序餘裕，hold violation 在 silicon 上無解 | [IC 設計流程](../ic-design-flow.md) |
+| **Signoff** | 下線前必須全部通過的檢查組合，例如 STA、DRC、LVS 等 | [IC 設計流程](../ic-design-flow.md) |
+| **GDSII／Tape-out** | GDSII（或 OASIS）是後段產出的版圖檔，交給晶圓廠做光罩；送出這一步稱為 tape-out（下線） | [IC 設計流程](../ic-design-flow.md) |
 
 ---
 

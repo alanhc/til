@@ -106,10 +106,21 @@ sidebar_position: 5
 | **`ipmitool sel elist`** | 比 `sel list` 多展開 SDR 資訊，比較好讀。`sel clear` 清空**清掉就沒了**，先備份 | [ipmi](../BMC/ipmi.md) |
 | **FRU (Field Replaceable Unit)** | 可現場更換的單元（主機板、電源、風扇背板）。每片板子放一顆 EEPROM，以 **IPMI Platform Management FRU Information** 格式存製造商、產品名、序號、part number | [fru](../BMC/fru.md)、[ipmi](../BMC/ipmi.md) |
 | **IPMI raw command** | 直接送原始 byte 的指令，格式 `ipmitool raw <NetFn> <Cmd> [data...]`，如 `ipmitool raw 0x04 0x2d 0x01`。**沒有任何保護**，打錯可能觸發非預期行為 | [ipmi](../BMC/ipmi.md)、[ai_bmc](../ai_bmc.md) |
-| **NetFn (Network Function)** | raw command 的功能分類碼：`0x00` Chassis、`0x04` Sensor/Event、`0x06` App、`0x0a` Storage、`0x2c` DCMI，`0x2e`／`0x30` 起為 **OEM 自訂區**（`ipmitool` 沒有對應子命令時就走 raw） | [ipmi](../BMC/ipmi.md) |
+| **NetFn (Network Function)** | raw command 的功能分類碼：`0x00` Chassis、`0x04` Sensor/Event、`0x06` App、`0x0a` Storage、`0x2c` DCMI，`0x2e`／`0x30` 起為 **OEM 自訂區**（`ipmitool` 沒有對應子命令時就走 raw） | [ipmi](../BMC/ipmi.md)、[ipmi-validation-1](../BMC/ipmi-validation-1-basics.md) |
 | **RMCP+** | IPMI v2.0 的網路傳輸協定（UDP 623），相較舊版 RMCP 支援加密與 RAKP 金鑰交換。`ipmitool -I lanplus` 即指定它 | [ipmi](../BMC/ipmi.md)、[sol](../BMC/sol.md) |
 | **KCS** | Keyboard Controller Style，Host 與 BMC 間的 IPMI 傳輸介面之一。`ipmid` 無回應時常見原因就是 KCS 驅動問題 | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md)、[mctp](../BMC/mctp.md) |
 | **IPMI LAN channel** | 經網路下 IPMI 指令的通道，也可用來設定網路（相容舊工具） | [network](../BMC/network.md)、[openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
+| **Completion Code** | IPMI response 的**第一個 byte**，`00` 為成功（`ipmitool raw` 成功時不顯示）。驗證時常見：`C1` 未實作、`C5` Reservation ID 失效、`C7` 長度錯、`C9` 超出範圍、`CB` 資料不存在、`CC` 欄位不合法、`D4` 權限不足、`D5` 目前狀態不允許。**回 `00` 不代表功能正確**，還要看實機行為與 SEL | [ipmi-validation-1](../BMC/ipmi-validation-1-basics.md) |
+| **raw 與 string 雙驗證** | 同一功能分別用 `ipmitool raw` 與字串子命令（`mc info`、`sel list`…）執行並比對：raw 驗 BMC 的 byte-level 行為，string 驗工具與實作的相容性 | [ipmi-validation-1](../BMC/ipmi-validation-1-basics.md) |
+| **Privilege Level** | IPMI session 的權限等級：1 Callback、2 User、3 Operator、4 Administrator、5 OEM。低權限帳號下管理命令應回 `D4` | [ipmi-validation-2](../BMC/ipmi-validation-2-commands.md) |
+| **Cipher Suite** | RMCP+ session 的認證／完整性／加密演算法組合，`ipmitool -C <id>` 指定、`channel getciphers ipmi <ch>` 查詢。**Cipher Suite 0 不做認證，應停用**；IPMI 1.5 的 `-I lan` 非必要也應關閉 | [ipmi-validation-2](../BMC/ipmi-validation-2-commands.md) |
+| **Watchdog Timer** | BMC 的看門狗（App `0x22`／`0x24`／`0x25`）：Set 只設定、**Reset 才開始倒數**，逾時可 Hard Reset／Power Down／Power Cycle；觸發後應有 Watchdog 2 SEL 與對應的 Restart Cause | [ipmi-validation-2](../BMC/ipmi-validation-2-commands.md) |
+| **System Restart Cause** | Chassis `0x07`：回報上次開機原因（Chassis Control、Reset／Power 按鈕、Watchdog、AC 恢復…），用來確認重開的觸發來源與預期一致 | [ipmi-validation-2](../BMC/ipmi-validation-2-commands.md) |
+| **Reservation ID** | 操作 SEL／SDR（Clear、Delete、Partial Add）前先 Reserve 取得的 ID；被其他 reserve 取代後再用舊 ID 會回 `C5`。Clear SEL 要帶 `'C' 'L' 'R'`（`0x43 0x4c 0x52`）加 `0xAA` | [ipmi-validation-2](../BMC/ipmi-validation-2-commands.md) |
+| **PEF / PET** | Platform Event Filter：BMC 依規則對 event 執行動作（power off、reset、送 alert）；送出的 alert 是 SNMP Trap 格式的 **Platform Event Trap**，可用 `tcpdump udp port 162` 驗證 | [ipmi-validation-2](../BMC/ipmi-validation-2-commands.md) |
+| **DCMI** | Data Center Manageability Interface：IPMI 之上的資料中心擴充（NetFn `0x2C`、Group ID `0xDC`），提供 power reading／power limit、asset tag、溫度讀值等，`ipmitool dcmi` 操作 | [ipmi-validation-2](../BMC/ipmi-validation-2-commands.md) |
+| **IANA Enterprise Number** | NetFn `0x2E`／`0x2F` OEM 命令 request 前 3 bytes 帶的廠商識別碼（LS byte 在前），成功 response 也會帶回同樣 3 bytes | [ipmi-validation-3](../BMC/ipmi-validation-3-firmware-cheatsheet.md) |
+| **HPM.1** | PICMG 的韌體升級規格，`ipmitool hpm check`／`hpm upgrade <file>.hpm` 使用。驗證韌體更新要涵蓋升版、降版、同版重燒 × in-band／out-of-band × 主機開關機，燒完檢查版本、SEL、LED 與設定是否保留 | [ipmi-validation-3](../BMC/ipmi-validation-3-firmware-cheatsheet.md)、[flash](../BMC/flash.md) |
 
 ### Redfish
 
@@ -381,7 +392,7 @@ sidebar_position: 5
 | **Nuvoton NPCM750 / NPCM845** | 另一系列 BMC SoC，分別為 Cortex-A9 / Cortex-A35 | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
 | **`aspeed-i2c` / `aspeed-adc` / `aspeed-vuart`** | AST 平台的 kernel 驅動：I2C bus、電壓感測器、Virtual UART（SOL 用） | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
 | **phosphor-state-manager** | 管理 Host 電源狀態的服務。Redfish/IPMI 的開機請求最後會由它去控制 GPIO 的 **`PWRON#`**（電源按鈕訊號） | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
-| **Power Restore Policy** | `AlwaysOff`（BMC 就緒後 Host 保持關機）／`AlwaysOn`（自動開啟 Host）／`LastState`（恢復斷電前狀態） | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md) |
+| **Power Restore Policy** | `AlwaysOff`（BMC 就緒後 Host 保持關機）／`AlwaysOn`（自動開啟 Host）／`LastState`（恢復斷電前狀態）。IPMI 對應 Chassis `0x06`（`chassis policy always-off\|always-on\|previous`），驗證時三種都要實際拔插 AC | [openbmc_boot_flow](../BMC/openbmc_boot_flow.md)、[ipmi-validation-2](../BMC/ipmi-validation-2-commands.md) |
 
 ### systemd
 
