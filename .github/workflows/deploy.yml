@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  # Manual re-deploy (e.g. after a failed or skipped run): gh workflow run deploy.yml
+  workflow_dispatch:
 
 # Allow only one Pages deployment at a time; don't cancel a running deploy.
 concurrency:
