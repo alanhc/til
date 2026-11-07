@@ -66,7 +66,6 @@ This file contains links to documentation sections following the llmstxt.org sta
 - [GPIO Hog](https://alanhc.github.io/til/docs/BMC/hog): 在 device tree 中直接宣告某支 GPIO 於開機時就被 kernel「佔用並設定成固定狀態」，不需要任何 driver 或 user space 程式介入。常用來拉高/拉低 enable、reset、power-good select 等訊號。
 - [I2C Hotplug](https://alanhc.github.io/til/docs/BMC/hotplug): `i2c-hotplug`
 - [hwmon](https://alanhc.github.io/til/docs/BMC/hwmon): `driver define`
-- [IC 設計的前段、中段、後段:一條從規格到 GDSII 的路](https://alanhc.github.io/til/docs/BMC/ic-design-flow): 跟不同背景的工程師聊天時,「前段 / 後段」這組詞的邊界常常對不起來。做驗證的人講的前段,跟做 Place & Route 的人心裡的前段,切點未必一樣;而「中段」這個詞在台灣業界很常用,到了歐美履歷上卻幾乎看不到。
 - [Linux 中斷處理（Interrupt）](https://alanhc.github.io/til/docs/BMC/interrupt): 硬體透過 **IRQ（Interrupt Request）** 通知 CPU 有事件發生（如網路封包到達、timer 到期），CPU 暫停當前工作轉去執行對應的 **irq handler**。這讓系統不必忙碌輪詢（polling）即可即時反應。
 - [BMC IPMI 驗證實戰（一）：基礎觀念與通用測試方法](https://alanhc.github.io/til/docs/BMC/ipmi-validation-1-basics): > TL;DR：IPMI 命令「回了 `00`」不代表功能正確。驗證一顆 BMC，要同時看 **byte-level 的回應**、**設定在重開後是否保留**、**權限與介面限制**，以及**實機行為和 SEL 紀錄是否對得上**。這篇先講 IPMI 命令的組成、連線方式、Completion...
 - [BMC IPMI 驗證實戰（二）：各命令類別的測試重點](https://alanhc.github.io/til/docs/BMC/ipmi-validation-2-commands): > TL;DR：依照 IPMI 2.0 的 NetFn 分類，逐類整理命令、`ipmitool` 用法和測試重點。共通原則是[上一篇](./ipmi-validation-1-basics.md)講的：raw 與 string 雙驗證、Set → Get → 還原、負面測試、持久性，以及用實機...
@@ -239,6 +238,7 @@ This file contains links to documentation sections following the llmstxt.org sta
 - [Hermes Agent](https://alanhc.github.io/til/docs/hermes): Nous Research 的 Hermes Agent，基於其 Hermes 系列開源模型打造的 agent 系統。
 - [Hermes on Kubernetes](https://alanhc.github.io/til/docs/hermes_kubernetes): ![alt text](assets/image.png)
 - [Hibernation:一份可以寫回 kernel 記憶體的快照](https://alanhc.github.io/til/docs/hibernation): 大部分人對 hibernation 的理解停在一句話:「把記憶體存到硬碟,然後關機。」
+- [IC 設計的前段、中段、後段:一條從規格到 GDSII 的路](https://alanhc.github.io/til/docs/ic-design-flow): 跟不同背景的工程師聊天時,「前段 / 後段」這組詞的邊界常常對不起來。做驗證的人講的前段,跟做 Place & Route 的人心裡的前段,切點未必一樣;而「中段」這個詞在台灣業界很常用,到了歐美履歷上卻幾乎看不到。
 - [Jev 是什麼？從 System One 決策模型看韌體 CI 自動化](https://alanhc.github.io/til/docs/jev-decision-model-for-firmware-ci): - **Jev** 是 TypeSafe AI 在 2026 年 9 月推出的「System One Model」（也叫 decision model）。它**不生成文字，只回傳帶機率的型別化判斷**。
 - [刷題面試：一場決策外包的共謀](https://alanhc.github.io/til/docs/job_interview): 每個工程師大概都經歷過這樣的時刻：深夜盯著 LeetCode 上第三百題，心裡冒出一個念頭——「我未來的工作內容，跟反轉二元樹到底有什麼關係？」
 - [kexec：讓 Linux kernel 自己當 bootloader](https://alanhc.github.io/til/docs/kexec): > TL;DR：kexec 讓一個正在執行的 Linux kernel 直接載入並跳進另一個 kernel，跳過韌體與 bootloader。它是 kdump 的基礎，也是 LinuxBoot 這類「用 Linux 當韌體」方案的核心。代價是硬體不會被韌體重置，driver 的 shutdow...
