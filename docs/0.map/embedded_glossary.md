@@ -469,6 +469,13 @@ sidebar_position: 7
 | **`gd`（global data）** | U-Boot 各 phase 共用的狀態結構，ARM 上放在 r9；SPL 在 DRAM 起來前把它放 SRAM，之後由 `spl_relocate_stack_gd` 搬到 DRAM | [BBB SPL 原始碼導讀](../Embedded/bbb-spl-source-walkthrough.md) |
 | **TPL / VPL / SPL / U-Boot proper** | U-Boot 的多段切分。SRAM 小到塞不下完整 U-Boot 時先用小程式把 DRAM 初始化起來；Rockchip、Allwinner 等平台的 SPL 本身就扮演 BL2 | [（三）U-Boot](../u-boot.md) |
 | **`CONFIG_SPL_ATF`** | 讓 SPL 從 FIT 載入 BL31（及可選的 OP-TEE），再由 BL31 把 U-Boot proper 當 BL33 帶起來 | [（三）U-Boot](../u-boot.md) |
+| **`malloc_limit` 與 "alloc space exhausted"** | `board_init_f` 階段 `gd->malloc_base` 有值但 `malloc_limit` 是 **0**，`malloc_simple` 的 `new_ptr > limit` 檢查因此對任何大小都失敗。limit 要到 `board_init_r` 的 `spl_common_init()` 才設——**錯誤訊息說空間不足，真正原因是階段不對** | [SPL 當 BL2](<../Embedded/spl-as-bl2-arm64-internals.md>) |
+| **`CONFIG_SPL_SEPARATE_BSS`** | 把 SPL 的 `.bss` 放到和 code 不同的 MEMORY region（linker script 的 `>.sdram` vs `>.sram`）。arm64 ZynqMP 上 `.text` 在 OCM `0xfffc0000`、`.bss` 在 DDR `0x1000`，相距近 4 GB；動機是 OCM 要讓位給 BL31 | [SPL 當 BL2](<../Embedded/spl-as-bl2-arm64-internals.md>) |
+| **BSS 清零的時機** | `crt0_64.S` 的 `clear_loop` 排在 `board_init_f` **之後**、`board_init_r` **之前**。所以 `board_init_f` 寫 BSS 不是「不保證保留」而是**一定會被抹掉**；在 `board_init_f` 寫毒值、到 `board_init_r` 讀回 0 就能直接證實 | [SPL 當 BL2](<../Embedded/spl-as-bl2-arm64-internals.md>) |
+| **`dm_fixup_for_gd_move`** | `uclass_root` 是**嵌在 `gd` 結構裡**的環狀 list sentinel，`memcpy` 整個 `gd` 之後鄰居的 `next`/`prev` 還指著舊位址，必須手動接回。「含自我指標的結構不能單純 memcpy」的真實案例 | [SPL 當 BL2](<../Embedded/spl-as-bl2-arm64-internals.md>) |
+| **fdtgrep / `bootph-*` 的實際效果** | build 時用 `bootph-all`、`bootph-pre-ram`（TPL 是 `bootph-pre-sram`、VPL 是 `bootph-verify`）當**選擇器**剪出 SPL 專用 DTB，剪完**把屬性本身也刪掉**。ZynqMP 實測 238 節點 → 23 節點、49 KB → 4.7 KB | [SPL 當 BL2](<../Embedded/spl-as-bl2-arm64-internals.md>) |
+| **`RESET_TO_BL31`** | TF-A 的選項，預設 0；`plat/qemu` 不支援，zynqmp 則強制為 1 ——build 出來**只有 `bl31.bin`，沒有 BL1/BL2**，因為那兩個角色由 U-Boot SPL 擔任 | [SPL 當 BL2](<../Embedded/spl-as-bl2-arm64-internals.md>) |
+| **`CONFIG_OF_BOARD` 在 SPL 的後果** | SPL 預期**前一階段在 runtime 餵一份 DTB**（ZynqMP 由 PMU 放在 `XILINX_OF_BOARD_DTB_ADDR`）。模擬器不餵時 `fdtdec_setup()` 回 `-EINVAL`，`spl_init()` 就回 **−22**，症狀只有一句 `### ERROR ### Please RESET the board ###` | [SPL 當 BL2](<../Embedded/spl-as-bl2-arm64-internals.md>) |
 | **`board_init_f` → relocation → `board_init_r`** | U-Boot proper 的骨幹（`_main` 起於 `crt0_64.S`），全程靠 `gd`（AArch64 放在 `x18`）傳狀態。**relocation 前記下的指標 relocation 後還用，是移植新板子的經典 bug** | [（三）U-Boot](../u-boot.md) |
 | **Driver Model（uclass / udevice / `U_BOOT_DRIVER`）** | U-Boot 的統一驅動框架，硬體描述來自 Device Tree（`OF_CONTROL`） | [（三）U-Boot](../u-boot.md) |
 | **Standard Boot（bootdev / bootmeth / bootflow）** | 取代 `distro_bootcmd` 腳本的開機機制；開 `BOOTSTD_DEFAULTS` 的板子預設 `bootcmd` 就是 `bootflow scan -lb` | [（三）U-Boot](../u-boot.md) |

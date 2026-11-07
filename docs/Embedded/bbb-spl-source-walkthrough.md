@@ -583,3 +583,4 @@ xxd -s 0x200 -l 8 MLO                                                      # GP 
 - 錄一份真正的 SPL log：UART 轉接器改插主機板直連埠（見上一篇的 USB hub 坑），開 `CONFIG_SPL_SERIAL` 的 debug 輸出，對照這篇的每一步。
 - 換自己 build 的 MLO 上板，用 `CONFIG_DEBUG_UART` 在 `board_init_f` 之前就印東西。
 - 試 Falcon mode：SPL 直接開 kernel，量省下多少時間。
+- 同一條路線換成 arm64 與「SPL 當 BL2」形態（SPL 載 BL31、BL31 再把 U-Boot proper 當 BL33）：[SPL 當 BL2：arm64 pre-relocation 的三個約束，與 QEMU 的極限](./spl-as-bl2-arm64-internals.md)。
