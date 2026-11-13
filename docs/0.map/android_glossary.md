@@ -591,7 +591,7 @@ sidebar_position: 1
 
 ## 十九、Kernel 交付：Kleaf 與 KMI
 
-> 出自 [02 GKI 與 Kleaf Kernel Build](../02-gki-kleaf-kernel-build.md)。GKI 本身的定義見第三節。
+> 出自 [02 GKI 與 Kleaf Kernel Build](../02-gki-kleaf-kernel-build.md)、[Android Vendor Hook](../android-vendor-hook.md)。GKI 本身的定義見第三節。
 
 | 名詞 | 說明 |
 |---|---|
@@ -600,6 +600,8 @@ sidebar_position: 1
 | **KMI（Kernel Module Interface）** | GKI 核心與 vendor module 之間的穩定 ABI；有了它 Google 才能單獨更新 kernel 而不重編 vendor module |
 | **symbol list** | Vendor 要用的 kernel symbol 必須先登記進 symbol list，才會被納入 KMI 保護範圍。沒登記的 symbol 隨時可能消失 |
 | **ABI 檢查** | build 時比對目前 kernel 的 ABI 與凍結的基準，任何破壞 KMI 的改動會直接擋下來——把「相容性」從人工紀律變成 CI 檢查 |
+| **Vendor hook（`android_vh_*`）** | ACK 在 core kernel 預留的掛載點，底層是 tracepoint：沒人掛時 static key 讓呼叫點近乎零成本；callback 在關搶佔的 context 執行，不能睡。詳見 [Android Vendor Hook](../android-vendor-hook.md) |
+| **Restricted vendor hook（`android_rvh_*`）** | 不經 tracepoint 的 RCU 路徑、直接 static_call 的 hook：callback 可以睡，但最多掛 2 個且掛上就拆不掉，module 也就卸不掉 |
 
 ---
 
