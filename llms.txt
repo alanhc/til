@@ -171,6 +171,7 @@ This file contains links to documentation sections following the llmstxt.org sta
 - [你的手機在 Android 發表前就準備好了：聊聊 PDK 與 aosp.xml](https://alanhc.github.io/til/docs/android-pdk-aosp-xml): 每年 Google 發表新版 Android 的時候，總會有一批手機在幾個月內就跟著升級。這件事其實有點違反直覺——原始碼不是剛剛才公開嗎？晶片廠和手機廠是怎麼做到的？
 - [Android Product Flavor 完整教學:一份程式碼,多個 App](https://alanhc.github.io/til/docs/android-product-flavor-完整教學): 在真實的 Android 開發裡,你經常會遇到這種需求:同一套 App 需要有免費版和付費版、需要賣給不同客戶做成白牌(white-label)、或是需要區分開發、測試、正式三種環境。
 - [從 `mount -o remount` 到 OverlayFS：Android Driver 開發者必須弄懂的 remount 機制](https://alanhc.github.io/til/docs/android-remount-deep-dive): > 適合對象：做 BSP、kernel module、vendor HAL、firmware 整合的系統工程師。假設你已經知道 AOSP build 流程、fastboot、以及 Linux mount 的基本語意。
+- [Android Vendor Hook：GKI 在 core kernel 裡挖的洞](https://alanhc.github.io/til/docs/android-vendor-hook): 從 ACK 原始碼拆解 vendor hook：為什麼 GKI 需要它、一個 hook 由哪四個部分組成、底層其實是 tracepoint 加 static key、vh 與 rvh 的差別（能不能睡、能掛幾個、能不能拔），以及用一個真實的 ACK change 看 hook 關掉時為什麼會編...
 - [Android](https://alanhc.github.io/til/docs/android): ![](file-20251206231448138.png)
 - [adb（Android Debug Bridge）](https://alanhc.github.io/til/docs/android_adb): adb 是 Android SDK Platform Tools 提供的命令列工具，用來與裝置或模擬器溝通。
 - [Android Boot Flow](https://alanhc.github.io/til/docs/android_boot_flow): ![Android Boot Flow 概觀](assets/image-3.png)
