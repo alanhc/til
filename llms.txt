@@ -121,6 +121,7 @@ This file contains links to documentation sections following the llmstxt.org sta
 - [BeagleBone Black 的 SPL 原始碼導讀：從 Boot ROM 到 DRAM](https://alanhc.github.io/til/docs/Embedded/bbb-spl-source-walkthrough): [上一篇](./bbb-uboot-bringup.md)從記憶體的角度走了一次開機：Boot ROM 把 MLO 搬進 SRAM，SPL 叫醒 DDR，再把 U-Boot 搬進 DRAM。那篇只講「搬到哪」，這篇照著 U-Boot 原始碼，一行一行看 SPL 是**怎麼**做到的：上電後第一...
 - [BeagleBone Black bring-up 練習：從 UART 到手動 bootz](https://alanhc.github.io/til/docs/Embedded/bbb-uboot-bringup): 用 BeagleBone Black（AM335x）練 bring-up 的第一天紀錄：接 debug UART、錄完整開機 log、在 U-Boot 裡直接戳 GPIO 暫存器點 LED，最後不靠 `bootcmd`，自己一步步把 Linux 開起來。
 - [Buildroot](https://alanhc.github.io/til/docs/Embedded/buildroot): `make menuconfig`
+- [FT232H 驅動 0.96" SPI TFT（ST7735）](https://alanhc.github.io/til/docs/Embedded/ft232h-spi-tft): 用 FT232H 當「USB 轉 SPI」，直接從 Windows 上的 Python 驅動一片 0.96 吋 SPI 彩色 TFT，最後做成新聞 + 時鐘小螢幕。
 - [SPL 當 BL2：arm64 pre-relocation 的三個約束，與 QEMU 的極限](https://alanhc.github.io/til/docs/Embedded/spl-as-bl2-arm64-internals): 用 GDB 實測 arm64 SPL 在 relocation 之前的執行環境：gd 為什麼綁 x18、malloc_limit 在 board_init_f 為什麼是 0、BSS 清零的真正時機（下毒驗證）、gd 搬家為什麼要修 DM 的環狀 list，以及 fdtgrep 用 bootph...
 - [State Machine](https://alanhc.github.io/til/docs/Embedded/state_machine): State Machine
 - [Das U-Boot](https://alanhc.github.io/til/docs/Embedded/uboot): U-Boot 是 embedded 平台最常見的 bootloader，負責初始化硬體、載入 kernel 與 device tree，並跳入 OS。提供互動式命令列，方便開發與除錯。
