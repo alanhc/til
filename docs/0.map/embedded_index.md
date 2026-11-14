@@ -94,7 +94,7 @@ sidebar_position: 6
 | [NVIDIA GPU](../gpu_nvidia.md) | Linux 上確認 NVIDIA 驅動狀態的指令與實測輸出：`lsmod \| grep nvidia` 看 `nvidia`/`nvidia_uvm`/`nvidia_drm`/`nvidia_modeset` 模組相依、`nvidia-smi` 查 RTX 5070 Ti 的驅動版本、CUDA 版本、溫度功耗與佔用 VRAM 的 process |
 | [VAD 與 Silero VAD 的晶片效能](../vad-silero-chip-performance.md) | VAD 是語音 pipeline 最前面的守門員（能量閾值 → WebRTC VAD 的 GMM → 小型 NN 的演進）；**Silero VAD** 規格（~1–2 MB、16 kHz 每 512 samples、STFT → CNN → 有狀態 LSTM、ONNX）；為什麼它是 always-on workload（每天約 270 萬次推論），關鍵指標是每次推論能耗、跑在哪個 core、能否讓 AP 睡覺、SRAM 佔用而非 TOPS；LSTM／batch=1／高頻 invoke 對 NPU 不友善之處；晶片廠為何在意與自行量測的方法表 |
 | [Raspberry Pi](<../raspberry pi.md>) | 單板電腦筆記：用 Raspberry Pi Imager 燒錄 OS 並預先設定 SSH／Wi-Fi／帳號、GPIO 接周邊的應用場景、官方文件與一支影片連結 |
-| [FT232H 驅動 0.96" SPI TFT（ST7735）](../Embedded/ft232h-spi-tft.md) | 實作紀錄：用 FT232H 的 MPSSE 當 USB 轉 SPI，在 Windows 上用 Python（pyftdi + Blinka）驅動小 TFT。附 **FT232H 腳位定義**（D0–D3 在 SPI／I2C／JTAG 下的固定功能、C0–C7 當 GPIO、Adafruit 板 I2C 開關用 SPI 時要關）、接線表、Zadig 換 WinUSB 與 libusb DLL 的錯誤訊息對照。主要的坑：**0.96" 不一定是 80×160**，這片其實是 128×64；ST7735 RAM 是 132×162，用「在整塊 RAM 上畫刻度尺」量出可見視窗 offset（2, 67）；紅→黃、綠→紫、藍→淺藍代表 `invert` 和 `bgr` 都設反。最後做成新聞＋時鐘小螢幕 |
+| [FT232H 驅動 0.96" SPI TFT（ST7735）](../Embedded/ft232h-spi-tft.md) | 實作紀錄：用 FT232H 的 MPSSE 當 USB 轉 SPI，在 Windows 上用 Python（pyftdi + Blinka）驅動小 TFT。附 **FT232H 腳位定義**（D0–D3 在 SPI／I2C／JTAG 下的固定功能、C0–C7 當 GPIO、Adafruit 板 I2C 開關用 SPI 時要關）、接線表、Zadig 換 WinUSB 與 libusb DLL 的錯誤訊息對照。主要的坑：**0.96" 不一定是 80×160**，這片其實是 128×64；ST7735 RAM 是 132×162，用「在整塊 RAM 上畫刻度尺」量出可見視窗 offset（2, 67）；紅→黃、綠→紫、藍→淺藍代表 `invert` 和 `bgr` 都設反。最後做成新聞＋時鐘小螢幕：Google 新聞 RSS 用標準函式庫解析、中文按像素寬度逐字斷行、長標題逐行上捲、RSS 放背景 thread、只在內容變了才送畫面；`render()` 不碰硬體，可先存 PNG 放大檢查排版。附截圖與完整程式碼（`static/code/ft232h-spi-tft/`） |
 
 ---
 

@@ -4,6 +4,8 @@
 
 重點心得：**這種小螢幕不要相信賣場寫的規格或網路上的預設值，要自己量出可見視窗的位置。**
 
+完整程式碼放在 [`static/code/ft232h-spi-tft/`](https://github.com/alanhc/til/tree/main/static/code/ft232h-spi-tft)。
+
 ## FT232H 是什麼
 
 FTDI 的單通道 USB 2.0 Hi-Speed 晶片。一般當 USB 轉 UART，但它有 **MPSSE**（Multi-Protocol Synchronous Serial Engine），可以把一組腳變成 SPI / I2C / JTAG，剩下的腳當 GPIO。等於讓電腦多一組「像 MCU 一樣的腳位」，不用寫韌體。
@@ -85,7 +87,7 @@ flowchart LR
 4. **確認抓得到裝置**：
    ```bash
    python -c "from pyftdi.ftdi import Ftdi; Ftdi.show_devices()"
-   # ftdi://ftdi:232h:FTAD44YR/1  (USB <-> Serial Converter)
+   # ftdi://ftdi:232h:<序號>/1  (USB <-> Serial Converter)
    ```
 
 ### 錯誤訊息對照
@@ -127,6 +129,8 @@ ST7735 控制器內部的顯示 RAM 是 **132 × 162**，但面板只露出其�
 
 最後一種最難猜：純紅經過 R/B 對調變成純藍，再反相就變成黃。綠色不受對調影響，反相後變紫。
 
+![invert 與 bgr 都設反時的顏色](../assets/ft232h-spi-tft/color-symptom.png)
+
 ### 校正方法：在整塊 RAM 上畫刻度尺
 
 不要一組一組猜 offset。直接把顯示器當成 132×162、offset 設 0，在整塊 RAM 上畫格線和座標標籤。面板邊緣看到的數字就是 offset。
@@ -138,7 +142,13 @@ ST7735 控制器內部的顯示 RAM 是 **132 × 162**，但面板只露出其�
 
 每換一組設定前，先把整塊 132×162 清成黑色，不然上一輪的殘影會被誤認成雜點。
 
-我這片最後的結果：
+下圖是第 1 步畫的刻度尺。白框是最後量出來的可見視窗，框外變暗的部分在面板上看不到：
+
+![在整塊 RAM 上畫的刻度尺，白框是可見視窗](../assets/ft232h-spi-tft/ram-ruler.png)
+
+這幾步用到的程式：[`tft_ruler.py`](https://github.com/alanhc/til/blob/main/static/code/ft232h-spi-tft/tft_ruler.py)（粗刻度）、[`tft_ruler_fine.py`](https://github.com/alanhc/til/blob/main/static/code/ft232h-spi-tft/tft_ruler_fine.py)（細刻度）、[`tft_calibrate.py`](https://github.com/alanhc/til/blob/main/static/code/ft232h-spi-tft/tft_calibrate.py)（輪播候選值）、[`tft_bottom.py`](https://github.com/alanhc/til/blob/main/static/code/ft232h-spi-tft/tft_bottom.py)（找底邊）。換一片螢幕時，可以照同樣流程再量一次。
+
+我這片最後的結果（[`tft_test.py`](https://github.com/alanhc/til/blob/main/static/code/ft232h-spi-tft/tft_test.py)）：
 
 ```python
 from adafruit_rgb_display import st7735
@@ -161,18 +171,116 @@ disp = st7735.ST7735R(
 - `y_offset=67`：一開始量到 70，結果上方多一條黑線、下方白線不見。量出底邊在第 130 列，反推上緣是 130 − 64 + 1 = 67 才對。
 - `rotation` 在 `adafruit_rgb_display` 裡只是在送出前用 PIL 把圖**逆時針**旋轉，不會改控制器的 MADCTL。所以 90 / 270 度時，你畫的圖寬高要對調。
 
+校正完的測試畫面，四邊白框完整、紅綠藍順序正確：
+
+![校正完成的測試畫面](../assets/ft232h-spi-tft/test-pattern.png)
+
 ## 應用：新聞 + 時鐘
 
-- **上方**：`HH:MM:SS`（Consolas Bold 16px）和日期星期（微軟正黑體）。
-- **下方**：Google 新聞台灣版 RSS（`https://news.google.com/rss?hl=zh-TW&gl=TW&ceid=TW:zh-Hant`）的頭條，用 12px 微軟正黑體，一次顯示 3 行。標題太長時每 3 秒往上捲一行。
+螢幕能動之後，做一個放在桌上的小資訊屏：上面是時鐘，下面輪播新聞頭條。完整程式是 [`news_clock.py`](https://github.com/alanhc/til/blob/main/static/code/ft232h-spi-tft/news_clock.py)，大約 150 行，`open_display()` 從 `tft_test.py` 匯入，校正值只寫在一個地方。
 
-幾個小技巧：
+![新聞時鐘畫面](../assets/ft232h-spi-tft/news-clock.png)
 
-- **中文斷行**要按像素寬度逐字斷（`font.getlength()`），不能用 `textwrap`。
-- **抓 RSS 放背景 thread**，網路慢的時候時鐘才不會卡住。
-- **只在內容變了才送畫面**：秒數、頁數或狀態有變才重畫，省下 SPI 頻寬。
-- Google News 的標題後面會帶「 - 媒體名」，部分媒體還會帶「| 作者 | 分類」，可以先切掉，在 128 px 寬的螢幕上很省空間。
-- **先把畫面存成 PNG 放大來看**，確認排版正確後再送到螢幕，不用每次都盯著小螢幕調。
+### 版面（128 × 64）
+
+| 區域 | 位置 | 內容 | 字型 |
+|---|---|---|---|
+| 時間 | 左上，高 18 px | `HH:MM:SS` | Consolas Bold 16px |
+| 日期 | 右上 | `11/14 (六)` | 微軟正黑體 11px |
+| 分隔線 | 第 17 列 | 一條藍線 | |
+| 新聞 | 下方 46 px | 頭條，一次 3 行，行高 15 px | 微軟正黑體 12px |
+
+64 px 高真的很擠：12px 中文一行 15 px，扣掉 18 px 的時間列，剛好放 3 行。第一版用 13px，第三行字的下緣就被切掉了。
+
+### 新聞來源
+
+用 Google 新聞台灣版的 RSS，不需要 API key，標準函式庫就能解析：
+
+```python
+import urllib.request
+import xml.etree.ElementTree as ET
+
+FEED_URL = "https://news.google.com/rss?hl=zh-TW&gl=TW&ceid=TW:zh-Hant"
+req = urllib.request.Request(FEED_URL, headers={"User-Agent": "Mozilla/5.0"})
+root = ET.fromstring(urllib.request.urlopen(req, timeout=15).read())
+for it in root.findall("./channel/item"):
+    title = it.findtext("title")    # 「標題 - 媒體名」
+    src = it.findtext("source")     # 「媒體名」
+```
+
+標題後面會帶「 - 媒體名」，部分媒體還會再接「| 作者 | 分類」。這些在 128 px 寬的螢幕上很佔空間，所以先切掉：
+
+```python
+if src and title.endswith(" - " + src):
+    title = title[: -len(" - " + src)]
+title = title.split(" | ")[0]
+```
+
+### 中文斷行
+
+`textwrap` 是按「字數」斷行，而且只會在空白處斷，中文標題沒有空白，等於完全不會斷。要改成按**像素寬度**逐字累加：
+
+```python
+def wrap(text, font, width):
+    lines, cur = [], ""
+    for ch in text:
+        if font.getlength(cur + ch) > width and cur:
+            lines.append(cur)
+            cur = ch
+        else:
+            cur += ch
+    if cur:
+        lines.append(cur)
+    return lines
+```
+
+標題超過 3 行時，不要直接翻到下一頁，而是**每次往上捲一行**，讀起來比較連貫：
+
+```python
+def pages_for(title):
+    lines = wrap(title, FONT_NEWS, WIDTH - 4)
+    last_start = max(0, len(lines) - 3)
+    return [lines[s:s + 3] for s in range(0, last_start + 1)]
+```
+
+### 主迴圈
+
+- **抓 RSS 放背景 thread**，每 10 分鐘更新一次。網路慢或斷線時時鐘不會卡住，畫面繼續顯示上一批新聞。
+- **每頁停 3 秒**，捲完一則標題的最後一頁，才換下一則。
+- **只在內容變了才送畫面**。迴圈每 50 ms 檢查一次，只有「秒數、第幾則、第幾頁、狀態」其中一個變了才重畫。`adafruit_rgb_display` 的 `image()` 是用純 Python 逐像素轉成 RGB565，不要每圈都送。
+
+```python
+key = (now.second, headline, page, status)
+if key != last_key:
+    disp.image(render(now, page_lines, status))
+    last_key = key
+time.sleep(0.05)
+```
+
+### 開發技巧：先存成 PNG 再上螢幕
+
+`render()` 只回傳一張 PIL 圖，不碰硬體。所以調排版時可以直接存成 PNG，放大 4 倍來看，確認沒問題再送上螢幕，不用每次都盯著 0.96 吋的小螢幕瞇眼看：
+
+```python
+img = render(datetime.now(), pages[0], "")
+img.resize((512, 256), Image.NEAREST).save("preview.png")
+```
+
+這篇文章裡的螢幕截圖也是這樣用同一支程式畫出來的。
+
+### 執行
+
+```bash
+python news_clock.py
+```
+
+要調整的話，改程式最上面的常數就好：
+
+| 常數 | 預設 | 用途 |
+|---|---|---|
+| `PAGE_SEC` | 3.0 | 每頁停留的秒數 |
+| `REFRESH_SEC` | 600 | 多久重抓一次新聞 |
+| `FEED_URL` | Google 新聞台灣版 | 換成任何 RSS，例如中央社或特定主題 |
 
 ## 參考
 
