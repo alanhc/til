@@ -529,9 +529,9 @@ sidebar_position: 7
 
 ---
 
-## 十五、Cortex-M bootloader（MT7697 / dapboot）
+## 十五、Cortex-M bootloader（MT7697 / dapboot / STM32 ROM）
 
-> 出自 [LinkIt 7697 的 bootloader 原始碼導讀](../Embedded/mt7697-bootloader-walkthrough.md) 與 [在 Blue Pill 上跑 dapboot](../Embedded/dapboot-bluepill.md)。
+> 出自 [LinkIt 7697 的 bootloader 原始碼導讀](../Embedded/mt7697-bootloader-walkthrough.md)、[在 Blue Pill 上跑 dapboot](../Embedded/dapboot-bluepill.md) 與 [STM32F103 ROM bootloader](../Embedded/stm32f103-rom-bootloader.md)。
 
 | 名詞 | 說明 | 出處 |
 |---|---|---|
@@ -547,3 +547,8 @@ sidebar_position: 7
 | **STM32F1 flash 開機映射** | BOOT0 = 0 時 flash 會被映射到 `0x0000_0000`，所以 dapboot 把 VTOR 寫成 `0x2000` 也能指到 `0x0800_2000` 的向量表 | [dapboot 實測](../Embedded/dapboot-bluepill.md) |
 | **OpenOCD working area** | OpenOCD 在 target RAM 裡借用的一塊空間，`verify_image` 的 CRC、flash 寫入演算法都在這裡跑。stm32f1x 從 `0x2000_0000` 開始，會蓋掉 app 的 `.bss`，之後讀 RAM 要先 reset | [dapboot 實測](../Embedded/dapboot-bluepill.md) |
 | **Download agent（DA）** | 燒錄工具先透過 ROM 的 UART 下載模式（XMODEM）送進 RAM 執行的小程式，再由它接收並寫入 flash。LinkIt 7697 的 `da97.bin` 就是同一份 bootloader 打開 UART 選單、改連結在 SYSRAM 的版本 | [MT7697 bootloader](../Embedded/mt7697-bootloader-walkthrough.md) |
+| **System memory bootloader** | STM32 出廠燒在 system memory（F103 是 `0x1FFF_F000`，2KB）的 bootloader，BOOT0 = 1 時映射到位址 0 執行。不開源，協定見 AN2606／AN3155；沒有讀保護，可用除錯器讀出 | [STM32 ROM bootloader](../Embedded/stm32f103-rom-bootloader.md) |
+| **`__main`／`__scatterload`** | ARM 編譯器（Keil/ARMCC）的 C runtime 進入點。`Reset_Handler` 跳到 `__main`，`__scatterload` 依 linker 產生的區段表逐筆複製 `.data`、清 `.bss`，最後才進 `main`。GCC 專案則在 `Reset_Handler` 裡直接寫迴圈 | [STM32 ROM bootloader](../Embedded/stm32f103-rom-bootloader.md) |
+| **MCU 的 RAM 初始化** | 晶片內建 SRAM 上電即可用，不像外接 DRAM 要設控制器與 training。MCU 啟動碼的「RAM 初始化」只是設 SP、複製 `.data`、清 `.bss` | [STM32 ROM bootloader](../Embedded/stm32f103-rom-bootloader.md) |
+| **自動鮑率偵測（`0x7F`）** | AN3155 規定主機先送 `0x7F`。bootloader 用 SysTick 量 bit0 上升到 bit7 下降的 7 個位元時間，除以 7 就是 `USART_BRR`；計時器與 USART 同一個時脈，HSI 誤差自然抵消 | [STM32 ROM bootloader](../Embedded/stm32f103-rom-bootloader.md) |
+| **Bit-band 別名** | Cortex-M3 把周邊區（`0x4000_0000`）每個位元映射成別名區（`0x4200_0000`）的一個 word，寫入即可改單一位元，不需讀－改－寫。ROM 用 `0x4242_0060` 設 `RCC_CR.PLLON` | [STM32 ROM bootloader](../Embedded/stm32f103-rom-bootloader.md) |
