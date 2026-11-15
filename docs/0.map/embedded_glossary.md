@@ -526,3 +526,20 @@ sidebar_position: 7
 | **`CONFIG_BT_NRF51_PM`** | Zephyr H4 驅動在開機時用 SWDIO 腳 reset Curie 的 nRF51 並拉起 BTWAKE。reset 後會立刻送 HCI_Reset，可能被還在重開的 nRF51 丟掉，造成主機卡住 | [Arduino 101 跑 Zephyr](../Embedded/zephyr-arduino-101.md) |
 | **USB CDC console（Zephyr 1.14）** | 把 `zephyr,console` 指到 `&usb_cdc`，log 從 USB 虛擬序列埠出來；Windows 的 usbser 需要 IAD，1.14 要開 `CONFIG_USB_COMPOSITE_DEVICE` 才會送，否則序列埠顯示 Code 10 | [Arduino 101 跑 Zephyr](../Embedded/zephyr-arduino-101.md) |
 | **Zadig / WinUSB** | Windows 上 libusb 系工具（如 dfu-util）需要裝置綁定 WinUSB 驅動才存取得到；Zadig 是產生並安裝這類驅動的工具，**要確認綁的是正確的 VID:PID** | [Arduino 101 跑 Zephyr](../Embedded/zephyr-arduino-101.md) |
+
+---
+
+## 十五、Cortex-M bootloader（MT7697）
+
+> 出自 [LinkIt 7697 的 bootloader 原始碼導讀](../Embedded/mt7697-bootloader-walkthrough.md)。
+
+| 名詞 | 說明 | 出處 |
+|---|---|---|
+| **XIP（execute in place）** | CPU 直接從 flash 抓指令執行，不先複製到 RAM。MT7697 把外接 SPI flash 映射到 `0x10000000`，經 32KB cache 讀取；flash 在抹寫時不能同時讀，所以要改寫 flash 的程式得先搬到 RAM | [MT7697 bootloader](../Embedded/mt7697-bootloader-walkthrough.md) |
+| **LMA vs VMA** | linker script 裡 `> SYSRAM AT > XIP_LOADER_CODE` 讓同一段有兩個位址：LMA 是實際存放處（flash），VMA 是程式以為自己在的地方（RAM）。啟動碼負責把 LMA 的內容複製到 VMA；反組譯同一份 binary 要依階段換不同的 base | [MT7697 bootloader](../Embedded/mt7697-bootloader-walkthrough.md) |
+| **Cortex-M 向量表 `[0]`／`[1]`** | 上電時硬體從向量表 `[0]` 載入 MSP、`[1]` 載入 PC。自我搬移的 bootloader 不能把 `[1]` 寫成 Reset handler 的符號（那是 RAM 位址），要手算 flash 上的位置 | [MT7697 bootloader](../Embedded/mt7697-bootloader-walkthrough.md) |
+| **Thumb bit** | 跳躍目標位址的 bit0。Cortex-M 只有 Thumb 狀態，載入 PC 或 `bx` 的位址 bit0 必須是 1，否則觸發 INVSTATE UsageFault。所以 `jump_to` 的目標是 `0x10079001` 而不是 `0x10079000` | [MT7697 bootloader](../Embedded/mt7697-bootloader-walkthrough.md) |
+| **VTOR** | `SCB->VTOR`，向量表的基底位址。bootloader 搬到 RAM 後把它指向 RAM 上的表；MT7697 的 `jump_to` 不重設它，由 app 自己處理 | [MT7697 bootloader](../Embedded/mt7697-bootloader-walkthrough.md) |
+| **SHCSR fault enable** | `SCB->SHCSR` bit16～18（`0x70000`）打開 MemManage、BusFault、UsageFault 各自的 handler；沒開的話這三種都會升級成 HardFault，難以分辨 | [MT7697 bootloader](../Embedded/mt7697-bootloader-walkthrough.md) |
+| **`bl getpc` 取 PC** | `bl` 到下一行再讀 LR，就得到目前執行位置。MT7697 的 `ResetISR` 用它判斷自己在 flash 還是已經在 RAM，決定要不要複製 | [MT7697 bootloader](../Embedded/mt7697-bootloader-walkthrough.md) |
+| **Download agent（DA）** | 燒錄工具先透過 ROM 的 UART 下載模式（XMODEM）送進 RAM 執行的小程式，再由它接收並寫入 flash。LinkIt 7697 的 `da97.bin` 就是同一份 bootloader 打開 UART 選單、改連結在 SYSRAM 的版本 | [MT7697 bootloader](../Embedded/mt7697-bootloader-walkthrough.md) |
