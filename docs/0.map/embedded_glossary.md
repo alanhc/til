@@ -529,9 +529,9 @@ sidebar_position: 7
 
 ---
 
-## 十五、Cortex-M bootloader（MT7697 / dapboot / STM32 ROM）
+## 十五、Cortex-M bootloader 與開機（MT7697 / dapboot / STM32 ROM / 手寫 startup）
 
-> 出自 [LinkIt 7697 的 bootloader 原始碼導讀](../Embedded/mt7697-bootloader-walkthrough.md)、[在 Blue Pill 上跑 dapboot](../Embedded/dapboot-bluepill.md) 與 [STM32F103 ROM bootloader](../Embedded/stm32f103-rom-bootloader.md)。
+> 出自 [LinkIt 7697 的 bootloader 原始碼導讀](../Embedded/mt7697-bootloader-walkthrough.md)、[在 Blue Pill 上跑 dapboot](../Embedded/dapboot-bluepill.md)、[STM32F103 ROM bootloader](../Embedded/stm32f103-rom-bootloader.md) 與 [手寫 startup 和 SysTick](../Embedded/stm32f103-startup-systick.md)。
 
 | 名詞 | 說明 | 出處 |
 |---|---|---|
@@ -552,3 +552,8 @@ sidebar_position: 7
 | **MCU 的 RAM 初始化** | 晶片內建 SRAM 上電即可用，不像外接 DRAM 要設控制器與 training。MCU 啟動碼的「RAM 初始化」只是設 SP、複製 `.data`、清 `.bss` | [STM32 ROM bootloader](../Embedded/stm32f103-rom-bootloader.md) |
 | **自動鮑率偵測（`0x7F`）** | AN3155 規定主機先送 `0x7F`。bootloader 用 SysTick 量 bit0 上升到 bit7 下降的 7 個位元時間，除以 7 就是 `USART_BRR`；計時器與 USART 同一個時脈，HSI 誤差自然抵消 | [STM32 ROM bootloader](../Embedded/stm32f103-rom-bootloader.md) |
 | **Bit-band 別名** | Cortex-M3 把周邊區（`0x4000_0000`）每個位元映射成別名區（`0x4200_0000`）的一個 word，寫入即可改單一位元，不需讀－改－寫。ROM 用 `0x4242_0060` 設 `RCC_CR.PLLON` | [STM32 ROM bootloader](../Embedded/stm32f103-rom-bootloader.md) |
+| **`.data`／`.bss` 與 `_sidata`** | 有初值的全域變數放 `.data`：執行位址在 RAM、內容存在 flash（linker script 的 `> RAM AT > FLASH`），`_sidata` 是 flash 上那份的位址，startup 要複製過去。沒初值的放 `.bss`，ELF 裡只記大小（`NOBITS`），startup 要填 0 | [手寫 startup](../Embedded/stm32f103-startup-systick.md) |
+| **ELF 與 `.bin`** | ELF 除了機器碼還帶每個區段的位址、符號表與除錯資訊，給 GDB、OpenOCD `load` 用；`objcopy -O binary` 抽出的 `.bin` 只有要燒進晶片的 bytes，沒有位址，dfu-util 與 ROM bootloader 用這種 | [手寫 startup](../Embedded/stm32f103-startup-systick.md) |
+| **SysTick** | Cortex-M 內建的 24 位元倒數計時器（`0xE000_E010` 起）。`RVR` 設重載值、`CSR = 0x7` 用 CPU 時脈並開中斷；數到 0 觸發例外 15，常用來做 1ms tick。重載值要依實際時脈算，在 bootloader 後面跑的 app 時脈可能已被改過 | [手寫 startup](../Embedded/stm32f103-startup-systick.md) |
+| **例外進入的自動 stacking** | Cortex-M 進中斷時硬體自動 push `r0-r3`、`r12`、`lr`、`pc`、`xPSR` 共 8 個字，`IPSR` 記例外編號，M3 約 12 cycle。stack 上的 `pc` 是被打斷的位置；`xPSR` bit9 表示為了 8-byte 對齊多墊了 4 bytes | [手寫 startup](../Embedded/stm32f103-startup-systick.md) |
+| **EXC_RETURN** | 進中斷時 `LR` 被設成 `0xFFFF_FFxx` 的特殊值（`0xFFFF_FFF9` = 返回 Thread mode、用 MSP）。handler 結尾把它載入 PC 時，CPU 認出這是例外返回，自動 pop 那 8 個字，所以 handler 可以寫成普通 C 函式 | [手寫 startup](../Embedded/stm32f103-startup-systick.md) |
