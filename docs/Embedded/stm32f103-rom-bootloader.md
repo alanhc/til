@@ -158,7 +158,7 @@ xxd -e -l 16 sysmem.bin
 
 幾個觀察：
 
-- **MSP = `0x2000_01FC`**：stack 從 SRAM 第 512 bytes 往下長，整支 bootloader 只動 `0x2000_0000`～`0x2000_01FF`。AN2606 說 bootloader 會用到 RAM 開頭那一塊，從這裡就看得出來。
+- **MSP = `0x2000_01FC`**：stack 從 SRAM 第 512 bytes 往下長，整支 bootloader 只動 `0x2000_0000`～`0x2000_01FF`。AN2606 Table 46 寫的正是「`0x2000_0000` 起 512 bytes 給 bootloader 用」，後面「對照 AN2606」一節會再逐項核對。
 - **位址 bit0 都是 1**：這是 Thumb bit。Reset 寫 `0x1FFF_F021`，實際程式在 `0x1FFF_F020`。
 - BOOT0 = 1 開機時，system memory 會被映射到 `0x0000_0000`，硬體從 `0x0` 讀向量表，讀到的就是這 4 格。
 
@@ -826,6 +826,81 @@ detach
 
 ---
 
+## 對照 AN2606：官方說法和實測一致嗎？
+
+AN2606（這裡看的是 Rev 71）第 21 章「STM32F10xxx devices」列了這支 bootloader 用到的硬體資源。拿來跟上面讀到的值逐項對：
+
+| AN2606 的說法（Table 46 等） | 實測／反組譯 | 對上了嗎 |
+|---|---|---|
+| 啟動條件 Pattern 1：BOOT0 = 1、BOOT1 = 0 | 步驟 12 用 GDB 模擬的就是這個狀態 | ✓ |
+| HSI 經 PLL，系統時脈 24MHz，不需要外部石英 | `RCC_CFGR` 寫 `0x0010_0002`、讀回 `0x0010_000A`（HSI/2 × 6） | ✓ |
+| RAM：`0x2000_0000` 起 512 bytes 給 bootloader 用 | MSP = `0x2000_01FC`，stack 最深到 `0x2000_00C4` | ✓ |
+| System memory：`0x1FFF_F000` 起 2KB | ROM 大小 2048 bytes | ✓ |
+| IWDG prescaler 設最大、定期餵狗，**只在使用者開了硬體看門狗時有作用** | `PR = 6`（/256，最大），沒寫 `0xCCCC`，getc 裡寫 `0xAAAA` | ✓ |
+| USART1：8 bit、even parity、1 stop | `CR1 = 0x340C`（M = 1、PCE = 1、PS = 0） | ✓ |
+| PA10 是 RX，輸入、不接上下拉 | `GPIOA_CRH` 的 PA10 欄位 = `0x4`（floating input） | ✓ |
+| PA9 是 TX，alternate push-pull | PA9 欄位 = `0xB`（AF push-pull，50MHz） | ✓ |
+| 用 SysTick 偵測主機的鮑率 | 步驟 9 的 SysTick 量測迴圈 | ✓ |
+| 流程：系統初始化 → 收到 `0x7F` → 關中斷 → 設 USART → 進命令迴圈 | 跟 `main` 的順序一致（關中斷在最前面就做了） | ✓ |
+| F10xxx 一般密度沒有 bootloader ID（Table 3 標 NA） | `0x1FFF_F7D6`（value line 放 ID 的位置）讀出來是 `0xFF`；版本只能從 GET 回應拿到 | ✓ |
+
+細節幾乎全對得上。唯一的小差異是 Figure 29 把「關中斷」畫在收到 `0x7F` 之後，實際的 `cpsid i` 在 `main` 一開頭就執行了；反正這支 ROM 本來就沒開任何中斷，順序不影響行為。
+
+### V2.2 改了什麼：RAM 前 512 bytes 的保護
+
+AN2606 Table 47 列出版本差異。V2.2（也就是 GET 回應裡的 `0x22`）新增了一條：Read Memory、Write Memory、Go 這三個指令碰到 **RAM 前 `0x200` bytes 一律回 NACK**。道理很直接：那 512 bytes 是 bootloader 自己的 stack，讓主機寫進去等於讓人改掉正在執行的 bootloader 的返回位址。
+
+在反組譯裡找得到對應的程式碼。`0x1FFF_F2BC` 是一個「位址分類」函式，三個指令都會呼叫它：
+
+```text
+1ffff2bc:  sub.w  r1, r0, #0x08000000
+1ffff2c0:  cmp.w  r1, #0x20000          ; flash 128KB 內？
+1ffff2c6:  movs   r0, #2                ;   → 2
+1ffff2ca:  ldr    r1, =0xDFFFFE00       ; r1 = addr - 0x20000200
+1ffff2ce:  cmp.w  r1, #0x4E00           ; 使用者 RAM（20KB - 512）內？
+1ffff2d4:  movs   r0, #3                ;   → 3
+1ffff2d8:  ldr    r1, =0xE0000800       ; r1 = addr - 0x1FFFF800
+1ffff2dc:  cmp.w  r1, #0x200            ; option bytes 內？
+1ffff2e2:  movs   r0, #4                ;   → 4
+1ffff2e6:  ldr    r1, =0xE0001000       ; r1 = addr - 0x1FFFF000
+1ffff2ea:  cmp.w  r0, #0x800            ; system memory 內？
+1ffff2f0:  movs   r0, #5                ;   → 5
+1ffff2f4:  movs   r0, #1                ; 其他 → 1（不合法）
+```
+
+`sub` 加 `cmp` 再 `bcs`（unsigned）是編譯器判斷「`start <= addr < start + len`」的標準寫法，減出負數會變成很大的 unsigned，一樣被判成超出範圍。整理成表：
+
+| 回傳值 | 範圍 | 意義 |
+|---|---|---|
+| 2 | `0x0800_0000`～`0x0801_FFFF` | flash |
+| 3 | `0x2000_0200`～`0x2000_4FFF` | 使用者 RAM |
+| 4 | `0x1FFF_F800`～`0x1FFF_F9FF` | option bytes |
+| 5 | `0x1FFF_F000`～`0x1FFF_F7FF` | system memory |
+| 1 | 其他，**包含 `0x2000_0000`～`0x2000_01FF`** | 不合法 → NACK |
+
+使用者 RAM 從 `0x2000_0200` 開始，跟 AN2606 附錄裡 F10xxx medium-density「RAM 可存取範圍 `0x2000_0200`～`0x2000_4FFF`」完全一樣。bootloader 自己那 512 bytes 不在任何一個範圍裡，就落到 1。
+
+三個呼叫端怎麼用這個回傳值：
+
+```bash
+grep -nE 'bl\s+0x1ffff2bc' sysmem.dis
+```
+
+```text
+497:1ffff4fa:	f7ff fedf 	bl	0x1ffff2bc     ; 後面是 cmp r0, #1 → Read Memory
+525:1ffff540:	f7ff febc 	bl	0x1ffff2bc     ; 後面只接受 2 或 3 → Go
+559:1ffff590:	f7ff fe94 	bl	0x1ffff2bc     ; 後面是 cmp ip, #1 → Write Memory
+```
+
+- Read／Write Memory 只擋回傳 1，所以 flash、使用者 RAM、option bytes、system memory 都能讀寫（system memory 寫了也沒用，它是 ROM）。
+- Go 只接受 2（flash）或 3（使用者 RAM），對應 Table 47 裡 V2.1 的另一條：跳到 option bytes 或 system memory 一律回 NACK。
+
+Read 那段接著呼叫 getc 收 byte 數，再用 `mvns` 算補數做檢查；Write 那段是 `adds r4, r0, #1`，也就是「N + 1 個 byte」，跟 AN3155 的封包格式一致，靠這個就能分出哪個是 Read、哪個是 Write。
+
+AN2606 的時序表也列了這系列的數字：bootloader 最短啟動時間 1.227ms。主機在 reset 放開後至少要等這麼久再送 `0x7F`，太早送的話 bootloader 還在設 PLL，會漏掉起始位元、量不到鮑率。
+
+---
+
 ## 跟開源 bootloader 對照
 
 ST 的 SDK 沒有這支 ROM 的原始碼，但 [STM32CubeF1](https://github.com/STMicroelectronics/STM32CubeF1/tree/c7656f1fee178058be2f8ebfc8df9eaf91dc565e) 有 IAP 範例（USART + Ymodem），放在 `Projects/STM3210E_EVAL/Applications/IAP/`。它跳到 app 的寫法，跟 dapboot 幾乎一樣：
@@ -871,7 +946,7 @@ if (((*(__IO uint32_t*)APPLICATION_ADDRESS) & 0x2FFE0000) == 0x20000000)
 
 ## 參考資料
 
-- [AN2606：STM32 microcontroller system memory boot mode](https://www.st.com/resource/en/application_note/an2606-introduction-to-system-memory-boot-mode-on-stm32-mcus-stmicroelectronics.pdf)（BOOT 腳位、bootloader 使用的 RAM、HSI 與 IWDG）
+- [AN2606：STM32 microcontroller system memory boot mode](https://www.st.com/resource/en/application_note/an2606-introduction-to-system-memory-boot-mode-on-stm32-mcus-stmicroelectronics.pdf)（Rev 71；第 21 章 STM32F10xxx：Table 46 硬體資源、Table 47 版本差異，附錄的 RAM 可存取範圍與啟動時序）
 - [AN3155：USART protocol used in the STM32 bootloader](https://www.st.com/resource/en/application_note/an3155-usart-protocol-used-in-the-stm32-bootloader-stmicroelectronics.pdf)（`0x7F` 同步、8E1、GET 回應格式）
 - [RM0008：STM32F10x Reference Manual](https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)（RCC、IWDG、USART、GPIO CRH、FLASH_KEYR、bit-band、boot 映射、electronic signature）
 - [STM32CubeF1](https://github.com/STMicroelectronics/STM32CubeF1/tree/c7656f1fee178058be2f8ebfc8df9eaf91dc565e)（IAP 範例）
