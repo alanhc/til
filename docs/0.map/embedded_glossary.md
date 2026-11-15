@@ -529,9 +529,9 @@ sidebar_position: 7
 
 ---
 
-## 十五、Cortex-M bootloader（MT7697）
+## 十五、Cortex-M bootloader（MT7697 / dapboot）
 
-> 出自 [LinkIt 7697 的 bootloader 原始碼導讀](../Embedded/mt7697-bootloader-walkthrough.md)。
+> 出自 [LinkIt 7697 的 bootloader 原始碼導讀](../Embedded/mt7697-bootloader-walkthrough.md) 與 [在 Blue Pill 上跑 dapboot](../Embedded/dapboot-bluepill.md)。
 
 | 名詞 | 說明 | 出處 |
 |---|---|---|
@@ -542,4 +542,8 @@ sidebar_position: 7
 | **VTOR** | `SCB->VTOR`，向量表的基底位址。bootloader 搬到 RAM 後把它指向 RAM 上的表；MT7697 的 `jump_to` 不重設它，由 app 自己處理 | [MT7697 bootloader](../Embedded/mt7697-bootloader-walkthrough.md) |
 | **SHCSR fault enable** | `SCB->SHCSR` bit16～18（`0x70000`）打開 MemManage、BusFault、UsageFault 各自的 handler；沒開的話這三種都會升級成 HardFault，難以分辨 | [MT7697 bootloader](../Embedded/mt7697-bootloader-walkthrough.md) |
 | **`bl getpc` 取 PC** | `bl` 到下一行再讀 LR，就得到目前執行位置。MT7697 的 `ResetISR` 用它判斷自己在 flash 還是已經在 RAM，決定要不要複製 | [MT7697 bootloader](../Embedded/mt7697-bootloader-walkthrough.md) |
+| **USB DFU（Device Firmware Upgrade）** | USB 標準的韌體更新類別。裝置在 DFU 模式下用 control transfer 收資料寫 flash；`dfu-util -D file -R` 下載後 reset。`bitWillDetach` 設定時裝置在 manifest 階段自己重開，所以 dfu-util 結尾的 `LIBUSB_ERROR_IO` 是正常的 | [dapboot 實測](../Embedded/dapboot-bluepill.md) |
+| **dapboot 進 DFU 的條件** | `BKP_DR1 == 0x4F42`（app 寫入後 reset，讀到就清掉）、BOOT1 跳線為高、或 app 向量表 `[0]` 不在 RAM（`& 0x2FFE0000 != 0x20000000`）。只檢查 SP，沒有 CRC 或簽章 | [dapboot 實測](../Embedded/dapboot-bluepill.md) |
+| **STM32F1 flash 開機映射** | BOOT0 = 0 時 flash 會被映射到 `0x0000_0000`，所以 dapboot 把 VTOR 寫成 `0x2000` 也能指到 `0x0800_2000` 的向量表 | [dapboot 實測](../Embedded/dapboot-bluepill.md) |
+| **OpenOCD working area** | OpenOCD 在 target RAM 裡借用的一塊空間，`verify_image` 的 CRC、flash 寫入演算法都在這裡跑。stm32f1x 從 `0x2000_0000` 開始，會蓋掉 app 的 `.bss`，之後讀 RAM 要先 reset | [dapboot 實測](../Embedded/dapboot-bluepill.md) |
 | **Download agent（DA）** | 燒錄工具先透過 ROM 的 UART 下載模式（XMODEM）送進 RAM 執行的小程式，再由它接收並寫入 flash。LinkIt 7697 的 `da97.bin` 就是同一份 bootloader 打開 UART 選單、改連結在 SYSRAM 的版本 | [MT7697 bootloader](../Embedded/mt7697-bootloader-walkthrough.md) |
