@@ -11,7 +11,7 @@ sidebar_position: 14
 各邊的狀態字眼還不一樣（merged / MERGED / NEW / ABANDONED / New / RFC），
 所以這頁統一成同一套圖例，並在最後附上重新查詢的指令，讓它可以隨時更新。
 
-> 資料以 **2026-11-13** 查詢結果為準。
+> 資料以 **2026-11-18** 查詢結果為準。
 
 **圖例**：✅ 已合入 ｜ 🔄 review 中 ｜ ⏸ 暫停（等前置條件或併入別的討論） ｜ ⛔ 已關閉（未合入）
 
@@ -33,7 +33,7 @@ sidebar_position: 14
 | GitHub | 其他（cert-tools、os-in-1000-lines） | 3 | — |
 | Mailing list | Linux（SpacemiT K1 reset／DT、cpsw/cpts、dma-buf） | 2（已進 maintainer tree） | 3 |
 | Mailing list | QEMU（SDHCI） | — | 1 |
-| Mailing list | U-Boot（virtio RTC、QEMU RISC-V、TPM、SpacemiT K1） | 8 | 8（另 ⏸ 1） |
+| Mailing list | U-Boot（virtio RTC、QEMU RISC-V、TPM、SpacemiT K1） | 8 ＋ 1（已進 SpacemiT tree） | 8（另 ⏸ 1） |
 
 主題大致分四塊：**Android kernel、HAL 與 bootloader 的文件／健壯性修補**、**RISC-V 與 SIMD 相關的
 效能與模擬器工作**、**韌體協定（PLDM、SPDM）的邊界檢查**、**Triton CPU backend**，以及在實機上做的
@@ -49,11 +49,11 @@ sidebar_position: 14
 | 領域 | ✅ 已合入 | 🔄 review 中 |
 |---|---|---|
 | 資料中心 / 伺服器 | 15 | 3（另 ⏸ 4） |
-| RISC-V | 20 | 6（另 ⏸ 1） |
+| RISC-V | 21 | 6（另 ⏸ 1） |
 | Compiler / 工具鏈 / 執行環境 | 19 | 4 |
 | LLM / AI | 16 | 2 |
 | Android | 9 | 17 |
-| 韌體 / 開機 | 26 | 15（另 ⏸ 5） |
+| 韌體 / 開機 | 27 | 15（另 ⏸ 5） |
 
 ### 資料中心 / 伺服器
 
@@ -86,6 +86,7 @@ sidebar_position: 14
 | U-Boot：[Milk-V Jupiter](https://patchwork.ozlabs.org/project/uboot/patch/20261012151530.1564771-1-alan.tseng.cs@gmail.com/) | ⏸ | 把 Jupiter 板子加進 mainline U-Boot，等上面的 Linux DT 先進 |
 | [U-Boot：QEMU RISC-V 用 fw_cfg 開 `-kernel`](https://patchwork.ozlabs.org/project/uboot/patch/20261014144724.1763675-2-alan.tseng.cs@gmail.com/) ×4 | ✅ | 讓 `qemu-riscv64` 的 U-Boot 預設開 QFW、改用 standard boot，`-kernel` 給的 kernel 不用再手動載 |
 | [U-Boot：K1 的 SPI NOR](https://patchwork.ozlabs.org/project/uboot/patch/20261027154347.1392094-2-alan.tseng.cs@gmail.com/)、[EEPROM index](https://patchwork.ozlabs.org/project/uboot/patch/20261027154347.1392094-3-alan.tseng.cs@gmail.com/)、[單 rank 板子的 DRAM 容量](https://patchwork.ozlabs.org/project/uboot/patch/20261031122721.3240434-1-alan.tseng.cs@gmail.com/) | ✅ | 在 Milk-V Jupiter 上開 mainline SPL 時找到：GigaDevice SPI NOR 認不到、讀 EEPROM 的 index 沒初始化、4 GiB 的板子被報成 8 GiB |
+| [U-Boot：K1 板子的 MAINTAINERS 加上 reviewer](https://git.u-boot-project.org/u-boot/custodians/u-boot-spacemit/-/commit/83b0cb0675f5a016ade619b735ed7b9f5f884a12) | ✅（SpacemiT tree） | 在 `board/spacemit/k1/MAINTAINERS` 掛上 `R:`，之後 K1 的 U-Boot patch 會 Cc 過來 review 並在 Jupiter 上實測 |
 | [U-Boot：VL817 USB hub](https://patchwork.ozlabs.org/project/uboot/patch/20261113031613.435429-2-alan.tseng.cs@gmail.com/) ×2 | 🔄 | Jupiter 和 BPI-F3 的 USB 口都在 VL817 後面，hub 要先上電、解 reset 才找得到裝置 |
 
 ### Compiler / 工具鏈 / 執行環境
@@ -143,6 +144,7 @@ sidebar_position: 14
 | [U-Boot：`tpm2_get_random()` 的長度欄位](https://patchwork.ozlabs.org/project/uboot/patch/20261014190605.2229511-1-alan.tseng.cs@gmail.com/) | ✅ | TPM2 回應裡亂數長度是 16 位元，卻被當 32 位元讀；用 gdb 在 QEMU＋swtpm 上追到 |
 | [U-Boot：QEMU RISC-V standard boot](https://patchwork.ozlabs.org/project/uboot/patch/20261014144724.1763675-2-alan.tseng.cs@gmail.com/) ×4 | ✅ | 開機流程從 distro boot 換成 standard boot，並支援 fw_cfg 傳入的 kernel |
 | [U-Boot：K1 的 SPI NOR、EEPROM index](https://patchwork.ozlabs.org/project/uboot/patch/20261027154347.1392094-2-alan.tseng.cs@gmail.com/) ×2、[DRAM 容量](https://patchwork.ozlabs.org/project/uboot/patch/20261031122721.3240434-1-alan.tseng.cs@gmail.com/) | ✅ | SPL 讀不到開機用的 SPI NOR、DDR 設定讀錯 EEPROM、DRAM 容量算成兩倍，都是 SPL 階段的問題 |
+| [U-Boot：K1 板子的 reviewer](https://git.u-boot-project.org/u-boot/custodians/u-boot-spacemit/-/commit/83b0cb0675f5a016ade619b735ed7b9f5f884a12) | ✅（SpacemiT tree） | 之後 K1 板子的開機相關 patch 會經過這裡 review |
 | [U-Boot：VL817 USB hub](https://patchwork.ozlabs.org/project/uboot/patch/20261113031613.435429-2-alan.tseng.cs@gmail.com/) ×2 | 🔄 | 讓 U-Boot 能從 USB 開機 |
 | [Linux：cpts 在 kexec 後殘留的事件](https://patchwork.kernel.org/project/netdevbpf/patch/20261026072314.663980-1-alan.tseng.cs@gmail.com/) | 🔄 | arm kexec 進新 kernel 後，cpsw 的 misc IRQ 比 CPTS 的 event pool 先就緒；維護者希望改成完整 reset CPTS |
 | U-Boot：Milk-V Jupiter | ⏸ | 見下方 [Mailing list](#mailing-list) |
@@ -167,7 +169,7 @@ sidebar_position: 14
 |---|---|---|---|
 | 1 | [llama.cpp #27961](https://github.com/ggml-org/llama.cpp/pull/27961)、[#28479](https://github.com/ggml-org/llama.cpp/pull/28479) — SpacemiT IME kernel sources 與 Q8_0 IME1 矩陣 kernel | 133k ★ | 觸及範圍最大，而且兩步都進了：#27961 讓 RISC-V 加速路徑編得進去，**#28479 是 kernel 本身** |
 | 2 | [u-root #3733](https://github.com/u-root/u-root/pull/3733)、[#3814](https://github.com/u-root/u-root/pull/3814) — `pkg/boot` 的 riscv64 與 32-bit arm kexec | 3.1k ★ | 新功能，而且落在開機鏈核心：u-root 是 LinuxBoot／firmware 場景的 userland。arm 那筆第一次送（#3736）因為沒有實機驗證而撤回，在 BeagleBone Black 上實際 kexec 到 login 後才重送 |
-| 3 | U-Boot：[QEMU RISC-V standard boot](https://patchwork.ozlabs.org/project/uboot/patch/20261014144724.1763675-2-alan.tseng.cs@gmail.com/) ×4、[`tpm2_get_random()`](https://patchwork.ozlabs.org/project/uboot/patch/20261014190605.2229511-1-alan.tseng.cs@gmail.com/)、[K1 SPI NOR／EEPROM index](https://patchwork.ozlabs.org/project/uboot/patch/20261027154347.1392094-2-alan.tseng.cs@gmail.com/) ×2、[單 rank DRAM 容量](https://patchwork.ozlabs.org/project/uboot/patch/20261031122721.3240434-1-alan.tseng.cs@gmail.com/) | U-Boot mainline | **mainline bootloader 的 8 個 commit**：QEMU RISC-V 那組改的是所有人跑 `qemu-riscv64` U-Boot 的預設開機流程；TPM 那筆是讀錯長度的正確性 bug；K1 那三筆都是在實機上開 mainline SPL 才抓到的 |
+| 3 | U-Boot：[QEMU RISC-V standard boot](https://patchwork.ozlabs.org/project/uboot/patch/20261014144724.1763675-2-alan.tseng.cs@gmail.com/) ×4、[`tpm2_get_random()`](https://patchwork.ozlabs.org/project/uboot/patch/20261014190605.2229511-1-alan.tseng.cs@gmail.com/)、[K1 SPI NOR／EEPROM index](https://patchwork.ozlabs.org/project/uboot/patch/20261027154347.1392094-2-alan.tseng.cs@gmail.com/) ×2、[單 rank DRAM 容量](https://patchwork.ozlabs.org/project/uboot/patch/20261031122721.3240434-1-alan.tseng.cs@gmail.com/) | U-Boot mainline | **mainline bootloader 的 8 個 commit**：QEMU RISC-V 那組改的是所有人跑 `qemu-riscv64` U-Boot 的預設開機流程；TPM 那筆是讀錯長度的正確性 bug；K1 那三筆都是在實機上開 mainline SPL 才抓到的。另外 K1 板子的 MAINTAINERS 已[加上我當 reviewer](https://git.u-boot-project.org/u-boot/custodians/u-boot-spacemit/-/commit/83b0cb0675f5a016ade619b735ed7b9f5f884a12)，在 SpacemiT 的 tree，等進 main |
 | 4 | [libspdm #3816](https://github.com/DMTF/libspdm/pull/3816)、[#4087](https://github.com/DMTF/libspdm/pull/4087) — key update rollback 與它的測試 | 191 ★ | star 數不高但身分特殊：**DMTF 的 SPDM 參考實作**。修的是 KEY_UPDATE 失敗時金鑰只換了一半、無法回復的正確性問題；#4087 是 review 時答應補的 callback 順序測試 |
 | 5 | [triton-cpu #329](https://github.com/triton-lang/triton-cpu/pull/329)、[#330](https://github.com/triton-lang/triton-cpu/pull/330)、[#324](https://github.com/triton-lang/triton-cpu/pull/324) — histogram 的 mask、沒有 avx512bf16 時 bf16 的 RNE、多開 43 個測試 | 214 ★（上游 triton 20k ★） | 兩個都是**算錯數字**的正確性 bug，而且 CI（GNR、Arm）抓不到，只有在沒有 AVX-512 的 x86 上才會出現；triton-cpu 直接 merge 進上游，作者身分保留 |
 | 6 | [sse2neon #774](https://github.com/DLTcollab/sse2neon/pull/774)、[#773](https://github.com/DLTcollab/sse2neon/pull/773) — 拿掉 `<fenv.h>` 依賴、SVE2 fast path | 1.5k ★ | #774 影響**所有 includer**——header 汙染是會傳染給下游的那種 bug；#773 是 opt-in 的效能路徑 |
@@ -280,7 +282,7 @@ patchwork 的 `New` 只代表「還沒有人改狀態」，不等於有人在看
 
 | 專案 | Patch | 狀態 | 後續 |
 |---|---|---|---|
-| Linux（reset） | [reset: spacemit: Fix the RCPU2 PWM reset registers](https://patchwork.kernel.org/project/linux-riscv/patch/20261021132130.3026998-1-alan.tseng.cs@gmail.com/) v2 | ✅ | reset 維護者收進 `reset/fixes`，等隨 fixes 進 mainline |
+| Linux（reset） | [reset: spacemit: Fix the RCPU2 PWM reset registers](https://patchwork.kernel.org/project/linux-riscv/patch/20261021132130.3026998-1-alan.tseng.cs@gmail.com/) v2 | ✅ | reset 維護者收進 `reset/fixes`，已在 linux-next，等進 mainline。11-17 有人送出 RCPU2 PWM 節點與 BPI-F3 風扇的 series，是第一個會用到這組 reset 的 DT |
 | Linux（riscv / devicetree） | [riscv: dts: spacemit: k1: mark boot-critical SoC nodes bootph-pre-ram](https://patchwork.kernel.org/project/linux-riscv/patch/20261024092558.143621-2-alan.tseng.cs@gmail.com/)、[mark K1 board boot devices bootph-pre-ram](https://patchwork.kernel.org/project/linux-riscv/patch/20261024092558.143621-3-alan.tseng.cs@gmail.com/) v3 | 🔄 | U-Boot reviewer 希望 SPL 用的 `bootph-pre-ram` 先進 Linux 的 DT，再讓 U-Boot 沿用。v4 照 review 拆成兩筆：BootROM 讀開機媒體要的節點、SPL 設定 DRAM 要的節點，以 7.4-rc2 為基底準備中 |
 | Linux（netdev） | [net: ethernet: ti: cpts: drop stale events before the misc IRQ can fire](https://patchwork.kernel.org/project/netdevbpf/patch/20261026072314.663980-1-alan.tseng.cs@gmail.com/) | 🔄 | 在 BeagleBone Black 上驗 arm kexec 時找到；維護者要求改成完整 reset CPTS，patchwork 標 Changes Requested |
 | Linux（dma-buf） | [dma-buf: fix stale return value documentation for dma_buf_set_name()](https://patchwork.kernel.org/project/dri-devel/patch/20260902135923.3599022-1-alan.tseng.cs@gmail.com/) | ✅ | 與 AOSP 已合入的那筆修的是同一段 kernel-doc；dma-buf 維護者 review 後收進 drm-misc，已在 linux-next，等進 mainline |
@@ -289,7 +291,8 @@ patchwork 的 `New` 只代表「還沒有人改狀態」，不等於有人在看
 | U-Boot（QEMU RISC-V） | [riscv: qemu: Boot a kernel passed with -kernel](https://patchwork.ozlabs.org/project/uboot/patch/20261014144724.1763675-2-alan.tseng.cs@gmail.com/) ×4 | ✅ | QEMU 只有在 U-Boot 從 pflash 開機時才會用 fw_cfg 交出 `-kernel`；這組讓 U-Boot 預設就去 fw_cfg 找 |
 | U-Boot（TPM） | [tpm: v2: Fix the size of the random data in tpm2_get_random()](https://patchwork.ozlabs.org/project/uboot/patch/20261014190605.2229511-1-alan.tseng.cs@gmail.com/) | ✅ | 回應裡的長度欄位是 u16，舊程式當成 u32 讀；第一筆進 U-Boot 的 commit |
 | U-Boot（SpacemiT K1） | [configs: k1: enable GigaDevice SPI NOR flash support](https://patchwork.ozlabs.org/project/uboot/patch/20261027154347.1392094-2-alan.tseng.cs@gmail.com/)、[initialise the EEPROM index in read_ddr_info()](https://patchwork.ozlabs.org/project/uboot/patch/20261027154347.1392094-3-alan.tseng.cs@gmail.com/)、[drop the CS1 DRAM map on single-rank boards](https://patchwork.ozlabs.org/project/uboot/patch/20261031122721.3240434-1-alan.tseng.cs@gmail.com/) | ✅ | 都是在 Milk-V Jupiter 上開 mainline SPL 時找到的 |
-| U-Boot（SpacemiT K1） | [usb: onboard-hub: Add support for VIA Labs VL817](https://patchwork.ozlabs.org/project/uboot/patch/20261113031613.435429-2-alan.tseng.cs@gmail.com/)、[configs: spacemit_k1: Enable onboard USB hub support](https://patchwork.ozlabs.org/project/uboot/patch/20261113031613.435429-3-alan.tseng.cs@gmail.com/) v2 | 🔄 | v2 帶上 BPI-F3 的 Tested-by；USB 維護者給了 Reviewed-by，正在決定由 USB 還是 SpacemiT 的 tree 收 |
+| U-Boot（SpacemiT K1） | [MAINTAINERS: spacemit: k1: add Hung-Chun Tseng as reviewer](https://git.u-boot-project.org/u-boot/custodians/u-boot-spacemit/-/commit/83b0cb0675f5a016ade619b735ed7b9f5f884a12) v2 | ✅ | SpacemiT 維護者收進 custodian tree 的 `for-main`，等隨 pull request 進 main；v2 照 review 把 commit message 改成祈使句 |
+| U-Boot（SpacemiT K1） | [usb: onboard-hub: Add support for VIA Labs VL817](https://patchwork.ozlabs.org/project/uboot/patch/20261113031613.435429-2-alan.tseng.cs@gmail.com/)、[configs: spacemit_k1: Enable onboard USB hub support](https://patchwork.ozlabs.org/project/uboot/patch/20261113031613.435429-3-alan.tseng.cs@gmail.com/) v2 | 🔄 | v2 帶上 BPI-F3 的 Tested-by；USB 維護者給了 Reviewed-by，11-18 SpacemiT 維護者也對 defconfig 那筆給了 Reviewed-by，還在決定由哪個 tree 收 |
 | U-Boot（SpacemiT K1） | [spacemit: k1: add Milk-V Jupiter](https://patchwork.ozlabs.org/project/uboot/patch/20261012151530.1564771-1-alan.tseng.cs@gmail.com/) | ⏸ | 等上面的 Linux DT 進了再送 v2。實機上 mainline SPL＋U-Boot 已經能從 SD 開到提示字元；過程中找到的 SPI NOR、DRAM 容量問題已經另外修好進 main |
 | U-Boot（SpacemiT K1） | [RFC: mmc: k1: do not require max-frequency in the device tree](https://patchwork.ozlabs.org/project/uboot/patch/20261013084448.433298-2-alan.tseng.cs@gmail.com/) ×2 | ⛔ | 已撤回：同一件事改用 DT 的 `assigned-clock-*` 處理，併入既有的 MMC 討論；在那串回報了 Jupiter 上 SD 訊號電壓設成 1.8 V 導致多區塊讀取失敗的問題 |
 
