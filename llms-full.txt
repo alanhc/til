@@ -2592,6 +2592,8 @@ IPMI                            ← 先懂 SEL／SDR／FRU 與 NetFn／Cmd 格�
 各邊的狀態字眼還不一樣（merged / MERGED / NEW / ABANDONED / New / RFC），
 所以這頁統一成同一套圖例，並在最後附上重新查詢的指令，讓它可以隨時更新。
 
+目前是 U-Boot **VIRTIO RTC maintainer**（`MAINTAINERS` 的 `M:`，已收進 `next`）。
+
 > 資料以 **2026-11-21** 查詢結果為準。
 
 **圖例**：✅ 已合入 ｜ 🔄 review 中 ｜ ⏸ 暫停（等前置條件或併入別的討論） ｜ ⛔ 已關閉（未合入）
